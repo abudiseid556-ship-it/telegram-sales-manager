@@ -7,7 +7,6 @@ from flask import Flask, render_template_string, request, redirect, url_for, ses
 app_flask = Flask(__name__)
 app_flask.secret_key = os.environ.get("WEB_SECRET_KEY", "super_secret_key_change_me")
 
-TOKEN = os.environ.get("TOKEN", "YOUR_BOT_TOKEN_HERE")
 WEB_PASSWORD = os.environ.get("WEB_PASSWORD", "admin123")
 DB_FILE = "database.json"
 
@@ -18,15 +17,13 @@ def load_db():
                 return json.load(f)
         except:
             pass
-    return {"products": [], "channels": [], "ads": [], "orders": []}
+    return {"products": [], "channels": [], "ads": [], "orders": [], "bot_token": os.environ.get("TOKEN", "")}
 
 def save_db(db):
     with open(DB_FILE, "w", encoding="utf-8") as f:
         json.dump(db, f, ensure_ascii=False, indent=2)
 
-# የቴሌግራም ቦቱን ከበስተጀርባ (Background) የሚያስኬድ ሰርቨር ሉፕ
 def run_bot_background():
-    # ቦቱ ከቴሌግራም ሰርቨር ጋር ያለውን ግንኙነት እንዲጠብቅ የሚያስችል ኮድ እዚህ ይካተታል
     print("🤖 Telegram Bot background worker started...")
 
 FULL_HTML_CODE = """
@@ -35,7 +32,7 @@ FULL_HTML_CODE = """
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Telegram Sales Manager</title>
+<title>Telegram Bot & Sales Manager</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans Ethiopic",sans-serif;background:#f4f7fb;color:#172033}
@@ -47,10 +44,6 @@ button{border:0;cursor:pointer}
 .header h1{font-size:23px;font-weight:900}
 .header p{font-size:12px;opacity:.85;margin-top:5px}
 .settings-btn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.18);color:white;font-size:20px}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
-.stat{padding:13px;border-radius:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.20)}
-.stat b{display:block;font-size:19px;font-weight:900}
-.stat span{font-size:10px;opacity:.85}
 .content{padding:15px}
 .page{display:none}
 .page.active{display:block}
@@ -67,32 +60,13 @@ button{border:0;cursor:pointer}
 .btn-red{background:#fff0f0;color:#d93636}
 label{display:block;font-size:12px;font-weight:800;margin:10px 0 6px}
 input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:12px;background:white;outline:none}
-.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.product{display:flex;align-items:center;gap:12px}
-.product-photo{width:60px;height:60px;border-radius:15px;background:#eef2f7;display:grid;place-items:center;font-size:24px;overflow:hidden}
-.product-photo img{width:100%;height:100%;object-fit:cover}
-.product-info{flex:1;min-width:0}
-.product-info b{font-size:14px}
-.price{color:#1264e8;font-weight:900;margin-top:3px}
-.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:900;background:#edf4ff;color:#1264e8}
-.badge-green{background:#e8fbf2;color:#078b58}
 .order-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f5}
-.order-left{flex:1}
-.order-left b{font-size:13px}
-.order-left small{display:block;color:#7c8798;margin-top:3px}
-.order-right{text-align:right}
-.order-right strong{font-size:13px}
-.notice{padding:13px;border-radius:16px;background:linear-gradient(135deg,#fff7df,#fff);border:1px solid #ffe3a3;font-size:12px;margin-bottom:12px}
-.tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px}
-.tab{white-space:nowrap;padding:9px 12px;border-radius:20px;background:#e9eef5;color:#596579;font-size:11px}
-.tab.active{background:#1477ff;color:white}
 .channel{display:flex;align-items:center;gap:10px}
 .channel-logo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e8f3ff;font-size:21px}
-.channel-info{flex:1}
 .channel-info b{font-size:13px}
 .channel-info small{display:block;color:#7c8798;margin-top:2px}
 .empty{text-align:center;padding:30px 15px;color:#8b96a6;font-size:13px}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:72px;background:white;border-top:1px solid #e8edf3;display:grid;grid-template-columns:repeat(5,1fr);z-index:20}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:72px;background:white;border-top:1px solid #e8edf3;display:grid;grid-template-columns:repeat(4,1fr);z-index:20}
 .nav-btn{background:none;color:#8490a1;font-size:10px}
 .nav-btn span{display:block;font-size:21px;margin-bottom:3px}
 .nav-btn.active{color:#1477ff;font-weight:900}
@@ -100,7 +74,6 @@ input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-ra
 .modal.show{display:flex}
 .sheet{width:min(760px,100%);max-height:92vh;overflow:auto;background:white;border-radius:25px 25px 0 0;padding:18px}
 .close-btn{float:right;width:34px;height:34px;border-radius:50%;background:#eef2f6;font-size:20px}
-.payment-row{display:flex;justify-content:space-between;padding:7px 0;font-size:12px}
 </style>
 </head>
 <body>
@@ -108,90 +81,78 @@ input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-ra
 <header class="header">
     <div class="header-top">
         <div>
-            <h1>Telegram Sales Manager</h1>
-            <p>ሽያጭ • ትዕዛዝ • ክፍያ • አውቶማቲክ ፖስት</p>
+            <h1>Telegram Bot Manager</h1>
+            <p>ቦት ማቀናበሪያ እና ፖስት ማድረጊያ</p>
         </div>
         <button class="settings-btn" onclick="openModal('settingsModal')">⚙️</button>
-    </div>
-    <div class="stats">
-        <div class="stat"><b id="statSales">0 ETB</b><span>የዛሬ ሽያጭ</span></div>
-        <div class="stat"><b id="statProfit">0 ETB</b><span>ትርፍ</span></div>
-        <div class="stat"><b id="statOrders">0</b><span>አዲስ Orders</span></div>
-        <div class="stat"><b id="statStock">0</b><span>የቀረ Stock</span></div>
     </div>
 </header>
 <main class="content">
 <section id="home" class="page active">
-    <div class="notice">📢 <b>ማስታወቂያ Center</b><br>ምርት ከጨመርክ በኋላ በቀጥታ ለቻናሎችዎ እና ግሩፖችዎ መላክ ይችላሉ።</div>
+    <div class="card" style="background:linear-gradient(135deg,#eef4ff,#fff);border:1px solid #d0e1ff;">
+        <h3>🤖 የቦት ሁኔታ (Bot Status)</h3>
+        <p style="font-size:13px;margin-bottom:10px;" id="botStatusText">ቦቱ ከዌብ ፓነል ጋር ተገናኝቷል።</p>
+        <button class="btn btn-primary" onclick="openModal('settingsModal')">⚙️ ቦት ቶከን ማስተካከያ</button>
+    </div>
     <div class="grid">
-        <button class="quick" onclick="openModal('productModal')"><div class="quick-icon">📦</div><b>አዲስ ምርት</b><small>ፎቶ፣ ዋጋ፣ Stock</small></button>
-        <button class="quick" onclick="showPage('orders')"><div class="quick-icon">🛒</div><b>Orders</b><small>Confirm / Reject</small></button>
-        <button class="quick" onclick="showPage('ads')"><div class="quick-icon">📢</div><b>ማስታወቂያ</b><small>Channels & Groups</small></button>
-        <button class="quick" onclick="showPage('payments')"><div class="quick-icon">💳</div><b>ክፍያ</b><small>ቅድሚያ / ቀብድ</small></button>
+        <button class="quick" onclick="openModal('adModal')"><div class="quick-icon">📢</div><b>ማስታወቂያ ላክ</b><small>ወደ ቻናል/ግሩፕ ፖስት</small></button>
+        <button class="quick" onclick="openModal('channelModal')"><div class="quick-icon">🔗</div><b>ቻናል አገናኝ</b><small>Channel / Group ጨምር</small></button>
     </div>
-    <div class="card"><h3>📦 የቅርብ ምርቶች</h3><div id="homeProducts"></div></div>
-    <div class="card"><h3>🛒 የቅርብ Orders</h3><div id="homeOrders"></div></div>
-</section>
-
-<section id="products" class="page">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <h2 style="font-size:19px;">📦 Products</h2>
-        <button class="btn btn-primary" onclick="openModal('productModal')">＋ አዲስ</button>
+    <div class="card">
+        <h3>🔗 የተገናኙ ቻናሎች እና ግሩፖች</h3>
+        <div id="channelList"></div>
     </div>
-    <div id="productList"></div>
-</section>
-
-<section id="orders" class="page">
-    <h2 style="font-size:19px;">🛒 Orders</h2>
-    <div id="orderList"></div>
 </section>
 
 <section id="ads" class="page">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h2 style="font-size:19px;">📢 Advertising Center</h2>
-        <button class="btn btn-primary" onclick="openModal('adModal')">＋ ማስታወቂያ</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2 style="font-size:19px;">📢 ፖስቶች እና ማስታወቂያዎች</h2>
+        <button class="btn btn-primary" onclick="openModal('adModal')">＋ አዲስ ፖስት</button>
     </div>
     <div class="card">
-        <h3>🔗 Channels & Groups</h3>
-        <div id="channelList"></div>
-        <hr style="margin:10px 0;border:0;border-top:1px solid #eee">
-        <button class="btn" onclick="openModal('channelModal')">＋ Channel / Group አገናኝ</button>
-    </div>
-    <div class="card">
-        <h3>📜 Advertising History</h3>
+        <h3>📜 የላካቸው ማስታወቂያዎች ታሪክ</h3>
         <div id="adHistory"></div>
     </div>
 </section>
 
-<section id="payments" class="page">
-    <h2 style="font-size:19px;">💳 Payments</h2>
-    <div id="paymentList"></div>
+<section id="channels_page" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2 style="font-size:19px;">🔗 ቻናሎች</h2>
+        <button class="btn btn-primary" onclick="openModal('channelModal')">＋ ቻናል አገናኝ</button>
+    </div>
+    <div class="card"><div id="channelListFull"></div></div>
+</section>
+
+<section id="settings_page" class="page">
+    <h2 style="font-size:19px;margin-bottom:12px;">⚙️ ቅንብሮች</h2>
+    <div class="card">
+        <h3>🔑 የቴሌግራም ቦት ቶከን (Bot Token)</h3>
+        <form id="tokenForm">
+            <label>Bot Token ከ BotFather</label>
+            <input id="botTokenInput" required placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+            <br><button class="btn btn-primary" type="submit" style="margin-top:10px;width:100%;">💾 ቶከኑን ቆጥብ (Save)</button>
+        </form>
+    </div>
 </section>
 </main>
 
 <nav class="bottom-nav">
     <button class="nav-btn active" onclick="showPage('home',this)"><span>⌂</span>ዋና</button>
-    <button class="nav-btn" onclick="showPage('products',this)"><span>📦</span>Products</button>
-    <button class="nav-btn" onclick="showPage('orders',this)"><span>🛒</span>Orders</button>
-    <button class="nav-btn" onclick="showPage('ads',this)"><span>📢</span>Ads</button>
-    <button class="nav-btn" onclick="showPage('reports',this)"><span>📊</span>Reports</button>
+    <button class="nav-btn" onclick="showPage('ads',this)"><span>📢</span>ማስታወቂያ</button>
+    <button class="nav-btn" onclick="showPage('channels_page',this)"><span>🔗</span>ቻናሎች</button>
+    <button class="nav-btn" onclick="showPage('settings_page',this)"><span>⚙️</span>ቅንብር</button>
 </nav>
 </div>
 
 <!-- MODALS -->
-<div class="modal" id="productModal">
+<div class="modal" id="settingsModal">
   <div class="sheet">
-    <button class="close-btn" onclick="closeModal('productModal')">×</button>
-    <h2>📦 አዲስ ምርት</h2>
-    <form id="productForm">
-      <label>የምርት ስም</label><input id="pName" required placeholder="ምሳሌ፦ Smart Watch">
-      <div class="form-grid">
-        <div><label>የግዢ ዋጋ</label><input id="pBuy" type="number" min="0" required placeholder="500"></div>
-        <div><label>የሽያጭ ዋጋ</label><input id="pSell" type="number" min="0" required placeholder="800"></div>
-      </div>
-      <label>Stock / የተገዛ ብዛት</label><input id="pStock" type="number" min="0" required placeholder="50">
-      <label>የምርት ፎቶ URL</label><input id="pPhoto" placeholder="https://...">
-      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">💾 Save Product</button>
+    <button class="close-btn" onclick="closeModal('settingsModal')">×</button>
+    <h2>⚙️ ቦት ማቀናበሪያ</h2>
+    <form id="modalTokenForm">
+      <label>Telegram Bot Token</label>
+      <input id="modalBotToken" required placeholder="Bot Token አስገባ">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">💾 ቶከን አስቀምጥ</button>
     </form>
   </div>
 </div>
@@ -202,9 +163,9 @@ input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-ra
     <h2>🔗 Channel / Group አገናኝ</h2>
     <form id="channelForm">
       <label>አይነት</label><select id="cType"><option value="Channel">📣 Channel</option><option value="Group">👥 Group</option></select>
-      <label>የChannel / Group ስም</label><input id="cName" required placeholder="ምሳሌ፦ My Shop">
-      <label>Username / Chat ID</label><input id="cId" required placeholder="@mychannel">
-      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">🔗 Save Connection</button>
+      <label>የChannel / Group ስም</label><input id="cName" required placeholder="ምሳሌ፦ የኔ ሱቅ">
+      <label>Username / Chat ID</label><input id="cId" required placeholder="@mychannel ወይም -100xxxxxxxxxx">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">🔗 ቻናል አገናኝ</button>
     </form>
   </div>
 </div>
@@ -212,12 +173,10 @@ input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-ra
 <div class="modal" id="adModal">
   <div class="sheet">
     <button class="close-btn" onclick="closeModal('adModal')">×</button>
-    <h2>📢 አዲስ ማስታወቂያ (ወደ ቴሌግራም መላኪያ)</h2>
+    <h2>📢 ወደ ቴሌግራም ፖስት መላኪያ</h2>
     <form id="adForm">
-      <label>የማስታወቂያ አይነት</label>
-      <select id="adType"><option>🔥 Hot Deal</option><option>🆕 New Product</option><option>💰 Discount</option></select>
       <label>ርዕስ</label><input id="adTitle" required placeholder="🔥 ልዩ ቅናሽ!">
-      <label>መልዕክት</label><textarea id="adText" rows="4" required placeholder="የማስታወቂያ ዝርዝር..."></textarea>
+      <label>መልዕክት</label><textarea id="adText" rows="4" required placeholder="የምርቱ ዝርዝር..."></textarea>
       <label>የሚላክበት Channel / Group ይምረጡ</label><select id="adTarget" style="margin-bottom:10px"></select>
       <button class="btn btn-primary" type="submit" style="width:100%;">📤 በቀጥታ ወደ ቴሌግራም ፖስት አድርግ</button>
     </form>
@@ -225,10 +184,22 @@ input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-ra
 </div>
 
 <script>
-let data = {"products": [], "channels": [], "ads": [], "orders": []};
+let data = {"products": [], "channels": [], "ads": [], "orders": [], "bot_token": ""};
 
 function loadData() {
-    fetch('/api/load').then(r => r.json()).then(d => { if(d) { data = d; renderAll(); } });
+    fetch('/api/load').then(r => r.json()).then(d => { 
+        if(d) { 
+            data = d; 
+            if(data.bot_token) {
+                document.getElementById("botTokenInput").value = data.bot_token;
+                document.getElementById("modalBotToken").value = data.bot_token;
+                document.getElementById("botStatusText").innerText = "✅ ቦቱ በሰኬት ተገናኝቷል (Token ገብቷል)";
+            } else {
+                document.getElementById("botStatusText").innerText = "⚠️ እባክዎ ከታች ወይም በቅንብር ገጽ የቦት ቶከን ያስገቡ!";
+            }
+            renderAll(); 
+        } 
+    });
 }
 
 function saveData() {
@@ -236,10 +207,9 @@ function saveData() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
-    }).then(() => renderAll());
+    }).then(() => { loadData(); });
 }
 
-function money(v){ return Number(v||0).toLocaleString("en-US") + " ETB"; }
 function openModal(id){ document.getElementById(id).classList.add("show"); }
 function closeModal(id){ document.getElementById(id).classList.remove("show"); }
 function showPage(id, btn){
@@ -251,20 +221,19 @@ function showPage(id, btn){
 }
 function escapeHTML(s){ return String(s?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-document.getElementById("productForm").addEventListener("submit", function(e){
+document.getElementById("tokenForm").addEventListener("submit", function(e){
     e.preventDefault();
-    data.products.push({
-        id: "P-" + Date.now(),
-        name: document.getElementById("pName").value.trim(),
-        buy: Number(document.getElementById("pBuy").value||0),
-        sell: Number(document.getElementById("pSell").value||0),
-        stock: Number(document.getElementById("pStock").value||0),
-        photo: document.getElementById("pPhoto").value.trim()
-    });
+    data.bot_token = document.getElementById("botTokenInput").value.trim();
     saveData();
-    closeModal("productModal");
-    this.reset();
-    alert("✅ ምርቱ ተጨምሯል።");
+    alert("✅ የቦት ቶከን ተቀምጧል!");
+});
+
+document.getElementById("modalTokenForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    data.bot_token = document.getElementById("modalBotToken").value.trim();
+    saveData();
+    closeModal('settingsModal');
+    alert("✅ የቦት ቶከን ተቀምጧል!");
 });
 
 document.getElementById("channelForm").addEventListener("submit", function(e){
@@ -278,19 +247,18 @@ document.getElementById("channelForm").addEventListener("submit", function(e){
     saveData();
     closeModal("channelModal");
     this.reset();
-    alert("✅ Channel ተመዝግቧል።");
+    alert("✅ ቻናሉ ተመዝግቧል።");
 });
 
 document.getElementById("adForm").addEventListener("submit", function(e){
     e.preventDefault();
     let title = document.getElementById("adTitle").value.trim();
     let text = document.getElementById("adText").value.trim();
-    let type = document.getElementById("adType").value;
     let chatId = document.getElementById("adTarget").value;
 
-    if(!chatId){ alert("እባክዎ መጀመሪያ Channel ያስገቡ!"); return; }
+    if(!chatId){ alert("እባክዎ መጀመሪያ ቻናል ይምረጡ!"); return; }
 
-    let fullText = `${type}\\n\\n<b>${title}</b>\\n\\n${text}`;
+    let fullText = `<b>${title}</b>\\n\\n${text}`;
 
     fetch('/api/telegram-post', {
         method: 'POST',
@@ -299,7 +267,7 @@ document.getElementById("adForm").addEventListener("submit", function(e){
     }).then(res => res.json()).then(resp => {
         if(resp.success){
             alert("✅ ማስታወቂያው በቀጥታ ወደ ቴሌግራም ተልኳል!");
-            data.ads.push({id:"AD-"+Date.now(), title, text, status:"SENT"});
+            data.ads.unshift({id:"AD-"+Date.now(), title, text, chatId, date: new Date().toLocaleString()});
             saveData();
             closeModal("adModal");
             this.reset();
@@ -310,24 +278,42 @@ document.getElementById("adForm").addEventListener("submit", function(e){
 });
 
 function renderChannels(){
-    let c = document.getElementById("channelList");
+    let html = "";
     let target = document.getElementById("adTarget");
     if(!data.channels.length){
-        c.innerHTML = '<div class="empty">Channel አልተገናኘም።</div>';
+        html = '<div class="empty">ምንም ቻናል አልተገናኘም።</div>';
         target.innerHTML = '<option value="">ቻናል የለም</option>';
+    } else {
+        html = data.channels.map((ch, idx) => `
+          <div class="order-row"><div class="channel"><div class="channel-logo">📣</div>
+          <div class="channel-info"><b>${escapeHTML(ch.name)}</b><small>${escapeHTML(ch.chatId)}</small></div></div>
+          <button class="btn btn-red" onclick="data.channels.splice(${idx},1);saveData();">×</button></div>`).join("");
+        
+        target.innerHTML = data.channels.map(ch => `<option value="${escapeHTML(ch.chatId)}">${escapeHTML(ch.name)} (${escapeHTML(ch.chatId)})</option>`).join("");
+    }
+    document.getElementById("channelList").innerHTML = html;
+    if(document.getElementById("channelListFull")) {
+        document.getElementById("channelListFull").innerHTML = html;
+    }
+}
+
+function renderAds(){
+    let hist = document.getElementById("adHistory");
+    if(!data.ads || !data.ads.length){
+        hist.innerHTML = '<div class="empty">የተላከ ማስታወቂያ የለም።</div>';
         return;
     }
-    c.innerHTML = data.channels.map((ch, idx) => `
-      <div class="order-row"><div class="channel"><div class="channel-logo">📣</div>
-      <div class="channel-info"><b>${escapeHTML(ch.name)}</b><small>${escapeHTML(ch.chatId)}</small></div></div>
-      <button class="btn btn-red" onclick="data.channels.splice(${idx},1);saveData();">×</button></div>`).join("");
-    
-    target.innerHTML = data.channels.map(ch => `<option value="${escapeHTML(ch.chatId)}">${escapeHTML(ch.name)} (${escapeHTML(ch.chatId)})</option>`).join("");
+    hist.innerHTML = data.ads.map(ad => `
+        <div class="order-row">
+            <div><b>${escapeHTML(ad.title)}</b><small>${escapeHTML(ad.date || '')}</small></div>
+            <span style="color:green;font-size:11px;font-weight:bold;">ተልኳል</span>
+        </div>
+    `).join("");
 }
 
 function renderAll(){
-    document.getElementById("productList").innerHTML = data.products.map(p => `<div class="card"><div class="product"><div class="product-photo">${p.photo?`<img src="${escapeHTML(p.photo)}">`:'📦'}</div><div class="product-info"><b>${escapeHTML(p.name)}</b><div class="price">${money(p.sell)}</div></div></div></div>`).join("") || '<div class="empty">ምርት የለም።</div>';
     renderChannels();
+    renderAds();
 }
 
 loadData();
@@ -364,7 +350,7 @@ def dashboard():
 def api_load():
     return json.dumps(load_db())
 
-@app_flask.route("/api/save", methods=["POST"])
+@app.route("/api/save", methods=["POST"])
 def api_save():
     if not session.get("logged_in"):
         return {"success": False}, 403
@@ -379,11 +365,16 @@ def api_telegram_post():
     if not session.get("logged_in"):
         return {"success": False, "error": "Unauthorized"}, 403
     
+    db = load_db()
+    token = db.get("bot_token")
+    if not token:
+        return {"success": False, "error": "የቦት ቶከን አልገባም (Bot Token is missing)"}
+
     req_data = request.json
     chat_id = req_data.get("chat_id")
     text = req_data.get("text")
     
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {"chat_id": chat_id, "text": text.replace("\\n", "\n"), "parse_mode": "HTML"}
     
     try:
@@ -397,7 +388,6 @@ def api_telegram_post():
         return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
-    # ቦቱን ከበስተጀርባ ማስኬጃ ስሬድ (Thread) መጀመር
     t = threading.Thread(target=run_bot_background, daemon=True)
     t.start()
     
