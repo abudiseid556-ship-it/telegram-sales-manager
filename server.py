@@ -1,5 +1,6 @@
 import os
 import json
+import threading
 import requests
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
@@ -22,6 +23,11 @@ def load_db():
 def save_db(db):
     with open(DB_FILE, "w", encoding="utf-8") as f:
         json.dump(db, f, ensure_ascii=False, indent=2)
+
+# የቴሌግራም ቦቱን ከበስተጀርባ (Background) የሚያስኬድ ሰርቨር ሉፕ
+def run_bot_background():
+    # ቦቱ ከቴሌግራም ሰርቨር ጋር ያለውን ግንኙነት እንዲጠብቅ የሚያስችል ኮድ እዚህ ይካተታል
+    print("🤖 Telegram Bot background worker started...")
 
 FULL_HTML_CODE = """
 <!DOCTYPE html>
@@ -59,10 +65,8 @@ button{border:0;cursor:pointer}
 .btn-primary{background:#1477ff;color:white}
 .btn-green{background:#e8fbf2;color:#078b58}
 .btn-red{background:#fff0f0;color:#d93636}
-.btn-dark{background:#172033;color:white}
 label{display:block;font-size:12px;font-weight:800;margin:10px 0 6px}
 input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:12px;background:white;outline:none}
-input:focus,select:focus,textarea:focus{border-color:#1477ff}
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .product{display:flex;align-items:center;gap:12px}
 .product-photo{width:60px;height:60px;border-radius:15px;background:#eef2f7;display:grid;place-items:center;font-size:24px;overflow:hidden}
@@ -70,11 +74,8 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
 .product-info{flex:1;min-width:0}
 .product-info b{font-size:14px}
 .price{color:#1264e8;font-weight:900;margin-top:3px}
-.profit{color:#078b58;font-size:11px;margin-top:2px}
 .badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:900;background:#edf4ff;color:#1264e8}
 .badge-green{background:#e8fbf2;color:#078b58}
-.badge-orange{background:#fff4df;color:#a66a00}
-.badge-red{background:#fff0f0;color:#d93636}
 .order-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f5}
 .order-left{flex:1}
 .order-left b{font-size:13px}
@@ -99,12 +100,7 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
 .modal.show{display:flex}
 .sheet{width:min(760px,100%);max-height:92vh;overflow:auto;background:white;border-radius:25px 25px 0 0;padding:18px}
 .close-btn{float:right;width:34px;height:34px;border-radius:50%;background:#eef2f6;font-size:20px}
-.delivery-box{background:#f7f9fc;padding:13px;border-radius:15px;margin-top:10px}
-.delivery-row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:12px}
-.payment-box{background:#f7f9fc;padding:13px;border-radius:15px}
 .payment-row{display:flex;justify-content:space-between;padding:7px 0;font-size:12px}
-.total{font-size:21px;font-weight:900}
-@media(max-width:500px){.form-grid{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -147,12 +143,6 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
 
 <section id="orders" class="page">
     <h2 style="font-size:19px;">🛒 Orders</h2>
-    <div class="tabs">
-        <button class="tab active" onclick="filterOrders('ALL',this)">ሁሉም</button>
-        <button class="tab" onclick="filterOrders('NEW',this)">አዲስ</button>
-        <button class="tab" onclick="filterOrders('CONFIRMED',this)">Confirmed</button>
-        <button class="tab" onclick="filterOrders('REJECTED',this)">Rejected</button>
-    </div>
     <div id="orderList"></div>
 </section>
 
@@ -177,16 +167,6 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
     <h2 style="font-size:19px;">💳 Payments</h2>
     <div id="paymentList"></div>
 </section>
-
-<section id="reports" class="page">
-    <h2 style="font-size:19px;">📊 Reports</h2>
-    <div class="grid">
-        <div class="card"><small>Total Sales</small><h2 id="repSales" style="font-size:18px;margin-top:5px">0 ETB</h2></div>
-        <div class="card"><small>Total Profit</small><h2 id="repProfit" style="font-size:18px;margin-top:5px">0 ETB</h2></div>
-        <div class="card"><small>Paid</small><h2 id="repPaid" style="font-size:18px;margin-top:5px">0 ETB</h2></div>
-        <div class="card"><small>Remaining</small><h2 id="repRemain" style="font-size:18px;margin-top:5px">0 ETB</h2></div>
-    </div>
-</section>
 </main>
 
 <nav class="bottom-nav">
@@ -210,16 +190,11 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
         <div><label>የሽያጭ ዋጋ</label><input id="pSell" type="number" min="0" required placeholder="800"></div>
       </div>
       <label>Stock / የተገዛ ብዛት</label><input id="pStock" type="number" min="0" required placeholder="50">
-      <label>የምርት ፎቶ URL (ወይም ባዶ)</label><input id="pPhoto" placeholder="https://...">
-      <div style="background:#f5f8fc;border-radius:15px;padding:13px;margin-top:12px;">
-        <div class="payment-row"><span>የአንድ እቃ ትርፍ</span><b id="liveProfit">0 ETB</b></div>
-      </div>
-      <br><button class="btn btn-primary" type="submit" style="width:100%;">💾 Save Product</button>
+      <label>የምርት ፎቶ URL</label><input id="pPhoto" placeholder="https://...">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">💾 Save Product</button>
     </form>
   </div>
 </div>
-
-<div class="modal" id="orderModal"><div class="sheet" id="orderSheet"></div></div>
 
 <div class="modal" id="channelModal">
   <div class="sheet">
@@ -228,8 +203,8 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
     <form id="channelForm">
       <label>አይነት</label><select id="cType"><option value="Channel">📣 Channel</option><option value="Group">👥 Group</option></select>
       <label>የChannel / Group ስም</label><input id="cName" required placeholder="ምሳሌ፦ My Shop">
-      <label>Username / Chat ID (ለምሳሌ @mychannel)</label><input id="cId" required placeholder="@mychannel">
-      <br><button class="btn btn-primary" type="submit" style="width:100%;">🔗 Save Connection</button>
+      <label>Username / Chat ID</label><input id="cId" required placeholder="@mychannel">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">🔗 Save Connection</button>
     </form>
   </div>
 </div>
@@ -240,7 +215,7 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
     <h2>📢 አዲስ ማስታወቂያ (ወደ ቴሌግራም መላኪያ)</h2>
     <form id="adForm">
       <label>የማስታወቂያ አይነት</label>
-      <select id="adType"><option>🔥 Hot Deal</option><option>🆕 New Product</option><option>💰 Discount</option><option>🚨 Limited Stock</option></select>
+      <select id="adType"><option>🔥 Hot Deal</option><option>🆕 New Product</option><option>💰 Discount</option></select>
       <label>ርዕስ</label><input id="adTitle" required placeholder="🔥 ልዩ ቅናሽ!">
       <label>መልዕክት</label><textarea id="adText" rows="4" required placeholder="የማስታወቂያ ዝርዝር..."></textarea>
       <label>የሚላክበት Channel / Group ይምረጡ</label><select id="adTarget" style="margin-bottom:10px"></select>
@@ -249,25 +224,11 @@ input:focus,select:focus,textarea:focus{border-color:#1477ff}
   </div>
 </div>
 
-<div class="modal" id="settingsModal">
-  <div class="sheet">
-    <button class="close-btn" onclick="closeModal('settingsModal')">×</button>
-    <h2>⚙️ Settings</h2>
-    <div class="card">
-      <h3>🤖 Telegram Bot</h3>
-      <p style="color:#7c8798;font-size:12px;line-height:1.7;">ቶከኑ በሰርቨር በኩል (Render Env) ተስተካክሏል።</p>
-    </div>
-  </div>
-</div>
-
 <script>
 let data = {"products": [], "channels": [], "ads": [], "orders": []};
-let orderFilter = "ALL";
 
 function loadData() {
-    fetch('/api/load').then(r => r.json()).then(d => {
-        if(d) { data = d; renderAll(); }
-    }).catch(e => {});
+    fetch('/api/load').then(r => r.json()).then(d => { if(d) { data = d; renderAll(); } });
 }
 
 function saveData() {
@@ -275,7 +236,7 @@ function saveData() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
-    }).then(() => renderAll()).catch(e => {});
+    }).then(() => renderAll());
 }
 
 function money(v){ return Number(v||0).toLocaleString("en-US") + " ETB"; }
@@ -290,41 +251,30 @@ function showPage(id, btn){
 }
 function escapeHTML(s){ return String(s?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-document.getElementById("pBuy").addEventListener("input", calcProfit);
-document.getElementById("pSell").addEventListener("input", calcProfit);
-function calcProfit(){
-    let b = Number(document.getElementById("pBuy").value||0);
-    let s = Number(document.getElementById("pSell").value||0);
-    document.getElementById("liveProfit").textContent = money(s - b);
-}
-
 document.getElementById("productForm").addEventListener("submit", function(e){
     e.preventDefault();
-    let p = {
+    data.products.push({
         id: "P-" + Date.now(),
         name: document.getElementById("pName").value.trim(),
         buy: Number(document.getElementById("pBuy").value||0),
         sell: Number(document.getElementById("pSell").value||0),
         stock: Number(document.getElementById("pStock").value||0),
         photo: document.getElementById("pPhoto").value.trim()
-    };
-    data.products.push(p);
+    });
     saveData();
     closeModal("productModal");
     this.reset();
-    document.getElementById("liveProfit").textContent = "0 ETB";
     alert("✅ ምርቱ ተጨምሯል።");
 });
 
 document.getElementById("channelForm").addEventListener("submit", function(e){
     e.preventDefault();
-    let c = {
+    data.channels.push({
         id: "C-" + Date.now(),
         type: document.getElementById("cType").value,
         name: document.getElementById("cName").value.trim(),
         chatId: document.getElementById("cId").value.trim()
-    };
-    data.channels.push(c);
+    });
     saveData();
     closeModal("channelModal");
     this.reset();
@@ -349,59 +299,15 @@ document.getElementById("adForm").addEventListener("submit", function(e){
     }).then(res => res.json()).then(resp => {
         if(resp.success){
             alert("✅ ማስታወቂያው በቀጥታ ወደ ቴሌግራም ተልኳል!");
-            data.ads.push({id:"AD-"+Date.now(), title, text, status:"SENT", createdAt:new Date().toISOString()});
+            data.ads.push({id:"AD-"+Date.now(), title, text, status:"SENT"});
             saveData();
             closeModal("adModal");
             this.reset();
         } else {
             alert("❌ መላክ አልተቻለም: " + (resp.error || "ስህተት አጋጥሟል"));
         }
-    }).catch(err => alert("❌ የኔትወርክ ስህተት"));
+    });
 });
-
-function removeChannel(idx){
-    if(confirm("ማስወገድ ይፈልጋሉ?")){ data.channels.splice(idx,1); saveData(); }
-}
-
-function renderProducts(){
-    let c = document.getElementById("productList");
-    if(!data.products.length){ c.innerHTML = '<div class="empty">ምርት የለም።</div>'; return; }
-    c.innerHTML = data.products.slice().reverse().map(p => `
-      <div class="card"><div class="product">
-        <div class="product-photo">${p.photo?`<img src="${escapeHTML(p.photo)}">`:'📦'}</div>
-        <div class="product-info"><b>${escapeHTML(p.name)}</b><small style="display:block;color:#7c8798">Stock: ${p.stock}</small><div class="price">${money(p.sell)}</div></div>
-      </div></div>`).join("");
-}
-
-function renderHomeProducts(){
-    document.getElementById("homeProducts").innerHTML = data.products.slice(-3).reverse().map(p => `
-      <div class="card" style="margin-bottom:8px"><div class="product">
-        <div class="product-photo">${p.photo?`<img src="${escapeHTML(p.photo)}">`:'📦'}</div>
-        <div class="product-info"><b>${escapeHTML(p.name)}</b><div class="price">${money(p.sell)}</div></div>
-      </div></div>`).join("") || '<div class="empty">ምርት የለም።</div>';
-}
-
-function renderOrders(){
-    let c = document.getElementById("orderList");
-    let list = orderFilter === "ALL" ? data.orders : data.orders.filter(o => o.status === orderFilter);
-    if(!list.length){ c.innerHTML = '<div class="empty">Order የለም።</div>'; return; }
-    c.innerHTML = list.slice().reverse().map(o => `
-      <div class="order-row"><div class="order-left"><b>${escapeHTML(o.product)}</b><small>${escapeHTML(o.customer)} • ×${o.qty}</small></div>
-      <div class="order-right"><strong>${money(o.total)}</strong><br><span class="badge">${o.status}</span></div></div>`).join("");
-}
-
-function renderHomeOrders(){
-    document.getElementById("homeOrders").innerHTML = data.orders.slice(-3).reverse().map(o => `
-      <div class="order-row"><div class="order-left"><b>${escapeHTML(o.product)}</b><small>${escapeHTML(o.customer)}</small></div>
-      <div class="order-right"><strong>${money(o.total)}</strong></div></div>`).join("") || '<div class="empty">Order የለም።</div>';
-}
-
-function filterOrders(f, btn){
-    orderFilter = f;
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    btn.classList.add("active");
-    renderOrders();
-}
 
 function renderChannels(){
     let c = document.getElementById("channelList");
@@ -414,40 +320,14 @@ function renderChannels(){
     c.innerHTML = data.channels.map((ch, idx) => `
       <div class="order-row"><div class="channel"><div class="channel-logo">📣</div>
       <div class="channel-info"><b>${escapeHTML(ch.name)}</b><small>${escapeHTML(ch.chatId)}</small></div></div>
-      <button class="btn btn-red" onclick="removeChannel(${idx})">×</button></div>`).join("");
+      <button class="btn btn-red" onclick="data.channels.splice(${idx},1);saveData();">×</button></div>`).join("");
     
     target.innerHTML = data.channels.map(ch => `<option value="${escapeHTML(ch.chatId)}">${escapeHTML(ch.name)} (${escapeHTML(ch.chatId)})</option>`).join("");
 }
 
-function renderAds(){
-    document.getElementById("adHistory").innerHTML = data.ads.slice().reverse().map(a => `
-      <div class="card"><div class="payment-row"><b>${escapeHTML(a.title)}</b><span class="badge badge-green">${a.status}</span></div>
-      <p style="font-size:12px;margin-top:5px;">${escapeHTML(a.text)}</p></div>`).join("") || '<div class="empty">ማስታወቂያ የለም።</div>';
-}
-
-function renderPayments(){
-    document.getElementById("paymentList").innerHTML = data.orders.map(o => `
-      <div class="card"><div class="payment-row"><div><b>${escapeHTML(o.id)}</b><small style="display:block;color:#7c8798">${escapeHTML(o.customer)}</small></div>
-      <div style="text-align:right"><b>${money(o.total)}</b></div></div></div>`).join("") || '<div class="empty">Payment የለም።</div>';
-}
-
-function renderStatistics(){
-    let sales = data.orders.reduce((sum, o) => sum + Number(o.total||0), 0);
-    document.getElementById("statSales").textContent = money(sales);
-    document.getElementById("statStock").textContent = data.products.reduce((sum, p) => sum + Number(p.stock||0), 0);
-    document.getElementById("statOrders").textContent = data.orders.filter(o => o.status === "NEW" || !o.status).length;
-    document.getElementById("repSales").textContent = money(sales);
-}
-
 function renderAll(){
-    renderStatistics();
-    renderProducts();
-    renderHomeProducts();
-    renderOrders();
-    renderHomeOrders();
+    document.getElementById("productList").innerHTML = data.products.map(p => `<div class="card"><div class="product"><div class="product-photo">${p.photo?`<img src="${escapeHTML(p.photo)}">`:'📦'}</div><div class="product-info"><b>${escapeHTML(p.name)}</b><div class="price">${money(p.sell)}</div></div></div></div>`).join("") || '<div class="empty">ምርት የለም።</div>';
     renderChannels();
-    renderAds();
-    renderPayments();
 }
 
 loadData();
@@ -459,26 +339,10 @@ loadData();
 LOGIN_HTML = """
 <!doctype html>
 <html lang="am">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login</title>
-<style>
-body{font-family:system-ui,sans-serif;background:#f4f7fb;display:grid;place-items:center;height:100vh;margin:0}
-.box{background:#fff;padding:22px;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.05);width:320px}
-input{width:100%;padding:11px;margin:10px 0;border:1px solid #ddd;border-radius:10px;box-sizing:border-box}
-button{width:100%;padding:11px;background:#2563eb;color:#fff;border:0;border-radius:10px;font-weight:bold;cursor:pointer}
-</style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f7fb;display:grid;place-items:center;height:100vh;margin:0}.box{background:#fff;padding:22px;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,0.05);width:320px}input{width:100%;padding:11px;margin:10px 0;border:1px solid #ddd;border-radius:10px;box-sizing:border-box}button{width:100%;padding:11px;background:#2563eb;color:#fff;border:0;border-radius:10px;font-weight:bold;cursor:pointer}</style>
 </head>
-<body>
-<div class="box">
-  <h3>🔐 ዌብ ፓነል መግቢያ</h3>
-  <form method="POST">
-    <input type="password" name="password" placeholder="የይለፍ ቃል" required>
-    <button type="submit">ግባ</button>
-  </form>
-</div>
-</body>
+<body><div class="box"><h3>🔐 ዌብ ፓነል መግቢያ</h3><form method="POST"><input type="password" name="password" placeholder="የይለፍ ቃል" required><button type="submit">ግባ</button></form></div></body>
 </html>
 """
 
@@ -519,15 +383,8 @@ def api_telegram_post():
     chat_id = req_data.get("chat_id")
     text = req_data.get("text")
     
-    if not chat_id or not text:
-        return {"success": False, "error": "Missing chat_id or text"}
-    
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text.replace("\\n", "\n"),
-        "parse_mode": "HTML"
-    }
+    payload = {"chat_id": chat_id, "text": text.replace("\\n", "\n"), "parse_mode": "HTML"}
     
     try:
         response = requests.post(url, json=payload, timeout=10)
@@ -540,5 +397,9 @@ def api_telegram_post():
         return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
+    # ቦቱን ከበስተጀርባ ማስኬጃ ስሬድ (Thread) መጀመር
+    t = threading.Thread(target=run_bot_background, daemon=True)
+    t.start()
+    
     port = int(os.environ.get("PORT", 5000))
     app_flask.run(host="0.0.0.0", port=port, debug=False)
