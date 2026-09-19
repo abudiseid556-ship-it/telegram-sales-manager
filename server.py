@@ -12,7 +12,6 @@ TOKEN = os.environ.get("TOKEN", "YOUR_BOT_TOKEN_HERE")
 ADMIN_CHAT_ID = os.environ.get("ADMIN_CHAT_ID", "")
 WEB_PASSWORD = os.environ.get("WEB_PASSWORD", "admin123")
 
-# ዳታዎችን በፋይል የመያዣ ስም
 DB_FILE = "database.json"
 
 import json
@@ -245,11 +244,9 @@ def run_telegram_bot():
     app.run_polling()
 
 if __name__ == "__main__":
-    # የቴሌግራም ቦቱን ከጀርባ (Background Thread) ማስጀመር
     bot_thread = threading.Thread(target=run_telegram_bot)
     bot_thread.daemon = True
     bot_thread.start()
 
-    # የ Flask ሰርቨርን በ Render የሚሰጠውን Port ማስኬድ
     port = int(os.environ.get("PORT", 5000))
     app_flask.run(host="0.0.0.0", port=port, debug=False)
