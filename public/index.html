@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Telegram Sales Manager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans Ethiopic",sans-serif;background:#f4f7fb;color:#172033}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+.app{width:100%;max-width:760px;min-height:100vh;margin:auto;background:#f7f9fc;padding-bottom:90px}
+.header{background:linear-gradient(135deg,#1477ff,#655cff);color:white;padding:22px 17px 25px;border-radius:0 0 28px 28px}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:23px;font-weight:900}
+.header p{font-size:12px;opacity:.85;margin-top:5px}
+.content{padding:15px}
+.page{display:none}
+.page.active{display:block}
+.card{background:white;border-radius:18px;padding:15px;margin-bottom:12px;border:1px solid #e9edf4;box-shadow:0 5px 20px rgba(20,40,80,.05)}
+.card h3{font-size:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.quick{text-align:left;padding:15px;border-radius:17px;background:white;border:1px solid #e8edf4;box-shadow:0 5px 16px rgba(20,40,80,.05)}
+.quick-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:#edf4ff;font-size:21px}
+.quick b{display:block;margin-top:8px;font-size:13px}
+.quick small{color:#7c8798;font-size:10px}
+.btn{padding:11px 14px;border-radius:12px;background:#edf4ff;color:#1264e8;font-weight:800}
+.btn-primary{background:#1477ff;color:white}
+label{display:block;font-size:12px;font-weight:800;margin:10px 0 6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #dfe5ee;border-radius:12px;background:white;outline:none}
+.order-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f5}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:72px;background:white;border-top:1px solid #e8edf3;display:grid;grid-template-columns:repeat(4,1fr);z-index:20}
+.nav-btn{background:none;color:#8490a1;font-size:10px}
+.nav-btn span{display:block;font-size:21px;margin-bottom:3px}
+.nav-btn.active{color:#1477ff;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+.sheet{width:min(760px,100%);max-height:92vh;overflow:auto;background:white;border-radius:25px 25px 0 0;padding:18px}
+.close-btn{float:right;width:34px;height:34px;border-radius:50%;background:#eef2f6;font-size:20px}
+.badge{padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800}
+.badge-new{background:#e8f3ff;color:#1477ff}
+.badge-green{background:#e8fbf2;color:#078b58}
+.badge-red{background:#fff0f0;color:#d93636}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+    <div class="header-top">
+        <div>
+            <h1>Telegram Sales Manager</h1>
+            <p>አውቶማቲክ የቦት እና ማስታወቂያ ማቀናበሪያ</p>
+        </div>
+    </div>
+</header>
+<main class="content">
+    <section id="home" class="page active">
+        <div class="grid">
+            <button class="quick" onclick="openModal('productModal')"><div class="quick-icon">📦</div><b>ምርት ጨምር</b><small>አዲስ እቃ መዝግብ</small></button>
+            <button class="quick" onclick="openModal('adModal')"><div class="quick-icon">📢</div><b>ማስታወቂያ ጻፍ</b><small>ወደ ቻናል ላክ</small></button>
+        </div>
+        <div class="card">
+            <h3>📦 የተመዘገቡ ምርቶች</h3>
+            <div id="productList"></div>
+        </div>
+    </section>
+    <section id="orders_page" class="page">
+        <h2>🛒 የደንበኞች ትዕዛዞች</h2>
+        <div class="card"><div id="orderList"></div></div>
+    </section>
+    <section id="channels_page" class="page">
+        <h2>🔗 የተገናኙ ቻናሎች</h2>
+        <div class="card"><div id="channelList"></div></div>
+    </section>
+    <section id="settings_page" class="page">
+        <h2>⚙️ ቅንብሮች</h2>
+        <div class="card"><h3>🤖 ቦት ሁኔታ</h3><p style="font-size:13px;color:#7c8798;">ተገናኝቷል</p></div>
+    </section>
+</main>
+<nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showPage('home',this)"><span>⌂</span>ዋና</button>
+    <button class="nav-btn" onclick="showPage('orders_page',this)"><span>🛒</span>ትዕዛዝ</button>
+    <button class="nav-btn" onclick="showPage('channels_page',this)"><span>🔗</span>ቻናሎች</button>
+    <button class="nav-btn" onclick="showPage('settings_page',this)"><span>⚙️</span>ቅንብር</button>
+</nav>
+</div>
+<div class="modal" id="productModal">
+  <div class="sheet">
+    <button class="close-btn" onclick="closeModal('productModal')">×</button>
+    <h2>📦 አዲስ ምርት</h2>
+    <form id="productForm">
+      <label>ስም</label><input id="pName" required placeholder="Smart Watch">
+      <label>ግዢ</label><input id="pBuy" type="number" required placeholder="500">
+      <label>ሽያጭ</label><input id="pSell" type="number" required placeholder="800">
+      <label>ስቶክ</label><input id="pStock" type="number" required placeholder="50">
+      <label>ፎቶ URL</label><input id="pPhoto" placeholder="https://...">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">💾 አስቀምጥ</button>
+    </form>
+  </div>
+</div>
+<div class="modal" id="adModal">
+  <div class="sheet">
+    <button class="close-btn" onclick="closeModal('adModal')">×</button>
+    <h2>📢 ማስታወቂያ</h2>
+    <form id="adForm">
+      <label>አይነት</label>
+      <select id="adType"><option>Hot Deal</option><option>New Product</option><option>Discount</option></select>
+      <label>ርዕስ</label><input id="adTitle" required placeholder="ልዩ ቅናሽ">
+      <label>መልዕክት</label><textarea id="adText" rows="3" required placeholder="መግለጫ..."></textarea>
+      <label>ፎቶ URL</label><input id="adPhoto" placeholder="https://...">
+      <label>ቻናል</label><input id="adChannel" required placeholder="@yabustech">
+      <br><button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">🚀 ፖስት አድርግ</button>
+    </form>
+  </div>
+</div>
+<script>
+let appData = { products: [], channels: [], orders: [], ads: [] };
+function loadData() { fetch('/api/data').then(res => res.json()).then(data => { appData = data; renderAll(); }); }
+function openModal(id){ document.getElementById(id).classList.add("show"); }
+function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+function showPage(id, btn){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    if(btn) btn.classList.add("active");
+}
+document.getElementById("productForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const product = { id: "P-" + Date.now(), name: document.getElementById("pName").value, buy: Number(document.getElementById("pBuy").value), sell: Number(document.getElementById("pSell").value), stock: Number(document.getElementById("pStock").value), photo: document.getElementById("pPhoto").value };
+    fetch('/api/products', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(product)}).then(res => res.json()).then(resp => { if(resp.success){ closeModal('productModal'); this.reset(); loadData(); alert("✅ ተመዝግቧል!"); }});
+});
+document.getElementById("adForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const ad = { id: "AD-" + Date.now(), type: document.getElementById("adType").value, title: document.getElementById("adTitle").value, text: document.getElementById("adText").value, photo: document.getElementById("adPhoto").value, target_channel: document.getElementById("adChannel").value };
+    fetch('/api/ads', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(ad)}).then(res => res.json()).then(resp => { if(resp.success){ closeModal('adModal'); this.reset(); loadData(); alert("🚀 ተልኳል!"); }});
+});
+function renderAll() {
+    document.getElementById("productList").innerHTML = appData.products.length ? appData.products.map(p => `<div class="order-row"><b>${p.name}</b> <span>${p.sell} ETB (Stock: ${p.stock})</span></div>`).join('') : '<div style="text-align:center;padding:15px;color:#8b96a6">ምርት የለም</div>';
+    document.getElementById("orderList").innerHTML = appData.orders.length ? appData.orders.map(o => `<div class="order-row"><div><b>${o.product}</b><br><small>${o.customer}</small></div></div>`).join('') : '<div style="text-align:center;padding:15px;color:#8b96a6">ትዕዛዝ የለም</div>';
+}
+loadData();
+</script>
+</body>
+</html>
 
