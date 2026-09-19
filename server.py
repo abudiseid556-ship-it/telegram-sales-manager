@@ -4,8 +4,8 @@ import threading
 import requests
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
-app_flask = Flask(__name__)
-app_flask.secret_key = os.environ.get("WEB_SECRET_KEY", "super_secret_key_change_me")
+ = Flask(__name__)
+flask.secret_key = os.environ.get("WEB_SECRET_KEY", "super_secret_key_change_me")
 
 WEB_PASSWORD = os.environ.get("WEB_PASSWORD", "admin123")
 DB_FILE = "database.json"
