@@ -3,6 +3,9 @@ const cors = require("cors");
 
 const app = express();
 
+app.get("/", (req, res) => {
+  res.send("Telegram Sales Manager API is running ✅");
+});
 app.use(cors());
 app.use(express.json());
 
