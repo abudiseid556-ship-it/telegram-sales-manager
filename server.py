@@ -4,8 +4,9 @@ import threading
 import requests
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
- = Flask(__name__)
-flask.secret_key = os.environ.get("WEB_SECRET_KEY", "super_secret_key_change_me")
+# ትክክለኛው አጠራር 'app' መሆኑን እርግጠኛ ይሁኑ
+app = Flask(__name__)
+app.secret_key = os.environ.get("WEB_SECRET_KEY", "super_secret_key_change_me")
 
 WEB_PASSWORD = os.environ.get("WEB_PASSWORD", "admin123")
 DB_FILE = "database.json"
@@ -332,7 +333,7 @@ LOGIN_HTML = """
 </html>
 """
 
-@app_flask.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         if request.form.get("password") == WEB_PASSWORD:
@@ -340,13 +341,13 @@ def login():
             return redirect(url_for("dashboard"))
     return render_template_string(LOGIN_HTML)
 
-@app_flask.route("/dashboard")
+@app.route("/dashboard")
 def dashboard():
     if not session.get("logged_in"):
         return redirect(url_for("login"))
     return render_template_string(FULL_HTML_CODE)
 
-@app_flask.route("/api/load")
+@app.route("/api/load")
 def api_load():
     return json.dumps(load_db())
 
@@ -360,7 +361,7 @@ def api_save():
         return {"success": True}
     return {"success": False}
 
-@app_flask.route("/api/telegram-post", methods=["POST"])
+@app.route("/api/telegram-post", methods=["POST"])
 def api_telegram_post():
     if not session.get("logged_in"):
         return {"success": False, "error": "Unauthorized"}, 403
@@ -392,4 +393,4 @@ if __name__ == "__main__":
     t.start()
     
     port = int(os.environ.get("PORT", 5000))
-    app_flask.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False)
