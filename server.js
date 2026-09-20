@@ -632,14 +632,13 @@ app.post(
 
     products.push(product);
 
-    res.json({
+    return res.json({
       ok: true,
       message: "Product added successfully",
       product
     });
   }
 );
-
 // ======================================================
 // ORDERS API
 // ======================================================
