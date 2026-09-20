@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express(); const path = require("path");
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -35,7 +38,7 @@ if (!BOT_TOKEN) {
 // ==================================================
 
 app.get("/", (req, res) => {
-  res.send("Telegram Sales Manager API is running ✅");
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
 // ==================================================
