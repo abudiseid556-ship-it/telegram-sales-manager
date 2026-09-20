@@ -682,7 +682,45 @@ app.get(
   }
 );
 
+//// ======================================================
+// ADD PRODUCT API
 // ======================================================
+
+app.post(
+  "/api/products",
+  (req, res) => {
+
+    const {
+      name,
+      buyPrice,
+      sellPrice,
+      stock
+    } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        ok: false,
+        error: "Product name is required"
+      });
+    }
+
+    const product = {
+      id: "P" + Date.now(),
+      name: String(name).trim(),
+      buyPrice: Number(buyPrice || 0),
+      sellPrice: Number(sellPrice || 0),
+      stock: Number(stock || 0)
+    };
+
+    products.push(product);
+
+    res.json({
+      ok: true,
+      message: "Product added successfully",
+      product
+    });
+  }
+); ======================================================
 // ORDERS API
 // ======================================================
 
@@ -697,6 +735,7 @@ app.get(
 
   }
 );
+
 
 // ======================================================
 // ROOT
