@@ -1,1 +1,598 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Telegram Sales Manager</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, "Noto Sans Ethiopic", sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1261ff, #5b8cff);
+      color: white;
+      padding: 22px;
+      border-radius: 0 0 25px 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.12);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 22px;
+    }
+
+    .header p {
+      margin-top: 5px;
+      opacity: .85;
+      font-size: 13px;
+    }
+
+    .refresh {
+      border: 0;
+      background: rgba(255,255,255,.18);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    }
+
+    .card .icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .card .label {
+      color: #78839a;
+      font-size: 13px;
+    }
+
+    .card .value {
+      font-size: 23px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .section {
+      margin: 0 18px 20px;
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .section-header h2 {
+      font-size: 18px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #667085;
+    }
+
+    .orders {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .order {
+      border: 1px solid #e7ebf2;
+      border-radius: 16px;
+      padding: 15px;
+      background: #fbfcff;
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .order-id {
+      font-weight: bold;
+      color: #1261ff;
+    }
+
+    .badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .pending {
+      background: #fff4cc;
+      color: #9a6b00;
+    }
+
+    .confirmed {
+      background: #dff8e8;
+      color: #087443;
+    }
+
+    .cancelled {
+      background: #ffe3e3;
+      color: #b42318;
+    }
+
+    .order-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .info {
+      background: white;
+      padding: 9px;
+      border-radius: 10px;
+    }
+
+    .info span {
+      display: block;
+      color: #7a8499;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .profit {
+      color: #087443;
+      font-weight: bold;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 10px;
+      color: #8a94a6;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #667085;
+    }
+
+    @media (max-width: 800px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .header {
+        padding: 18px;
+      }
+
+      .header h1 {
+        font-size: 19px;
+      }
+
+      .cards {
+        padding: 12px;
+        gap: 10px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .card .value {
+        font-size: 19px;
+      }
+
+      .section {
+        margin: 0 12px 15px;
+        padding: 14px;
+      }
+
+      .order-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <div>
+        <h1>📊 Telegram Sales Manager</h1>
+        <p>የሽያጭና ትዕዛዝ መቆጣጠሪያ</p>
+      </div>
+
+      <button class="refresh" onclick="loadOrders()">
+        🔄 Refresh
+      </button>
+    </div>
+  </header>
+
+
+  <section class="cards">
+
+    <div class="card">
+      <div class="icon">📦</div>
+      <div class="label">ጠቅላላ ትዕዛዞች</div>
+      <div class="value" id="totalOrders">0</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🟡</div>
+      <div class="label">Pending</div>
+      <div class="value" id="pendingOrders">0</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">💰</div>
+      <div class="label">ጠቅላላ ሽያጭ</div>
+      <div class="value" id="totalSales">0 ETB</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">📈</div>
+      <div class="label">ጠቅላላ ትርፍ</div>
+      <div class="value" id="totalProfit">0 ETB</div>
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-header">
+      <h2>🛒 የቅርብ ጊዜ ትዕዛዞች</h2>
+      <div class="status" id="lastUpdated">
+        -
+      </div>
+    </div>
+
+    <div id="orders" class="orders">
+      <div class="loading">
+        ትዕዛዞች በመጫን ላይ...
+      </div>
+    </div>
+
+  </section>
+
+
+<script>
+
+const API_URL = "/api/orders";
+
+
+async function loadOrders() {
+
+  const container = document.getElementById("orders");
+
+  container.innerHTML = `
+    <div class="loading">
+      ⏳ ትዕዛዞች በመጫን ላይ...
+    </div>
+  `;
+
+  try {
+
+    const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      throw new Error("Orders API error");
+    }
+
+    const data = await response.json();
+
+    /*
+      API የሚመልሰው orders array ከሆነ
+      በቀጥታ እንጠቀማለን።
+    */
+
+    const orders = Array.isArray(data)
+      ? data
+      : (data.orders || []);
+
+    updateStats(orders);
+
+    renderOrders(orders);
+
+    document.getElementById("lastUpdated").textContent =
+      "የመጨረሻ ማዘመኛ፦ " +
+      new Date().toLocaleTimeString("am-ET");
+
+  } catch (error) {
+
+    console.error(error);
+
+    container.innerHTML = `
+      <div class="empty">
+        ❌ ትዕዛዞችን ማግኘት አልተቻለም።
+        <br><br>
+        🔄 Refresh ይጫኑ።
+      </div>
+    `;
+  }
+}
+
+
+function updateStats(orders) {
+
+  document.getElementById("totalOrders").textContent =
+    orders.length;
+
+  const pending = orders.filter(order =>
+    String(order.status || "pending").toLowerCase() === "pending"
+  ).length;
+
+  document.getElementById("pendingOrders").textContent =
+    pending;
+
+
+  let sales = 0;
+  let profit = 0;
+
+  orders.forEach(order => {
+
+    const quantity =
+      Number(order.quantity || 1);
+
+    const sellPrice =
+      Number(
+        order.sellPrice ??
+        order.price ??
+        order.total ??
+        0
+      );
+
+    const buyPrice =
+      Number(
+        order.buyPrice ??
+        0
+      );
+
+    sales += sellPrice * quantity;
+
+    profit +=
+      (sellPrice - buyPrice) * quantity;
+
+  });
+
+
+  document.getElementById("totalSales").textContent =
+    formatMoney(sales) + " ETB";
+
+  document.getElementById("totalProfit").textContent =
+    formatMoney(profit) + " ETB";
+}
+
+
+function renderOrders(orders) {
+
+  const container =
+    document.getElementById("orders");
+
+
+  if (!orders.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        📭 እስካሁን ምንም ትዕዛዝ የለም።
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const sorted =
+    [...orders].reverse();
+
+
+  container.innerHTML =
+    sorted.map((order, index) => {
+
+      const status =
+        String(order.status || "pending").toLowerCase();
+
+      let statusClass = "pending";
+      let statusText = "Pending";
+
+      if (status === "confirmed") {
+        statusClass = "confirmed";
+        statusText = "Confirmed";
+      }
+
+      if (status === "cancelled") {
+        statusClass = "cancelled";
+        statusText = "Cancelled";
+      }
+
+
+      const quantity =
+        Number(order.quantity || 1);
+
+      const sellPrice =
+        Number(
+          order.sellPrice ??
+          order.price ??
+          order.total ??
+          0
+        );
+
+      const buyPrice =
+        Number(order.buyPrice ?? 0);
+
+      const total =
+        sellPrice * quantity;
+
+      const profit =
+        (sellPrice - buyPrice) * quantity;
+
+
+      const product =
+        order.productName ||
+        order.name ||
+        order.product ||
+        "ያልታወቀ እቃ";
+
+
+      const customer =
+        order.customerName ||
+        order.username ||
+        order.firstName ||
+        order.customer ||
+        "ያልታወቀ";
+
+
+      const telegram =
+        order.username
+          ? "@" + String(order.username).replace("@", "")
+          : "-";
+
+
+      const orderId =
+        order.id ||
+        ("ORDER-" + (index + 1));
+
+
+      return `
+
+        <div class="order">
+
+          <div class="order-top">
+
+            <div class="order-id">
+              #${escapeHtml(orderId)}
+            </div>
+
+            <div class="badge ${statusClass}">
+              ${statusText}
+            </div>
+
+          </div>
+
+
+          <div class="order-info">
+
+            <div class="info">
+              <span>👤 ደንበኛ</span>
+              ${escapeHtml(customer)}
+            </div>
+
+            <div class="info">
+              <span>📱 Telegram</span>
+              ${escapeHtml(telegram)}
+            </div>
+
+            <div class="info">
+              <span>🛍️ እቃ</span>
+              ${escapeHtml(product)}
+            </div>
+
+            <div class="info">
+              <span>🔢 ብዛት</span>
+              ${quantity}
+            </div>
+
+            <div class="info">
+              <span>💰 የሽያጭ ዋጋ</span>
+              ${formatMoney(sellPrice)} ETB
+            </div>
+
+            <div class="info">
+              <span>💵 የተገዛበት</span>
+              ${formatMoney(buyPrice)} ETB
+            </div>
+
+            <div class="info">
+              <span>🧾 ጠቅላላ</span>
+              ${formatMoney(total)} ETB
+            </div>
+
+            <div class="info">
+              <span>📈 ትርፍ</span>
+              <strong class="profit">
+                ${formatMoney(profit)} ETB
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+
+function formatMoney(number) {
+
+  return Number(number || 0)
+    .toLocaleString("en-US", {
+      maximumFractionDigits: 2
+    });
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/*
+  15 ሰከንድ በኋላ በራሱ ያዘምናል።
+*/
+setInterval(loadOrders, 15000);
+
+
+/*
+  ገጹ ሲከፈት
+*/
+loadOrders();
+
+</script>
+
+</body>
+</html>
