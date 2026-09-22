@@ -1,3 +1,7 @@
+// --- Root Route: Redirect or Serve Admin Page ---
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
