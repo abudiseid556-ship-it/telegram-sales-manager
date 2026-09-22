@@ -1,1 +1,322 @@
+<!doctype html>
+<html lang="am">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Telegram Sales Manager — Master Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#172033;font-family:Arial,"Noto Sans Ethiopic",sans-serif}
+button,input{font:inherit}.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:82px}
+.hero{background:linear-gradient(135deg,#1769ff,#6758f5);color:#fff;padding:20px 16px 18px;border-radius:0 0 28px 28px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.hero h1{margin:0;font-size:22px}.hero p{margin:5px 0 0;font-size:12px;opacity:.86}
+.refresh{border:0;border-radius:14px;padding:10px 13px;background:#ffffff22;color:#fff}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.stat{background:#ffffff18;border:1px solid #ffffff35;border-radius:16px;padding:12px}.stat b{display:block;font-size:20px}.stat span{font-size:11px;opacity:.82}
+.content{padding:14px}.card{background:#fff;border:1px solid #e5eaf2;border-radius:18px;padding:14px;margin-bottom:11px;box-shadow:0 5px 18px #1b31500a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{border:1px solid #e4eaf3;background:#fff;border-radius:17px;padding:15px;text-align:left;min-height:105px;box-shadow:0 5px 18px #1b31500a}.quick b{display:block;margin-top:9px}.quick small{color:#8490a0}
+.btn{border:0;border-radius:11px;padding:10px 13px;font-weight:700;background:#edf3ff;color:#1664e8}.primary{background:#1769ff;color:#fff}.green{background:#e8fbf2;color:#087b51}.red{background:#fff0f0;color:#d63737}.orange{background:#fff5df;color:#9a6900}
+label{display:block;font-size:11px;font-weight:700;margin:9px 0 5px}input{width:100%;padding:12px;border:1px solid #dce4ee;border-radius:11px;outline:none}input:focus{border-color:#1769ff}
+.message{font-size:12px;padding:10px;border-radius:11px;margin-top:10px;display:none}.ok{display:block;background:#e9fbf2;color:#087b51}.err{display:block;background:#fff0f0;color:#c83232}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:5px 0 10px}.section-title h2{font-size:17px;margin:0}
+.product,.order{display:flex;gap:11px;align-items:center}.pic{width:58px;height:58px;border-radius:14px;background:#eef3fa;display:grid;place-items:center;font-size:25px;overflow:hidden;flex:none}.pic img{width:100%;height:100%;object-fit:cover}.grow{flex:1;min-width:0}.muted{color:#8490a0;font-size:11px}.price{color:#1769ff;font-weight:800;margin-top:3px}.profit{color:#078453;font-size:11px}.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:800;background:#fff4df;color:#9a6900}.badge.green{background:#e8fbf2;color:#087b51}.badge.red{background:#fff0f0;color:#d63737}.empty{text-align:center;color:#8a95a4;padding:24px;font-size:12px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:68px;background:#fff;border-top:1px solid #e5eaf2;display:grid;grid-template-columns:repeat(4,1fr);z-index:20}.nav{border:0;background:none;color:#7d8999;font-size:10px}.nav span{display:block;font-size:20px}.nav.active{color:#1769ff;font-weight:800}
+.modal{position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:flex-end}.modal.show{display:flex}.sheet{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px}.close{float:right;border:0;background:#eef2f6;border-radius:50%;width:34px;height:34px}
+.order-actions{display:flex;gap:8px;margin-top:12px}.order-actions button{flex:1}
+hr{border:0;border-top:1px solid #edf0f5;margin:13px 0}
+@media(min-width:700px){.content{padding:18px}.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hero">
+  <div class="row">
+    <div><h1>📊 Telegram Sales Manager</h1><p>Master Admin • Products • Orders • Accounting</p></div>
+    <button class="refresh" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="productCount">0</b><span>📦 ምርቶች</span></div>
+    <div class="stat"><b id="pendingCount">0</b><span>🟠 Pending Orders</span></div>
+    <div class="stat"><b id="salesTotal">0 ETB</b><span>💰 ሽያጭ</span></div>
+    <div class="stat"><b id="stockTotal">0</b><span>📦 Stock</span></div>
+  </div>
+</header>
 
+<main class="content">
+  <section id="home">
+    <div class="grid">
+      <button class="quick" onclick="openModal('productModal')">📦<b>አዲስ ምርት</b><small>ስም • ዋጋ • Stock</small></button>
+      <button class="quick" onclick="showSection('orders')">🛒<b>Orders</b><small>Pending • Confirm • Reject</small></button>
+      <button class="quick" onclick="showSection('products')">📋<b>ምርቶች</b><small>Live data from Supabase</small></button>
+      <button class="quick" onclick="showSection('reports')">📈<b>Reports</b><small>ሽያጭ • Stock • Profit</small></button>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>📦 የቅርብ ምርቶች</h2><button class="btn" onclick="showSection('products')">ሁሉንም</button></div>
+      <div id="homeProducts"><div class="empty">እየጫነ...</div></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>🛒 Pending Orders</h2><button class="btn" onclick="showSection('orders')">Orders</button></div>
+      <div id="homeOrders"><div class="empty">እየጫነ...</div></div>
+    </div>
+  </section>
+
+  <section id="products" style="display:none">
+    <div class="section-title"><h2>📦 Products</h2><button class="btn primary" onclick="openModal('productModal')">＋ አዲስ</button></div>
+    <div id="productsList"></div>
+  </section>
+
+  <section id="orders" style="display:none">
+    <div class="section-title"><h2>🛒 Orders</h2><button class="btn" onclick="loadOrders()">↻</button></div>
+    <div class="card" style="font-size:12px">🧾 ደረሰኝ ከተላከ በኋላ <b>Admin እየተረጋገጠ</b> ሆኖ ይታያል።</div>
+    <div id="ordersList"></div>
+  </section>
+
+  <section id="reports" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">📈 Master Reports</h2>
+      <div class="row"><span>ምርቶች</span><b id="rProducts">0</b></div><hr>
+      <div class="row"><span>Stock</span><b id="rStock">0</b></div><hr>
+      <div class="row"><span>Pending Orders</span><b id="rPending">0</b></div><hr>
+      <div class="row"><span>Sales</span><b id="rSales">0 ETB</b></div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom">
+  <button class="nav active" data-section="home" onclick="showSection('home')"><span>⌂</span>ዋና</button>
+  <button class="nav" data-section="products" onclick="showSection('products')"><span>📦</span>Products</button>
+  <button class="nav" data-section="orders" onclick="showSection('orders')"><span>🛒</span>Orders</button>
+  <button class="nav" data-section="reports" onclick="showSection('reports')"><span>📊</span>Reports</button>
+</nav>
+</div>
+
+<div id="productModal" class="modal">
+ <div class="sheet">
+  <button class="close" onclick="closeModal('productModal')">×</button>
+  <h2>📦 አዲስ ምርት</h2>
+  <p class="muted">ይህ የMaster Admin ቅጽ ነው። Purchase Price እና Profit እዚህ ብቻ ይታያሉ።</p>
+  <form id="productForm">
+   <label>የምርት ስም</label><input id="pName" required placeholder="ምሳሌ፦ ሴቶች ልብስ">
+   <label>የግዢ ዋጋ</label><input id="pBuy" type="number" min="0" step="0.01" required placeholder="500">
+   <label>የሽያጭ ዋጋ</label><input id="pSell" type="number" min="0" step="0.01" required placeholder="800">
+   <label>Stock</label><input id="pStock" type="number" min="0" step="1" required placeholder="10">
+   <label>Product Photo URL <span class="muted">(Storage ሲገናኝ የፎቶ Upload ይተካል)</span></label>
+   <input id="pPhoto" type="url" placeholder="https://...">
+   <div id="productMessage" class="message"></div>
+   <button class="btn primary" style="width:100%;margin-top:12px" id="saveProductBtn">💾 Save Product</button>
+  </form>
+ </div>
+</div>
+
+<div id="orderModal" class="modal">
+ <div class="sheet" id="orderBody"></div>
+</div>
+
+<script>
+const PRODUCTS_API="/api/products";
+const ORDERS_API="/api/orders";
+let products=[], orders=[];
+
+const $=id=>document.getElementById(id);
+const money=n=>(Number(n)||0).toLocaleString("en-US",{maximumFractionDigits:2})+" ETB";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function openModal(id){$(id).classList.add("show")}
+function closeModal(id){$(id).classList.remove("show")}
+function msg(text,type){
+  const e=$("productMessage"); e.textContent=text; e.className="message "+type;
+}
+function showSection(id){
+  ["home","products","orders","reports"].forEach(x=>$(x).style.display=x===id?"block":"none");
+  document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.section===id));
+  if(id==="orders")loadOrders();
+  if(id==="products")renderProducts();
+}
+
+async function getJSON(url,options){
+  const r=await fetch(url,options);
+  const text=await r.text();
+  let data={}; try{data=text?JSON.parse(text):{}}catch{}
+  if(!r.ok)throw new Error(data.error||data.message||("HTTP "+r.status));
+  return data;
+}
+
+function mapProduct(p){
+  return {
+    id:p.id,
+    name:p.name,
+    buy:Number(p.buyPrice??p.buy_price??0),
+    sell:Number(p.sellPrice??p.sell_price??0),
+    stock:Number(p.stock??0),
+    photo:p.photoUrl??p.photo_url??p.photo??""
+  };
+}
+
+function mapOrder(o){
+  return {
+    id:o.id,
+    productName:o.productName??o.product_name??"—",
+    customerName:o.customerName??o.customer_name??"—",
+    phone:o.phone??"—",
+    username:o.username??"",
+    quantity:Number(o.quantity??1),
+    sellPrice:Number(o.sellPrice??o.sell_price??0),
+    total:Number(o.total??0),
+    status:String(o.status??"NEW").toUpperCase(),
+    receipt:o.receiptUrl??o.receipt_url??o.receipt_file_id??"",
+    createdAt:o.createdAt??o.created_at??""
+  };
+}
+
+async function loadProducts(){
+  try{
+    const data=await getJSON(PRODUCTS_API);
+    const raw=Array.isArray(data)?data:(data.products||[]);
+    products=raw.map(mapProduct);
+  }catch(e){
+    console.error(e);
+    products=[];
+  }
+  renderProducts();
+}
+
+async function loadOrders(){
+  try{
+    const data=await getJSON(ORDERS_API);
+    const raw=Array.isArray(data)?data:(data.orders||[]);
+    orders=raw.map(mapOrder);
+  }catch(e){
+    console.error(e);
+    orders=[];
+  }
+  renderOrders();
+}
+
+function productCard(p){
+  return `<div class="card"><div class="product">
+    <div class="pic">${p.photo?`<img src="${esc(p.photo)}" alt="">`:"📦"}</div>
+    <div class="grow"><b>${esc(p.name)}</b>
+      <div class="muted">Stock: ${p.stock}</div>
+      <div class="price">የሽያጭ ዋጋ: ${money(p.sell)}</div>
+      <div class="muted">የግዢ ዋጋ: ${money(p.buy)} • <span class="profit">Profit: ${money(p.sell-p.buy)}</span></div>
+    </div>
+  </div></div>`;
+}
+
+function orderCard(o){
+  const cls=o.status==="CONFIRMED"?"green":(o.status==="REJECTED"?"red":"");
+  return `<div class="card" onclick="openOrder('${esc(o.id)}')">
+    <div class="order">
+      <div class="grow"><b>${esc(o.productName)}</b><div class="muted">👤 ${esc(o.customerName)} • ×${o.quantity}</div><div class="muted">📞 ${esc(o.phone)}</div></div>
+      <div style="text-align:right"><b>${money(o.total)}</b><br><span class="badge ${cls}">${esc(o.status)}</span></div>
+    </div>
+  </div>`;
+}
+
+function renderProducts(){
+  $("productCount").textContent=products.length;
+  $("stockTotal").textContent=products.reduce((a,p)=>a+p.stock,0);
+  $("rProducts").textContent=products.length;
+  $("rStock").textContent=products.reduce((a,p)=>a+p.stock,0);
+  $("productsList").innerHTML=products.length?products.slice().reverse().map(productCard).join(""):'<div class="empty">ምርት የለም። ＋ አዲስ ምርት ጨምር።</div>';
+  $("homeProducts").innerHTML=products.length?products.slice(-3).reverse().map(productCard).join(""):'<div class="empty">ምርት የለም።</div>';
+}
+
+function renderOrders(){
+  const pending=orders.filter(o=>["NEW","PENDING","RECEIPT_PENDING","VERIFYING"].includes(o.status));
+  $("pendingCount").textContent=pending.length;
+  $("rPending").textContent=pending.length;
+  const sales=orders.filter(o=>o.status==="CONFIRMED").reduce((a,o)=>a+o.total,0);
+  $("salesTotal").textContent=money(sales);
+  $("rSales").textContent=money(sales);
+  $("ordersList").innerHTML=orders.length?orders.slice().reverse().map(orderCard).join(""):'<div class="empty">አሁን ምንም Order የለም።</div>';
+  $("homeOrders").innerHTML=pending.length?pending.slice(0,3).map(orderCard).join(""):'<div class="empty">Pending Order የለም።</div>';
+}
+
+function openOrder(id){
+  const o=orders.find(x=>String(x.id)===String(id)); if(!o)return;
+  $("orderBody").innerHTML=`
+    <button class="close" onclick="closeModal('orderModal')">×</button>
+    <h2>🛒 Order ${esc(o.id)}</h2>
+    <div class="card">
+      <div class="row"><span>ደንበኛ</span><b>${esc(o.customerName)}</b></div><hr>
+      <div class="row"><span>📞 ስልክ</span><b>${esc(o.phone)}</b></div><hr>
+      <div class="row"><span>📦 ምርት</span><b>${esc(o.productName)}</b></div><hr>
+      <div class="row"><span>ብዛት</span><b>${o.quantity}</b></div><hr>
+      <div class="row"><span>💰 ድምር</span><b>${money(o.total)}</b></div><hr>
+      <div class="row"><span>📌 Status</span><span class="badge">${esc(o.status)}</span></div>
+    </div>
+    ${o.receipt?`<div class="card"><h3>🧾 Receipt</h3><p class="muted">${esc(o.receipt)}</p></div>`:""}
+    ${["NEW","PENDING","RECEIPT_PENDING","VERIFYING"].includes(o.status)?`
+      <div class="order-actions">
+        <button class="btn green" onclick="changeOrderStatus('${esc(o.id)}','CONFIRMED')">✅ Confirm</button>
+        <button class="btn red" onclick="changeOrderStatus('${esc(o.id)}','REJECTED')">❌ Reject</button>
+      </div>`:""}
+  `;
+  openModal("orderModal");
+}
+
+async function changeOrderStatus(id,status){
+  try{
+    let r=await fetch(ORDERS_API+"/"+encodeURIComponent(id),{
+      method:"PATCH",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({status})
+    });
+    if(!r.ok){
+      r=await fetch(ORDERS_API+"/"+encodeURIComponent(id)+"/status",{
+        method:"PATCH",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({status})
+      });
+    }
+    if(!r.ok)throw new Error("Order status API አልተዘጋጀም።");
+    closeModal("orderModal");
+    await refreshAll();
+  }catch(e){
+    alert(e.message);
+  }
+}
+
+$("productForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=$("saveProductBtn");
+  btn.disabled=true; btn.textContent="⏳ Saving...";
+  msg("","");
+
+  const body={
+    name:$("pName").value.trim(),
+    buyPrice:Number($("pBuy").value),
+    sellPrice:Number($("pSell").value),
+    stock:Number($("pStock").value),
+    photoUrl:$("pPhoto").value.trim()
+  };
+
+  if(!body.name||body.buyPrice<0||body.sellPrice<0||body.stock<0){
+    msg("የምርት መረጃውን በትክክል ሙላ።","err");
+    btn.disabled=false;btn.textContent="💾 Save Product";return;
+  }
+
+  try{
+    await getJSON(PRODUCTS_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
+    msg("✅ ምርቱ Supabase ላይ ተመዝግቧል። Telegram Bot ከዚህ ውሂብ ይጠቀማል።","ok");
+    e.target.reset();
+    await loadProducts();
+    setTimeout(()=>closeModal("productModal"),700);
+  }catch(err){
+    msg("❌ Save አልተሳካም፦ "+err.message,"err");
+  }finally{
+    btn.disabled=false;btn.textContent="💾 Save Product";
+  }
+});
+
+async function refreshAll(){
+  await Promise.all([loadProducts(),loadOrders()]);
+}
+refreshAll();
+setInterval(loadOrders,15000);
+</script>
+</body>
+</html>
