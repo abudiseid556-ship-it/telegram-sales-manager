@@ -94,14 +94,19 @@ hr{border:0;border-top:1px solid #edf0f5;margin:13px 0}
  <div class="sheet">
   <button class="close" onclick="closeModal('productModal')">×</button>
   <h2>📦 አዲስ ምርት</h2>
-  <p class="muted">ይህ የMaster Admin ቅጽ ነው። Purchase Price እና Profit እዚህ ብቻ ይታያሉ።</p>
+  <p class="muted">የምርቱን መረጃዎች ይሙሉ እና ፎቶ ከጋለሪ ይምረጡ</p>
   <form id="productForm">
    <label>የምርት ስም</label><input id="pName" required placeholder="ምሳሌ፦ ሴቶች ልብስ">
    <label>የግዢ ዋጋ</label><input id="pBuy" type="number" min="0" step="0.01" required placeholder="500">
    <label>የሽያጭ ዋጋ</label><input id="pSell" type="number" min="0" step="0.01" required placeholder="800">
    <label>Stock</label><input id="pStock" type="number" min="0" step="1" required placeholder="10">
-   <label>Product Photo URL <span class="muted">(Storage ሲገናኝ የፎቶ Upload ይተካል)</span></label>
-   <input id="pPhoto" type="url" placeholder="https://...">
+   
+   <label style="color:#1769ff; font-weight:bold; margin-top:12px;">📁 የምርት ፎቶ ከጋለሪ ለመምረጥ እዚህ ይጫኑ</label>
+   <input id="pImageFile" type="file" accept="image/*" style="width:100%; padding:10px; background:#eef3fa; border:2px dashed #1769ff; border-radius:11px; margin-bottom:8px; cursor:pointer;">
+
+   <label>Product Photo URL (በራሱ ይሞላል)</label>
+   <input id="pPhoto" type="url" placeholder="ፎቶ ሲመረጥ ሊንኩ እዚህ በራሱ ይመጣል..." style="background:#f4f6fa;" readonly>
+   
    <div id="productMessage" class="message"></div>
    <button class="btn primary" style="width:100%;margin-top:12px" id="saveProductBtn">💾 Save Product</button>
   </form>
@@ -115,6 +120,7 @@ hr{border:0;border-top:1px solid #edf0f5;margin:13px 0}
 <script>
 const PRODUCTS_API="/api/products";
 const ORDERS_API="/api/orders";
+const UPLOAD_API="/api/upload";
 let products=[], orders=[];
 
 const $=id=>document.getElementById(id);
@@ -276,39 +282,75 @@ async function changeOrderStatus(id,status){
   }
 }
 
-$("productForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const btn=$("saveProductBtn");
-  btn.disabled=true; btn.textContent="⏳ Saving...";
-  msg("","");
+// ፎቶ ከጋለሪ ሲመረጥ በራሱ ወደ ሰርቨር በመላክ ዩአርኤሉን መቀበል
+$("pImageFile").onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-  const body={
-    name:$("pName").value.trim(),
-    buyPrice:Number($("pBuy").value),
-    sellPrice:Number($("pSell").value),
-    stock:Number($("pStock").value),
-    photoUrl:$("pPhoto").value.trim()
+  const btn = $("saveProductBtn");
+  btn.disabled = true; 
+  btn.textContent = "📤 ፎቶው በመጫን ላይ ነው...";
+  msg("እባክዎ ትንሽ ይጠብቁ፣ ፎቶው ወደ ስቶሬጅ እየተጫነ ነው...", "ok");
+
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  try {
+    const res = await fetch(UPLOAD_API, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "አፕሎድ አልተሳካም");
+
+    $("pPhoto").value = data.url;
+    msg("✅ ፎቶው በተሳካ ሁኔታ ተጭኗል! አሁን 'Save Product' የሚለውን መጫን ይችላሉ።", "ok");
+  } catch (err) {
+    msg("❌ የፎቶ አፕሎድ ስህተት፦ " + err.message, "err");
+  } finally {
+    btn.disabled = false; 
+    btn.textContent = "💾 Save Product";
+  }
+};
+
+$("productForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("saveProductBtn");
+  btn.disabled = true; 
+  btn.textContent = "⏳ በመመዝገብ ላይ...";
+  msg("", "");
+
+  const body = {
+    name: $("pName").value.trim(),
+    buyPrice: Number($("pBuy").value),
+    sellPrice: Number($("pSell").value),
+    stock: Number($("pStock").value),
+    photoUrl: $("pPhoto").value.trim()
   };
 
-  if(!body.name||body.buyPrice<0||body.sellPrice<0||body.stock<0){
-    msg("የምርት መረጃውን በትክክል ሙላ።","err");
-    btn.disabled=false;btn.textContent="💾 Save Product";return;
+  if (!body.name || body.buyPrice < 0 || body.sellPrice < 0 || body.stock < 0) {
+    msg("የምርት መረጃውን በትክክል ሙላ።", "err");
+    btn.disabled = false; 
+    btn.textContent = "💾 Save Product"; 
+    return;
   }
 
-  try{
-    await getJSON(PRODUCTS_API,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body)
+  try {
+    await getJSON(PRODUCTS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
     });
-    msg("✅ ምርቱ Supabase ላይ ተመዝግቧል። Telegram Bot ከዚህ ውሂብ ይጠቀማል።","ok");
+    msg("✅ ምርቱ Supabase ላይ ተመዝግቧል። Telegram Bot ከዚህ ውሂብ ይጠቀማል።", "ok");
     e.target.reset();
+    $("pPhoto").value = "";
     await loadProducts();
-    setTimeout(()=>closeModal("productModal"),700);
-  }catch(err){
-    msg("❌ Save አልተሳካም፦ "+err.message,"err");
-  }finally{
-    btn.disabled=false;btn.textContent="💾 Save Product";
+    setTimeout(() => closeModal("productModal"), 700);
+  } catch (err) {
+    msg("❌ Save አልተሳካም፦ " + err.message, "err");
+  } finally {
+    btn.disabled = false; 
+    btn.textContent = "💾 Save Product";
   }
 });
 
