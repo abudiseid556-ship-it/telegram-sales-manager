@@ -1292,20 +1292,24 @@ app.post(
       const b=req.body||{};
 
       const row={
-        product_id:
-          b.productId??
-          b.product_id||
-          null,
-        title:b.title||"",
-        text:b.text||"",
-        photo_url:
-          b.photoUrl??
-          b.photo_url||
-          null,
-        button_text:
-          b.buttonText??
-          b.button_text||
-          "🛒 በዚህ ይዘዙን",
+    product_id:
+        b.productId ??
+        b.product_id ??
+        null,
+
+    title:b.title || "",
+
+    text:b.text || "",
+
+    photo_url:
+        b.photoUrl ??
+        b.photo_url ??
+        null,
+
+    button_text:
+        b.buttonText ??
+        b.button_text ??
+        null,
         status:
           b.status||
           "ACTIVE",
