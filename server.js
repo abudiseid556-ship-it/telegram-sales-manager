@@ -3576,3 +3576,262 @@ app.post(
           req.auth,
           s
         );
+           if (!allowed) {
+        return res.status(403).json({
+          error:
+            s === "CONFIRMED"
+              ? "Confirm Order Permission የለህም።"
+              : "Verify Payment Permission የለህም።"
+        });
+      }
+
+      const updated =
+        await changeOrderStatus(
+          id,
+          s,
+          req.auth
+        );
+
+      res.json({
+        ok: true,
+        order: updated
+      });
+
+    } catch (error) {
+      console.error(
+        "Admin Telegram Action:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   REGISTER TELEGRAM WEBHOOK
+========================================================= */
+
+app.post(
+  "/api/telegram/set-webhook",
+  requireMaster,
+  async (req, res) => {
+    try {
+      if (!WEBHOOK_URL) {
+        return res.status(400).json({
+          error:
+            "WEBHOOK_URL በRender Environment Variables ውስጥ የለም።"
+        });
+      }
+
+      const webhook =
+        `${WEBHOOK_URL}/telegram/webhook`;
+
+      const result =
+        await telegram(
+          "setWebhook",
+          {
+            url: webhook
+          }
+        );
+
+      if (!result.ok) {
+        return res.status(500).json({
+          error:
+            result.description ||
+            "Webhook registration failed",
+          result
+        });
+      }
+
+      res.json({
+        ok: true,
+        webhook,
+        result
+      });
+
+    } catch (error) {
+      console.error(
+        "Set webhook:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   WEBHOOK DELETE
+========================================================= */
+
+app.post(
+  "/api/telegram/delete-webhook",
+  requireMaster,
+  async (req, res) => {
+    try {
+      const result =
+        await telegram(
+          "deleteWebhook",
+          {
+            drop_pending_updates:
+              false
+          }
+        );
+
+      res.json(result);
+
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+app.get(
+  "/api/reports",
+  requirePermission("reports"),
+  async (req, res) => {
+    try {
+      const {
+        data: orders,
+        error
+      } = await supabase
+        .from("orders")
+        .select("*");
+
+      if (error) {
+        throw error;
+      }
+
+      const rows =
+        orders || [];
+
+      let sales = 0;
+      let profit = 0;
+      let confirmedOrders = 0;
+      let pendingOrders = 0;
+      let rejectedOrders = 0;
+
+      for (const order of rows) {
+        const status =
+          String(
+            order.status || ""
+          ).toUpperCase();
+
+        if (
+          status === "CONFIRMED"
+        ) {
+          confirmedOrders++;
+
+          sales += Number(
+            order.total || 0
+          );
+
+          profit += Number(
+            order.profit || 0
+          );
+        }
+
+        if (
+          status ===
+            "PAYMENT_PENDING" ||
+          status ===
+            "RECEIPT_PENDING"
+        ) {
+          pendingOrders++;
+        }
+
+        if (
+          status === "REJECTED"
+        ) {
+          rejectedOrders++;
+        }
+      }
+
+      res.json({
+        ok: true,
+
+        summary: {
+          totalOrders:
+            rows.length,
+
+          confirmedOrders,
+
+          pendingOrders,
+
+          rejectedOrders,
+
+          sales,
+
+          profit
+        }
+      });
+
+    } catch (error) {
+      console.error(
+        "Reports:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   FRONTEND FALLBACK
+========================================================= */
+
+app.get(
+  "/{*splat}",
+  (req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "public",
+        "admin.html"
+      )
+    );
+  }
+);
+
+/* =========================================================
+   START SERVER
+========================================================= */
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Telegram Sales Manager running on port ${PORT}`
+    );
+
+    console.log(
+      `Bot: @${BOT_USERNAME}`
+    );
+
+    console.log(
+      `Webhook URL: ${
+        WEBHOOK_URL
+          ? `${WEBHOOK_URL}/telegram/webhook`
+          : "NOT SET"
+      }`
+    );
+  }
+); 
