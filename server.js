@@ -3798,18 +3798,20 @@ app.get(
    FRONTEND FALLBACK
 ========================================================= */
 
-app.get(
-  "/{*splat}",
-  (req, res) => {
-    res.sendFile(
-      path.join(
-        __dirname,
-        "public",
-        "admin.html"
-      )
-    );
-  }
-);
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "public", "admin.html"),
+    (error) => {
+      if (error) {
+        console.error("Admin HTML error:", error);
+
+        res.status(404).send(
+          "admin.html በ public folder ውስጥ አልተገኘም።"
+        );
+      }
+    }
+  );
+});
 
 /* =========================================================
    START SERVER
