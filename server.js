@@ -2608,17 +2608,17 @@ app.get(
           .eq(
             "employee_id",
             req.auth.employeeId
-          );
+);
 
-      user.permissions =
-        (data || []).map(
-                 user.permissions =
-        (data || [])
-          .map((x) => x.permission)
-          .filter(Boolean);
-    } else {
-      user.permissions = ["*"];
-    }
+user.permissions = (data || [])
+  .map((x) => x.permission)
+  .filter(Boolean);
+
+} else {
+  user.permissions = ["*"];
+}
+
+res.json({
 
     res.json({
       ok: true,
