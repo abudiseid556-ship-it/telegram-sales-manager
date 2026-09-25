@@ -236,10 +236,6 @@ button{cursor:pointer}
   margin-top:11px;
 }
 .item-actions .btn{font-size:11px;padding:8px 10px}
-.thumb{
-  width:55px;height:55px;border-radius:13px;
-  object-fit:cover;background:#edf1f7;
-}
 .status{
   display:inline-flex;
   align-items:center;
@@ -369,22 +365,6 @@ button{cursor:pointer}
   margin-top:10px;
 }
 
-/* PERMISSIONS */
-.permissions{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
-.permission{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid var(--border);
-  padding:9px;
-  border-radius:10px;
-  font-size:11px;
-}
-
 /* BOTTOM NAV */
 .bottom-nav{
   position:fixed;
@@ -434,7 +414,6 @@ button{cursor:pointer}
   transform:translateX(-50%) translateY(0);
 }
 
-/* DESKTOP */
 @media(min-width:800px){
   .main{padding:25px 24px 50px}
   .stats-grid{grid-template-columns:repeat(4,1fr)}
@@ -442,7 +421,6 @@ button{cursor:pointer}
   .modal{align-items:center;padding:20px}
   .modal-box{border-radius:25px}
   .bottom-nav{display:none}
-  .main{padding-bottom:40px}
 }
 </style>
 </head>
@@ -483,23 +461,13 @@ button{cursor:pointer}
         <div class="brand-sub">UNI MARKET • Master Admin</div>
       </div>
     </div>
-
     <div class="user-pill" id="userPill">Admin</div>
   </div>
 
   <div class="header-stats">
-    <div class="header-stat">
-      <small>Sales</small>
-      <strong id="headSales">0 ETB</strong>
-    </div>
-    <div class="header-stat">
-      <small>Profit</small>
-      <strong id="headProfit">0 ETB</strong>
-    </div>
-    <div class="header-stat">
-      <small>Orders</small>
-      <strong id="headOrders">0</strong>
-    </div>
+    <div class="header-stat"><small>Sales</small><strong id="headSales">0 ETB</strong></div>
+    <div class="header-stat"><small>Profit</small><strong id="headProfit">0 ETB</strong></div>
+    <div class="header-stat"><small>Orders</small><strong id="headOrders">0</strong></div>
   </div>
 </header>
 
@@ -507,7 +475,6 @@ button{cursor:pointer}
 
 <!-- HOME -->
 <section id="page-home" class="page active">
-
   <div class="section-head">
     <div>
       <div class="section-title">Dashboard</div>
@@ -517,84 +484,37 @@ button{cursor:pointer}
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">📦</div>
-      <div class="stat-label">Products</div>
-      <div class="stat-value" id="statProducts">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">🛍️</div>
-      <div class="stat-label">Active Orders</div>
-      <div class="stat-value" id="statOrders">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">💰</div>
-      <div class="stat-label">Sales</div>
-      <div class="stat-value" id="statSales">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">📈</div>
-      <div class="stat-label">Profit</div>
-      <div class="stat-value" id="statProfit">0</div>
-    </div>
+    <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-label">Products</div><div class="stat-value" id="statProducts">0</div></div>
+    <div class="stat-card"><div class="stat-icon">🛍️</div><div class="stat-label">Active Orders</div><div class="stat-value" id="statOrders">0</div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Sales</div><div class="stat-value" id="statSales">0</div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-label">Profit</div><div class="stat-value" id="statProfit">0</div></div>
   </div>
 
   <div style="height:18px"></div>
-
-  <div class="section-head">
-    <div>
-      <div class="section-title" style="font-size:17px">Quick Actions</div>
-    </div>
-  </div>
+  <div class="section-head"><div class="section-title" style="font-size:17px">Quick Actions</div></div>
 
   <div class="quick-grid">
-    <button class="quick" onclick="openProductModal()">
-      <div class="quick-icon">➕</div>
-      <span>Product</span>
-    </button>
-
-    <button class="quick" onclick="showPage('orders')">
-      <div class="quick-icon">🛍️</div>
-      <span>Orders</span>
-    </button>
-
-    <button class="quick" onclick="openAdModal()">
-      <div class="quick-icon">📢</div>
-      <span>Advertise</span>
-    </button>
-
-    <button class="quick" onclick="showPage('employees')">
-      <div class="quick-icon">👥</div>
-      <span>Workers</span>
-    </button>
+    <button class="quick" onclick="openProductModal()"><div class="quick-icon">➕</div><span>Product</span></button>
+    <button class="quick" onclick="showPage('orders')"><div class="quick-icon">🛍️</div><span>Orders</span></button>
+    <button class="quick" onclick="openAdModal()"><div class="quick-icon">📢</div><span>Advertise</span></button>
+    <button class="quick" onclick="showPage('employees')"><div class="quick-icon">👥</div><span>Workers</span></button>
   </div>
 
   <div style="height:18px"></div>
-
   <div class="section-head">
-    <div>
-      <div class="section-title" style="font-size:17px">Latest Orders</div>
-    </div>
+    <div class="section-title" style="font-size:17px">Latest Orders</div>
     <button class="btn btn-light" onclick="showPage('orders')">View all</button>
   </div>
-
   <div id="homeOrders" class="list"></div>
-
 </section>
-
 
 <!-- PRODUCTS -->
 <section id="page-products" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Products</div>
       <div class="section-sub">Telegram shop products & stock</div>
     </div>
-
     <button class="btn btn-primary" onclick="openProductModal()">＋ Add</button>
   </div>
 
@@ -606,15 +526,11 @@ button{cursor:pointer}
       <option value="out">Out</option>
     </select>
   </div>
-
   <div id="productsList" class="product-grid"></div>
-
 </section>
-
 
 <!-- ORDERS -->
 <section id="page-orders" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Orders</div>
@@ -634,97 +550,58 @@ button{cursor:pointer}
       <option value="REJECTED">Rejected</option>
     </select>
   </div>
-
   <div id="ordersList" class="list"></div>
-
 </section>
-
 
 <!-- ADS -->
 <section id="page-ads" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Advertising</div>
       <div class="section-sub">Telegram channel / group publishing</div>
     </div>
-
     <button class="btn btn-primary" onclick="openAdModal()">＋ Ad</button>
   </div>
-
   <div id="adsList" class="list"></div>
-
 </section>
-
 
 <!-- EMPLOYEES -->
 <section id="page-employees" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Employees</div>
-      <div class="section-sub">ሰራተኛ ስም • ኮድ • Username • Permissions</div>
+      <div class="section-sub">ሰራተኛ ስም • ኮድ • Username</div>
     </div>
-
     <button class="btn btn-primary" onclick="openEmployeeModal()">＋ Worker</button>
   </div>
-
   <div id="employeesList" class="list"></div>
-
 </section>
-
 
 <!-- REPORTS -->
 <section id="page-reports" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Reports</div>
       <div class="section-sub">Sales, profit and order lifecycle</div>
     </div>
-
     <button class="btn btn-light" onclick="loadReports()">↻</button>
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">💵</div>
-      <div class="stat-label">Confirmed Sales</div>
-      <div class="stat-value" id="repSales">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">📈</div>
-      <div class="stat-label">Profit</div>
-      <div class="stat-value" id="repProfit">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">🚚</div>
-      <div class="stat-label">Delivery Pending</div>
-      <div class="stat-value" id="repDelivery">0</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">✅</div>
-      <div class="stat-label">Delivered</div>
-      <div class="stat-value" id="repDelivered">0</div>
-    </div>
+    <div class="stat-card"><div class="stat-icon">💵</div><div class="stat-label">Confirmed Sales</div><div class="stat-value" id="repSales">0</div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-label">Profit</div><div class="stat-value" id="repProfit">0</div></div>
+    <div class="stat-card"><div class="stat-icon">🚚</div><div class="stat-label">Delivery Pending</div><div class="stat-value" id="repDelivery">0</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">Delivered</div><div class="stat-value" id="repDelivered">0</div></div>
   </div>
-
   <div style="height:18px"></div>
-
   <div class="card card-pad">
     <div style="font-weight:800;margin-bottom:12px">Order Summary</div>
     <div id="reportDetails"></div>
   </div>
-
 </section>
-
 
 <!-- SETTINGS -->
 <section id="page-settings" class="page">
-
   <div class="section-head">
     <div>
       <div class="section-title">Settings</div>
@@ -733,316 +610,127 @@ button{cursor:pointer}
   </div>
 
   <div class="card card-pad">
-
     <h3>💳 Payment Settings</h3>
-
     <div class="form-grid">
-      <div class="field">
-        <label>Bank Name</label>
-        <input id="bankName">
-      </div>
-
-      <div class="field">
-        <label>Account Name</label>
-        <input id="accountName">
-      </div>
-
-      <div class="field">
-        <label>Account Number</label>
-        <input id="accountNumber">
-      </div>
-
-      <div class="field">
-        <label>Payment Note</label>
-        <input id="paymentNote">
-      </div>
+      <div class="field"><label>Bank Name</label><input id="bankName"></div>
+      <div class="field"><label>Account Name</label><input id="accountName"></div>
+      <div class="field"><label>Account Number</label><input id="accountNumber"></div>
+      <div class="field"><label>Payment Note</label><input id="paymentNote"></div>
     </div>
-
     <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
   </div>
 
   <div style="height:15px"></div>
 
   <div class="card card-pad">
-
     <h3>🤖 Telegram Settings</h3>
-
-    <div class="field">
-      <label>Bot Username</label>
-      <input id="telegramUsername" placeholder="uni_market_shop_bot">
-    </div>
-
-    <div class="field">
-      <label>Admin Chat ID</label>
-      <input id="telegramAdminChatId" placeholder="Telegram Admin Chat ID">
-    </div>
-
-    <div class="field">
-      <label>Webhook URL</label>
-      <input id="telegramWebhookUrl" placeholder="https://.../telegram/webhook">
-    </div>
-
+    <div class="field"><label>Bot Username</label><input id="telegramUsername" placeholder="uni_market_shop_bot"></div>
+    <div class="field"><label>Admin Chat ID</label><input id="telegramAdminChatId" placeholder="Telegram Admin Chat ID"></div>
+    <div class="field"><label>Webhook URL</label><input id="telegramWebhookUrl" placeholder="https://.../telegram/webhook"></div>
     <button class="btn btn-primary" onclick="saveTelegram()">Save Telegram</button>
   </div>
 
   <div style="height:15px"></div>
-
   <div class="card card-pad">
     <h3>🔐 Session</h3>
     <button class="btn btn-red" onclick="logout()">Logout</button>
   </div>
-
 </section>
 
 </main>
 
-
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-page="home" onclick="showPage('home')">
-    <span class="ico">⌂</span>
-    Home
-  </button>
-
-  <button class="nav-btn" data-page="products" onclick="showPage('products')">
-    <span class="ico">📦</span>
-    Products
-  </button>
-
-  <button class="nav-btn" data-page="orders" onclick="showPage('orders')">
-    <span class="ico">🛍️</span>
-    Orders
-  </button>
-
-  <button class="nav-btn" data-page="employees" onclick="showPage('employees')">
-    <span class="ico">👥</span>
-    Workers
-  </button>
-
-  <button class="nav-btn" data-page="settings" onclick="showPage('settings')">
-    <span class="ico">⚙️</span>
-    Settings
-  </button>
+  <button class="nav-btn active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span>Home</button>
+  <button class="nav-btn" data-page="products" onclick="showPage('products')"><span class="ico">📦</span>Products</button>
+  <button class="nav-btn" data-page="orders" onclick="showPage('orders')"><span class="ico">🛍️</span>Orders</button>
+  <button class="nav-btn" data-page="employees" onclick="showPage('employees')"><span class="ico">👥</span>Workers</button>
+  <button class="nav-btn" data-page="settings" onclick="showPage('settings')"><span class="ico">⚙️</span>Settings</button>
 </nav>
 
 </section>
 
-
-<!-- PRODUCT MODAL -->
+<!-- MODALS -->
 <div id="productModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-head">
       <div class="modal-title" id="productModalTitle">Add Product</div>
       <button class="close" onclick="closeModal('productModal')">×</button>
     </div>
-
     <input type="hidden" id="pId">
-
     <div class="form-grid">
-
-      <div class="field full-col">
-        <label>Product Name</label>
-        <input id="pName" placeholder="Product name">
-      </div>
-
-      <div class="field">
-        <label>Buy Price</label>
-        <input id="pBuy" type="number" min="0" step="0.01">
-      </div>
-
-      <div class="field">
-        <label>Sell Price</label>
-        <input id="pSell" type="number" min="0" step="0.01">
-      </div>
-
-      <div class="field">
-        <label>Stock</label>
-        <input id="pStock" type="number" min="0" step="1">
-      </div>
-
-      <div class="field">
-        <label>Photo URL</label>
-        <input id="pPhoto" placeholder="https://...">
-      </div>
-
+      <div class="field full-col"><label>Product Name</label><input id="pName"></div>
+      <div class="field"><label>Buy Price</label><input id="pBuy" type="number" min="0" step="0.01"></div>
+      <div class="field"><label>Sell Price</label><input id="pSell" type="number" min="0" step="0.01"></div>
+      <div class="field"><label>Stock</label><input id="pStock" type="number" min="0" step="1"></div>
+      <div class="field"><label>Photo URL</label><input id="pPhoto"></div>
       <div class="field full-col">
         <label>Product Photo</label>
         <div class="file-box">
-          <input id="pImageFile" type="file" accept="image/*"
-                 onchange="uploadPhoto(this,'product')">
-          <div id="pUploadText" style="font-size:11px;color:#748096;margin-top:7px">
-            Select product image
-          </div>
+          <input id="pImageFile" type="file" accept="image/*" onchange="uploadPhoto(this,'product')">
           <img id="pPreview" class="preview hidden">
         </div>
       </div>
-
-      <div class="field full-col">
-        <label>Description</label>
-        <textarea id="pDescription" placeholder="Product description"></textarea>
-      </div>
-
+      <div class="field full-col"><label>Description</label><textarea id="pDescription"></textarea></div>
     </div>
-
     <button class="btn btn-primary full" onclick="saveProduct()">Save Product</button>
   </div>
 </div>
 
-
-<!-- ORDER MODAL -->
 <div id="orderModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-head">
       <div class="modal-title">Order Details</div>
       <button class="close" onclick="closeModal('orderModal')">×</button>
     </div>
-
     <div id="orderDetails"></div>
-
   </div>
 </div>
 
-
-<!-- AD MODAL -->
 <div id="adModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-head">
       <div class="modal-title">Create Advertisement</div>
       <button class="close" onclick="closeModal('adModal')">×</button>
     </div>
-
-    <input type="hidden" id="aId">
-
     <div class="form-grid">
-
-      <div class="field full-col">
-        <label>Product</label>
-        <select id="aProduct"></select>
-      </div>
-
-      <div class="field">
-        <label>Title</label>
-        <input id="aTitle">
-      </div>
-
-      <div class="field">
-        <label>Button Text</label>
-        <input id="aButton" value="Order Now">
-      </div>
-
-      <div class="field full-col">
-        <label>Advertisement Text</label>
-        <textarea id="aText"></textarea>
-      </div>
-
-      <div class="field">
-        <label>Old Price</label>
-        <input id="aOldPrice" type="number">
-      </div>
-
-      <div class="field">
-        <label>Discount</label>
-        <input id="aDiscount" type="number">
-      </div>
-
-      <div class="field full-col">
-        <label>Telegram Chat ID</label>
-        <input id="aChatId" placeholder="@channel or -100...">
-      </div>
-
-      <div class="field full-col">
-        <label>Photo URL</label>
-        <input id="aPhoto">
-      </div>
-
+      <div class="field full-col"><label>Product</label><select id="aProduct"></select></div>
+      <div class="field"><label>Title</label><input id="aTitle"></div>
+      <div class="field"><label>Button Text</label><input id="aButton" value="Order Now"></div>
+      <div class="field full-col"><label>Advertisement Text</label><textarea id="aText"></textarea></div>
+      <div class="field full-col"><label>Telegram Chat ID</label><input id="aChatId" placeholder="@channel or -100..."></div>
+      <div class="field full-col"><label>Photo URL</label><input id="aPhoto"></div>
       <div class="field full-col">
         <label>Advertisement Photo</label>
         <div class="file-box">
-          <input id="aImageFile" type="file" accept="image/*"
-                 onchange="uploadPhoto(this,'ad')">
-          <div style="font-size:11px;color:#748096;margin-top:7px">
-            Select advertisement image
-          </div>
+          <input id="aImageFile" type="file" accept="image/*" onchange="uploadPhoto(this,'ad')">
           <img id="aPreview" class="preview hidden">
         </div>
       </div>
-
     </div>
-
     <button class="btn btn-primary full" onclick="saveAd()">Save Advertisement</button>
   </div>
 </div>
 
-
-<!-- EMPLOYEE MODAL -->
 <div id="employeeModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-head">
-      <div class="modal-title" id="employeeModalTitle">Add Employee</div>
+      <div class="modal-title">Add Employee</div>
       <button class="close" onclick="closeModal('employeeModal')">×</button>
     </div>
-
-    <input type="hidden" id="eId">
-
     <div class="form-grid">
-
-      <div class="field">
-        <label>Employee Code</label>
-        <input id="eCode" placeholder="EMP-001">
-      </div>
-
-      <div class="field">
-        <label>Employee Name</label>
-        <input id="eName" placeholder="Full name">
-      </div>
-
-      <div class="field">
-        <label>Username</label>
-        <input id="eUsername" autocomplete="off">
-      </div>
-
-      <div class="field">
-        <label>Password</label>
-        <input id="ePassword" type="password" autocomplete="new-password">
-      </div>
-
-      <div class="field full-col">
-        <label>Permissions</label>
-
-        <div class="permissions">
-          <label class="permission"><input type="checkbox" value="view_orders" class="perm"> Orders</label>
-          <label class="permission"><input type="checkbox" value="verify_payment" class="perm"> Verify Payment</label>
-          <label class="permission"><input type="checkbox" value="confirm_order" class="perm"> Confirm Order</label>
-          <label class="permission"><input type="checkbox" value="products" class="perm"> Products</label>
-          <label class="permission"><input type="checkbox" value="delete_product" class="perm"> Delete Product</label>
-          <label class="permission"><input type="checkbox" value="advertising" class="perm"> Advertising</label>
-          <label class="permission"><input type="checkbox" value="payment_settings" class="perm"> Payment</label>
-          <label class="permission"><input type="checkbox" value="telegram_settings" class="perm"> Telegram</label>
-          <label class="permission"><input type="checkbox" value="employees" class="perm"> Employees</label>
-          <label class="permission"><input type="checkbox" value="reports" class="perm"> Reports</label>
-        </div>
-      </div>
-
+      <div class="field"><label>Employee Code</label><input id="eCode" placeholder="EMP-001"></div>
+      <div class="field"><label>Employee Name</label><input id="eName" placeholder="Full name"></div>
+      <div class="field"><label>Username</label><input id="eUsername"></div>
+      <div class="field"><label>Password</label><input id="ePassword" type="password"></div>
     </div>
-
     <button class="btn btn-primary full" onclick="saveEmployee()">Save Employee</button>
-
   </div>
 </div>
 
-
 <div id="toast"></div>
 
-
 <script>
-/* =========================================================
-   API CONFIG & STATE
-========================================================= */
-
 const API = {
   auth:"/api/auth",
   products:"/api/products",
@@ -1057,46 +745,15 @@ const API = {
 
 let token = localStorage.getItem("tsm_token") || "";
 let currentUser = null;
-let products = [];
-let orders = [];
-let ads = [];
-let employees = [];
-let reports = null;
+let products = [], orders = [], ads = [], employees = [], reports = null;
 
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function money(v){
-  const n = Number(v || 0);
-  return n.toLocaleString("en-US",{maximumFractionDigits:2}) + " ETB";
-}
-
-function esc(v){
-  return String(v ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function toast(msg){
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"),2500);
-}
-
-function errorBox(msg){
-  const el = document.getElementById("errorBox");
-  el.textContent = msg;
-  el.classList.remove("hidden");
-}
-
-function clearError(){
-  document.getElementById("errorBox").classList.add("hidden");
-}
+function money(v){ return (Number(v || 0)).toLocaleString("en-US",{maximumFractionDigits:2}) + " ETB"; }
+function esc(v){ return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+function toast(msg){ const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2500); }
+function errorBox(msg){ const el = document.getElementById("errorBox"); el.textContent = msg; el.classList.remove("hidden"); }
+function clearError(){ document.getElementById("errorBox").classList.add("hidden"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function emptyState(icon, text){ return `<div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:32px;margin-bottom:8px">${icon}</div><div>${text}</div></div>`; }
 
 function headers(){
   const h = {};
@@ -1106,66 +763,32 @@ function headers(){
 
 async function api(url,options={}){
   options.headers = options.headers || {};
-  if(!(options.body instanceof FormData)){
-    options.headers["Content-Type"] = "application/json";
-  }
+  if(!(options.body instanceof FormData)){ options.headers["Content-Type"] = "application/json"; }
   Object.assign(options.headers, headers());
 
   const res = await fetch(url,options);
   let data = {};
   try{ data = await res.json(); }catch(e){}
 
-  if(res.status === 401){
-    logout();
-    throw new Error("Session expired");
-  }
-
-  if(!res.ok){
-    throw new Error(data.error || data.message || "Request failed");
-  }
+  if(res.status === 401){ logout(); throw new Error("Session expired"); }
+  if(!res.ok){ throw new Error(data.error || data.message || "Request failed"); }
   return data;
 }
-
-function closeModal(id){
-  document.getElementById(id).classList.remove("open");
-}
-
-function emptyState(icon, text){
-  return `<div style="text-align:center;padding:30px;color:var(--muted)">
-    <div style="font-size:32px;margin-bottom:8px">${icon}</div>
-    <div>${text}</div>
-  </div>`;
-}
-
-/* =========================================================
-   LOGIN & AUTH
-========================================================= */
 
 async function login(){
   clearError();
   const username = document.getElementById("loginUser").value.trim();
   const password = document.getElementById("loginPass").value;
-
-  if(!username || !password){
-    errorBox("Username and password are required.");
-    return;
-  }
+  if(!username || !password){ errorBox("Username and password required"); return; }
 
   try{
-    const d = await api(API.auth + "/login",{
-      method:"POST",
-      body:JSON.stringify({username,password})
-    });
-
+    const d = await api(API.auth + "/login",{ method:"POST", body:JSON.stringify({username,password}) });
     token = d.token || "";
     localStorage.setItem("tsm_token",token);
-
     const me = await api(API.auth + "/me");
     currentUser = me.user || me;
     openApp();
-  }catch(err){
-    errorBox(err.message);
-  }
+  }catch(err){ errorBox(err.message); }
 }
 
 async function checkSession(){
@@ -1174,9 +797,7 @@ async function checkSession(){
     const d = await api(API.auth + "/me");
     currentUser = d.user || d;
     openApp();
-  }catch(e){
-    logout();
-  }
+  }catch(e){ logout(); }
 }
 
 function openApp(){
@@ -1187,25 +808,17 @@ function openApp(){
 }
 
 function logout(){
-  token="";
-  currentUser=null;
+  token=""; currentUser=null;
   localStorage.removeItem("tsm_token");
   document.getElementById("app").classList.add("hidden");
   document.getElementById("loginPage").classList.remove("hidden");
 }
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
 function showPage(page){
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
   const target = document.getElementById("page-" + page);
   if(target) target.classList.add("active");
-
-  document.querySelectorAll(".nav-btn").forEach(x=>{
-    x.classList.toggle("active", x.dataset.page === page);
-  });
+  document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active", x.dataset.page === page));
 
   if(page==="products") loadProducts();
   if(page==="orders") loadOrders();
@@ -1216,41 +829,19 @@ function showPage(page){
 }
 
 async function refreshAll(){
-  await Promise.allSettled([
-    loadProducts(),
-    loadOrders(),
-    loadAds(),
-    loadEmployees(),
-    loadReports(),
-    loadSettings()
-  ]);
+  await Promise.allSettled([loadProducts(), loadOrders(), loadAds(), loadEmployees(), loadReports(), loadSettings()]);
   updateDashboard();
 }
 
-/* =========================================================
-   PRODUCTS
-========================================================= */
-
-function mapProduct(p){
-  return {
-    id:p.id,
-    name:p.name || p.productName || "",
-    buyPrice:Number(p.buyPrice ?? p.buy_price ?? 0),
-    sellPrice:Number(p.sellPrice ?? p.sell_price ?? 0),
-    stock:Number(p.stock ?? 0),
-    photoUrl:p.photoUrl || p.photo_url || p.photo || "",
-    description:p.description || ""
-  };
-}
-
+/* PRODUCTS */
 async function loadProducts(){
   try{
     const d = await api(API.products);
-    products = Array.isArray(d) ? d.map(mapProduct) : Array.isArray(d.products) ? d.products.map(mapProduct) : [];
+    products = Array.isArray(d) ? d : [];
     renderProducts();
     updateProductSelect();
     updateDashboard();
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 
 function renderProducts(){
@@ -1259,26 +850,24 @@ function renderProducts(){
   const filter = document.getElementById("stockFilter")?.value || "all";
 
   let arr = products.filter(p=>{
-    const match = p.name.toLowerCase().includes(search);
-    const stockMatch = filter==="all" || (filter==="in" && p.stock>0) || (filter==="out" && p.stock<=0);
+    const name = p.name || p.product_name || "";
+    const match = name.toLowerCase().includes(search);
+    const stock = Number(p.stock || 0);
+    const stockMatch = filter==="all" || (filter==="in" && stock>0) || (filter==="out" && stock<=0);
     return match && stockMatch;
   });
 
-  if(!arr.length){
-    box.innerHTML = emptyState("📦","No products found");
-    return;
-  }
-
+  if(!arr.length){ box.innerHTML = emptyState("📦","No products found"); return; }
   box.innerHTML = arr.map(p=>`
     <div class="product-card">
-      ${p.photoUrl ? `<img class="product-img" src="${esc(p.photoUrl)}" onerror="this.style.display='none'">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:38px">📦</div>`}
+      ${p.photo_url ? `<img class="product-img" src="${esc(p.photo_url)}" onerror="this.style.display='none'">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:38px">📦</div>`}
       <div class="product-body">
-        <div class="product-name">${esc(p.name)}</div>
+        <div class="product-name">${esc(p.name || p.product_name)}</div>
         <div class="price-row">
-          <div><div class="price-buy">Buy</div><div>${money(p.buyPrice)}</div></div>
-          <div style="text-align:right"><div class="price-buy">Sell</div><div class="price-sell">${money(p.sellPrice)}</div></div>
+          <div><div class="price-buy">Buy</div><div>${money(p.buy_price)}</div></div>
+          <div style="text-align:right"><div class="price-buy">Sell</div><div class="price-sell">${money(p.sell_price)}</div></div>
         </div>
-        <div class="stock">Stock: <b>${p.stock}</b></div>
+        <div class="stock">Stock: <b>${p.stock || 0}</b></div>
         <div class="product-actions">
           <button class="btn btn-blue" onclick="editProduct('${esc(p.id)}')">Edit</button>
           <button class="btn btn-red" onclick="deleteProduct('${esc(p.id)}')">Delete</button>
@@ -1292,20 +881,13 @@ function openProductModal(p=null){
   document.getElementById("productModal").classList.add("open");
   document.getElementById("productModalTitle").textContent = p ? "Edit Product" : "Add Product";
   document.getElementById("pId").value = p?.id || "";
-  document.getElementById("pName").value = p?.name || "";
-  document.getElementById("pBuy").value = p?.buyPrice ?? "";
-  document.getElementById("pSell").value = p?.sellPrice ?? "";
+  document.getElementById("pName").value = p?.name || p?.product_name || "";
+  document.getElementById("pBuy").value = p?.buy_price ?? "";
+  document.getElementById("pSell").value = p?.sell_price ?? "";
   document.getElementById("pStock").value = p?.stock ?? "";
-  document.getElementById("pPhoto").value = p?.photoUrl || "";
+  document.getElementById("pPhoto").value = p?.photo_url || "";
   document.getElementById("pDescription").value = p?.description || "";
-
-  const preview = document.getElementById("pPreview");
-  if(p?.photoUrl){
-    preview.src = p.photoUrl;
-    preview.classList.remove("hidden");
-  }else{
-    preview.classList.add("hidden");
-  }
+  document.getElementById("pPreview").classList.add("hidden");
 }
 
 function editProduct(id){
@@ -1324,166 +906,134 @@ async function saveProduct(){
       photoUrl:document.getElementById("pPhoto").value.trim(),
       description:document.getElementById("pDescription").value.trim()
     };
-    if(!payload.name){ toast("Product name is required"); return; }
+    if(!payload.name){ toast("Product name required"); return; }
 
     await api(id ? API.products + "/" + encodeURIComponent(id) : API.products, {
-      method:id ? "PATCH" : "POST",
-      body:JSON.stringify(payload)
+      method: id ? "PATCH" : "POST",
+      body: JSON.stringify(payload)
     });
     closeModal("productModal");
     toast("Product saved");
-    await loadProducts();
+    loadProducts();
   }catch(e){ toast(e.message); }
 }
 
 async function deleteProduct(id){
-  if(!confirm("Delete this product?")) return;
+  if(!confirm("Delete product?")) return;
   try{
-    await api(API.products + "/" + encodeURIComponent(id),{ method:"DELETE" });
-    toast("Product deleted");
-    await loadProducts();
+    await api(API.products + "/" + encodeURIComponent(id), { method:"DELETE" });
+    toast("Deleted");
+    loadProducts();
   }catch(e){ toast(e.message); }
 }
 
-/* =========================================================
-   UPLOAD
-========================================================= */
-
-async function uploadPhoto(input,context){
+async function uploadPhoto(input, context){
   if(!input.files || !input.files[0]) return;
   try{
     const fd = new FormData();
-    fd.append("photo",input.files[0]);
-    fd.append("context",context);
-
-    const d = await api(API.upload,{ method:"POST", body:fd });
-    if(!d.url) throw new Error("No URL returned");
-
+    fd.append("photo", input.files[0]);
+    const d = await api(API.upload, { method:"POST", body:fd });
     if(context==="product"){
-      document.getElementById("pPhoto").value=d.url;
-      const preview=document.getElementById("pPreview");
-      preview.src=d.url;
-      preview.classList.remove("hidden");
-    }else{
-      document.getElementById("aPhoto").value=d.url;
-      const preview=document.getElementById("aPreview");
-      preview.src=d.url;
-      preview.classList.remove("hidden");
+      document.getElementById("pPhoto").value = d.url;
+      const prev = document.getElementById("pPreview");
+      prev.src = d.url; prev.classList.remove("hidden");
+    } else {
+      document.getElementById("aPhoto").value = d.url;
     }
     toast("Photo uploaded");
   }catch(e){ toast("Upload error: " + e.message); }
 }
 
-/* =========================================================
-   ORDERS
-========================================================= */
-
-function mapOrder(o){
-  return {
-    id:o.id,
-    productId:o.productId || o.product_id,
-    productName:o.productName || o.product_name || "Product",
-    customerName:o.customerName || o.customer_name || "",
-    phone:o.phone || "",
-    username:o.username || "",
-    quantity:Number(o.quantity || 0),
-    buyPrice:Number(o.buyPrice ?? o.buy_price ?? 0),
-    sellPrice:Number(o.sellPrice ?? o.sell_price ?? 0),
-    total:Number(o.total ?? 0),
-    profit:Number(o.profit ?? 0),
-    status:String(o.status || "NEW").toUpperCase(),
-    receiptUrl:o.receiptUrl || o.receipt_url || "",
-    receiptFileId:o.receipt_file_id || o.receiptFileId || "",
-    createdAt:o.createdAt || o.created_at || "",
-    closedAt:o.closed_at || o.closedAt || ""
-  };
-}
-
+/* ORDERS */
 async function loadOrders(){
   try{
     const d = await api(API.orders);
-    orders = Array.isArray(d) ? d.map(mapOrder) : Array.isArray(d.orders) ? d.orders.map(mapOrder) : [];
+    orders = Array.isArray(d) ? d : [];
     renderOrders();
     renderHomeOrders();
     updateDashboard();
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 
-function isClosed(o){
-  return o.status==="DELIVERED" || !!o.closedAt;
-}
+function isClosed(o){ return String(o.status).toUpperCase() === "DELIVERED" || !!o.closed_at; }
 
 function renderOrders(){
-  const box=document.getElementById("ordersList");
-  const search=(document.getElementById("orderSearch")?.value || "").toLowerCase();
-  const filter=document.getElementById("orderFilter")?.value || "active";
+  const box = document.getElementById("ordersList");
+  const search = (document.getElementById("orderSearch")?.value || "").toLowerCase();
+  const filter = document.getElementById("orderFilter")?.value || "active";
 
-  let arr=orders.filter(o=>{
-    const text=[o.id, o.productName, o.customerName, o.phone, o.username, o.status].join(" ").toLowerCase();
+  let arr = orders.filter(o=>{
+    const text = [o.id, o.product_name, o.customer_name, o.phone, o.status].join(" ").toLowerCase();
     if(search && !text.includes(search)) return false;
-    if(filter==="active") return !isClosed(o) && o.status!=="REJECTED";
+    const st = String(o.status || "").toUpperCase();
+    if(filter==="active") return !isClosed(o) && st !== "REJECTED";
     if(filter==="all") return true;
-    return o.status===filter;
+    return st === filter;
   });
 
-  arr.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
-  if(!arr.length){ box.innerHTML=emptyState("🛍️","No orders"); return; }
-  box.innerHTML=arr.map(orderCard).join("");
-}
-
-function orderCard(o){
-  return `
+  if(!arr.length){ box.innerHTML = emptyState("🛍️","No orders found"); return; }
+  box.innerHTML = arr.map(o=>`
     <div class="item">
       <div class="item-row">
         <div class="item-main">
-          <div class="item-title">${esc(o.productName)}</div>
-          <div class="item-sub">${esc(o.customerName || "Customer")} ${o.username ? " • " + esc(o.username) : ""}</div>
-          <div class="item-sub">Qty: ${o.quantity} • ${money(o.total)}</div>
+          <div class="item-title">${esc(o.product_name)}</div>
+          <div class="item-sub">${esc(o.customer_name || "Customer")} • ${esc(o.phone || "-")}</div>
+          <div class="item-sub">Qty: ${o.quantity || 1} • ${money(o.total)}</div>
         </div>
         <span class="status ${esc(o.status)}">${esc(o.status)}</span>
       </div>
       <div class="item-actions">
         <button class="btn btn-blue" onclick="viewOrder('${esc(o.id)}')">Details</button>
-        ${o.status==="RECEIPT_PENDING" ? `
+        ${String(o.status).toUpperCase() === "RECEIPT_PENDING" ? `
           <button class="btn btn-green" onclick="changeOrder('${esc(o.id)}','CONFIRMED')">✓ Confirm</button>
           <button class="btn btn-red" onclick="changeOrder('${esc(o.id)}','REJECTED')">✕ Reject</button>
         ` : ""}
-        ${o.receiptFileId || o.receiptUrl ? `<button class="btn btn-orange" onclick="viewReceipt('${esc(o.id)}')">🧾 Receipt</button>` : ""}
+        ${o.receipt_file_id ? `<button class="btn btn-orange" onclick="viewReceipt('${esc(o.id)}')">🧾 Receipt</button>` : ""}
       </div>
     </div>
-  `;
+  `).join("");
 }
 
 function renderHomeOrders(){
-  const box=document.getElementById("homeOrders");
-  const arr=orders.filter(o=>!isClosed(o) && o.status!=="REJECTED")
-    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
-  if(!arr.length){ box.innerHTML=emptyState("✅","No active orders"); return; }
-  box.innerHTML=arr.map(orderCard).join("");
+  const box = document.getElementById("homeOrders");
+  const arr = orders.filter(o=>!isClosed(o) && String(o.status).toUpperCase() !== "REJECTED").slice(0,5);
+  if(!arr.length){ box.innerHTML = emptyState("✅","No active orders"); return; }
+  box.innerHTML = arr.map(o=>`
+    <div class="item">
+      <div class="item-row">
+        <div class="item-main">
+          <div class="item-title">${esc(o.product_name)}</div>
+          <div class="item-sub">${esc(o.customer_name)} • ${money(o.total)}</div>
+        </div>
+        <span class="status ${esc(o.status)}">${esc(o.status)}</span>
+      </div>
+    </div>
+  `).join("");
 }
 
-async function changeOrder(id,status){
-  if(!confirm(status==="CONFIRMED" ? "Confirm this order?" : "Reject this order?")) return;
+async function changeOrder(id, status){
+  if(!confirm(status==="CONFIRMED" ? "Confirm this order and update stock?" : "Reject this order?")) return;
   try{
-    await api(API.orders+"/"+encodeURIComponent(id)+"/status",{
+    await api(API.orders + "/" + encodeURIComponent(id) + "/status", {
       method:"PATCH",
       body:JSON.stringify({status})
     });
-    toast("Order updated");
+    toast("Order updated successfully");
     await loadOrders();
+    await loadProducts();
   }catch(e){ toast(e.message); }
 }
 
 function viewOrder(id){
-  const o=orders.find(x=>String(x.id)===String(id));
+  const o = orders.find(x=>String(x.id)===String(id));
   if(!o) return;
   document.getElementById("orderDetails").innerHTML=`
     <div class="item">
-      <div class="item-title">${esc(o.productName)}</div>
+      <div class="item-title">${esc(o.product_name)}</div>
       <div style="margin-top:10px"><b>Order ID:</b> ${esc(o.id)}</div>
-      <div style="margin-top:7px"><b>Customer:</b> ${esc(o.customerName)}</div>
-      <div style="margin-top:7px"><b>Phone:</b> ${esc(o.phone || "-")}</div>
-      <div style="margin-top:7px"><b>Quantity:</b> ${o.quantity}</div>
+      <div style="margin-top:7px"><b>Customer:</b> ${esc(o.customer_name)}</div>
+      <div style="margin-top:7px"><b>Phone:</b> ${esc(o.phone)}</div>
+      <div style="margin-top:7px"><b>Address:</b> ${esc(o.address || "-")}</div>
       <div style="margin-top:7px"><b>Total:</b> ${money(o.total)}</div>
       <div style="margin-top:10px"><b>Status:</b> <span class="status ${esc(o.status)}">${esc(o.status)}</span></div>
     </div>
@@ -1492,28 +1042,22 @@ function viewOrder(id){
 }
 
 function viewReceipt(id){
-  const o=orders.find(x=>String(x.id)===String(id));
-  if(!o) return;
-  if(o.receiptUrl) window.open(o.receiptUrl,"_blank");
-  else window.open(API.orders+"/"+encodeURIComponent(id)+"/receipt","_blank");
+  window.open(API.orders + "/" + encodeURIComponent(id) + "/receipt", "_blank");
 }
 
-/* =========================================================
-   ADS
-========================================================= */
-
+/* ADS */
 async function loadAds(){
   try{
     const d = await api(API.ads);
-    ads = Array.isArray(d) ? d : Array.isArray(d.ads) ? d.ads : [];
+    ads = Array.isArray(d) ? d : [];
     renderAds();
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 
 function updateProductSelect(){
   const s = document.getElementById("aProduct");
   if(!s) return;
-  s.innerHTML = products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+  s.innerHTML = products.map(p=>`<option value="${esc(p.id)}">${esc(p.name || p.product_name)}</option>`).join("");
 }
 
 function renderAds(){
@@ -1522,11 +1066,8 @@ function renderAds(){
   box.innerHTML = ads.map(a=>`
     <div class="item">
       <div class="item-row">
-        <div class="item-main">
-          <div class="item-title">${esc(a.title || "Advertisement")}</div>
-          <div class="item-sub">${esc(a.text || "")}</div>
-        </div>
-        <span class="status ${a.published ? "DELIVERED" : "PAYMENT_PENDING"}">${a.published ? "PUBLISHED" : "DRAFT"}</span>
+        <div class="item-main"><div class="item-title">${esc(a.title || "Ad")}</div><div class="item-sub">${esc(a.text || "")}</div></div>
+        <span class="status ${a.status==="PUBLISHED" ? "DELIVERED" : "NEW"}">${esc(a.status || "DRAFT")}</span>
       </div>
       <div class="item-actions">
         <button class="btn btn-blue" onclick="publishAd('${esc(a.id)}')">📢 Publish</button>
@@ -1543,14 +1084,15 @@ function openAdModal(){
 
 async function saveAd(){
   try{
-    const payload={
+    const payload = {
       product_id:document.getElementById("aProduct").value,
       title:document.getElementById("aTitle").value.trim(),
       text:document.getElementById("aText").value.trim(),
+      button_text:document.getElementById("aButton").value.trim(),
       target_chat_id:document.getElementById("aChatId").value.trim(),
       photo_url:document.getElementById("aPhoto").value.trim()
     };
-    await api(API.ads,{ method:"POST", body:JSON.stringify(payload) });
+    await api(API.ads, { method:"POST", body:JSON.stringify(payload) });
     closeModal("adModal");
     toast("Ad saved");
     loadAds();
@@ -1558,10 +1100,10 @@ async function saveAd(){
 }
 
 async function publishAd(id){
-  if(!confirm("Publish ad?")) return;
+  if(!confirm("Publish ad to Telegram?")) return;
   try{
-    await api(API.ads+"/"+encodeURIComponent(id)+"/publish",{ method:"POST" });
-    toast("Published");
+    await api(API.ads + "/" + encodeURIComponent(id) + "/publish", { method:"POST" });
+    toast("Published successfully");
     loadAds();
   }catch(e){ toast(e.message); }
 }
@@ -1569,26 +1111,19 @@ async function publishAd(id){
 async function deleteAd(id){
   if(!confirm("Delete ad?")) return;
   try{
-    await api(API.ads+"/"+encodeURIComponent(id),{ method:"DELETE" });
+    await api(API.ads + "/" + encodeURIComponent(id), { method:"DELETE" });
     toast("Deleted");
     loadAds();
   }catch(e){ toast(e.message); }
 }
 
-/* =========================================================
-   EMPLOYEES
-========================================================= */
-
-function employeeName(e){
-  return e.name || e.full_name || e.username || "Worker";
-}
-
+/* EMPLOYEES */
 async function loadEmployees(){
   try{
     const d = await api(API.employees);
-    employees = Array.isArray(d) ? d : Array.isArray(d.employees) ? d.employees : [];
+    employees = Array.isArray(d) ? d : [];
     renderEmployees();
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 
 function renderEmployees(){
@@ -1598,8 +1133,8 @@ function renderEmployees(){
     <div class="item">
       <div class="item-row">
         <div class="item-main">
-          <div class="item-title">${esc(employeeName(e))} (${esc(e.username || "-")})</div>
-          <div class="item-sub">Code: ${esc(e.employee_code || e.employeeCode || "-")}</div>
+          <div class="item-title">${esc(e.name)} (${esc(e.username)})</div>
+          <div class="item-sub">Code: ${esc(e.employee_code)}</div>
         </div>
         <button class="btn btn-red" onclick="deleteEmployee('${esc(e.id)}')">Delete</button>
       </div>
@@ -1613,15 +1148,15 @@ function openEmployeeModal(){
 
 async function saveEmployee(){
   try{
-    const payload={
+    const payload = {
       employee_code:document.getElementById("eCode").value.trim(),
       name:document.getElementById("eName").value.trim(),
       username:document.getElementById("eUsername").value.trim(),
       password:document.getElementById("ePassword").value
     };
-    await api(API.employees,{ method:"POST", body:JSON.stringify(payload) });
+    await api(API.employees, { method:"POST", body:JSON.stringify(payload) });
     closeModal("employeeModal");
-    toast("Employee saved");
+    toast("Employee created");
     loadEmployees();
   }catch(e){ toast(e.message); }
 }
@@ -1629,16 +1164,13 @@ async function saveEmployee(){
 async function deleteEmployee(id){
   if(!confirm("Delete employee?")) return;
   try{
-    await api(API.employees+"/"+encodeURIComponent(id),{ method:"DELETE" });
+    await api(API.employees + "/" + encodeURIComponent(id), { method:"DELETE" });
     toast("Deleted");
     loadEmployees();
   }catch(e){ toast(e.message); }
 }
 
-/* =========================================================
-   REPORTS & SETTINGS
-========================================================= */
-
+/* REPORTS & SETTINGS */
 async function loadReports(){
   try{
     const d = await api(API.reports);
@@ -1648,7 +1180,7 @@ async function loadReports(){
     document.getElementById("repDelivered").textContent = reports.deliveredOrders || 0;
     document.getElementById("repDelivery").textContent = reports.pendingOrders || 0;
     document.getElementById("reportDetails").innerHTML = `<div>Total Orders: <b>${reports.totalOrders || 0}</b></div>`;
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 
 async function loadSettings(){
@@ -1665,54 +1197,50 @@ async function loadSettings(){
 
 async function savePayment(){
   try{
-    const payload={
+    const payload = {
       bank_name:document.getElementById("bankName").value.trim(),
       account_name:document.getElementById("accountName").value.trim(),
       account_number:document.getElementById("accountNumber").value.trim(),
       payment_note:document.getElementById("paymentNote").value.trim()
     };
-    await api(API.payment,{ method:"POST", body:JSON.stringify(payload) });
+    await api(API.payment, { method:"POST", body:JSON.stringify(payload) });
     toast("Payment settings saved");
   }catch(e){ toast(e.message); }
 }
 
 async function saveTelegram(){
   try{
-    const payload={
+    const payload = {
       bot_username:document.getElementById("telegramUsername").value.trim(),
       admin_chat_id:document.getElementById("telegramAdminChatId").value.trim(),
       webhook_url:document.getElementById("telegramWebhookUrl").value.trim()
     };
-    await api(API.telegram,{ method:"POST", body:JSON.stringify(payload) });
+    await api(API.telegram, { method:"POST", body:JSON.stringify(payload) });
     toast("Telegram settings saved");
   }catch(e){ toast(e.message); }
 }
 
 function updateDashboard(){
   document.getElementById("statProducts").textContent = products.length;
-  const activeOrdersCount = orders.filter(o=>!isClosed(o) && o.status!=="REJECTED").length;
-  document.getElementById("statOrders").textContent = activeOrdersCount;
+  const activeOrders = orders.filter(o=>!isClosed(o) && String(o.status).toUpperCase() !== "REJECTED").length;
+  document.getElementById("statOrders").textContent = activeOrders;
 
-  let totalSales = 0;
-  let totalProfit = 0;
+  let sales = 0, profit = 0;
   orders.forEach(o=>{
     if(isClosed(o)){
-      totalSales += o.total || 0;
-      totalProfit += o.profit || 0;
+      sales += Number(o.total || 0);
+      profit += Number(o.profit || 0);
     }
   });
 
-  document.getElementById("statSales").textContent = money(totalSales);
-  document.getElementById("statProfit").textContent = money(totalProfit);
-
-  document.getElementById("headSales").textContent = money(totalSales);
-  document.getElementById("headProfit").textContent = money(totalProfit);
-  document.getElementById("headOrders").textContent = activeOrdersCount;
+  document.getElementById("statSales").textContent = money(sales);
+  document.getElementById("statProfit").textContent = money(profit);
+  document.getElementById("headSales").textContent = money(sales);
+  document.getElementById("headProfit").textContent = money(profit);
+  document.getElementById("headOrders").textContent = activeOrders;
 }
 
-// Initial session check
 checkSession();
 </script>
-
 </body>
 </html>
