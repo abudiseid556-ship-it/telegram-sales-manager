@@ -3821,585 +3821,601 @@ async function processTelegram(
       }
 
       const largest =
-        message.photo[
-          message.photo.length - 1
-        ];
+user.permissions =
+  (data || []).map((p) => p.permission || p.name || p);
 
-      const { data, error } =
-        await supabase
-          .from("orders")
-          .update({
-            receipt_file_id:
-              largest.file_id,
-            receipt_status:
-              "PENDING",
-            payment_status:
-              "RECEIPT_PENDING",
-            status:
-              "RECEIPT_PENDING",
-            receipt_uploaded_at:
-              nowISO()
-          })
-          .eq(
-            "id",
-            order.id
-          )
-          .select("*")
-          .single();
+return res.json({
+  ok: true,
+  user
+});
+});
 
-      if (error) {
-        throw error;
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "Telegram Sales Manager",
+    time: nowISO()
+  });
+});
+
+app.get("/api/reports", requireAuth, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const orders = data || [];
+
+    let totalSales = 0;
+    let totalProfit = 0;
+    let totalOrders = orders.length;
+    let deliveredOrders = 0;
+    let pendingOrders = 0;
+
+    for (const o of orders) {
+      totalSales += Number(o.total || 0);
+      totalProfit += Number(o.profit || 0);
+
+      const status = String(o.status || "").toUpperCase();
+
+      if (status === "DELIVERED" || status === "CLOSED") {
+        deliveredOrders++;
+      } else {
+        pendingOrders++;
+      }
+    }
+
+    res.json({
+      ok: true,
+      summary: {
+        totalOrders,
+        deliveredOrders,
+        pendingOrders,
+        totalSales,
+        totalProfit
+      },
+      orders
+    });
+  } catch (err) {
+    console.error("Reports error:", err);
+    res.status(500).json({
+      ok: false,
+      error: err.message
+    });
+  }
+});
+
+async function sendDeliveryPendingMessage(order) {
+  if (!order || !order.telegram_chat_id) return;
+
+  const text =
+    `📦 የእቃ መላኪያ ሂደት\n\n` +
+    `🛍 እቃ: ${order.product_name || "-"}\n` +
+    `🔢 ብዛት: ${order.quantity || 1}\n` +
+    `💰 ድምር: ${order.total || 0}\n\n` +
+    `✅ ክፍያዎ ተረጋግጧል።\n` +
+    `🚚 እቃዎ ለመላክ ተዘጋጅቷል።`;
+
+  await sendMessage(
+    order.telegram_chat_id,
+    text,
+    {
+      inline_keyboard: [
+        [
+          {
+            text: "📦 ደርሶኛል",
+            callback_data: `order_received_${order.id}`
+          }
+        ]
+      ]
+    }
+  );
+}
+
+async function telegramAdminAction(order, action) {
+  if (!ADMIN_CHAT_ID || !order) return;
+
+  let text = "";
+
+  if (action === "confirm") {
+    text =
+      `✅ ክፍያ ተረጋግጧል\n\n` +
+      `🛍 ${order.product_name || "-"}\n` +
+      `👤 ${order.customer_name || "-"}\n` +
+      `📞 ${order.phone || "-"}\n` +
+      `🔢 ${order.quantity || 1}\n` +
+      `💰 ${order.total || 0}`;
+  }
+
+  if (action === "reject") {
+    text =
+      `❌ ኦርደሩ ተቀባይነት አላገኘም\n\n` +
+      `🛍 ${order.product_name || "-"}\n` +
+      `👤 ${order.customer_name || "-"}`;
+  }
+
+  if (text) {
+    await sendMessage(ADMIN_CHAT_ID, text);
+  }
+}
+
+async function findPendingOrder(chatId) {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("telegram_chat_id", String(chatId))
+    .in("status", [
+      "NEW",
+      "PAYMENT_PENDING",
+      "RECEIPT_PENDING",
+      "CONFIRMED",
+      "DELIVERY_PENDING"
+    ])
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("findPendingOrder:", error);
+    return null;
+  }
+
+  return data && data.length ? data[0] : null;
+}
+
+async function processTelegram(update) {
+  try {
+    if (!update) return;
+
+    if (update.callback_query) {
+      const callback = update.callback_query;
+      const chatId = callback.message?.chat?.id;
+      const fromId = callback.from?.id;
+      const data = callback.data || "";
+
+      if (!chatId) return;
+
+      await telegram("answerCallbackQuery", {
+        callback_query_id: callback.id
+      });
+
+      if (data.startsWith("admin_confirm_")) {
+        if (!ADMIN_CHAT_ID || String(fromId) !== String(ADMIN_CHAT_ID)) {
+          return;
+        }
+
+        const orderId = data.replace("admin_confirm_", "");
+
+        await changeOrderStatus(
+          orderId,
+          "CONFIRMED",
+          "MASTER_ADMIN"
+        );
+
+        return;
       }
 
-      const customerMessage =
+      if (data.startsWith("admin_reject_")) {
+        if (!ADMIN_CHAT_ID || String(fromId) !== String(ADMIN_CHAT_ID)) {
+          return;
+        }
+
+        const orderId = data.replace("admin_reject_", "");
+
+        await changeOrderStatus(
+          orderId,
+          "REJECTED",
+          "MASTER_ADMIN"
+        );
+
+        return;
+      }
+
+      if (data.startsWith("order_received_")) {
+        const orderId = data.replace("order_received_", "");
+        const order = await getOrderById(orderId);
+
+        if (!order) return;
+
+        if (
+          String(order.telegram_chat_id) !== String(chatId)
+        ) {
+          return;
+        }
+
+        await changeOrderStatus(
+          orderId,
+          "DELIVERED",
+          `TELEGRAM_${fromId}`
+        );
+
+        return;
+      }
+
+      if (data.startsWith("product_")) {
+        const productId = data.replace("product_", "");
+        const product = await getProduct(productId);
+
+        if (!product) {
+          await sendMessage(chatId, "❌ እቃው አልተገኘም።");
+          return;
+        }
+
+        const stock = productStock(product);
+
+        if (stock <= 0) {
+          await sendMessage(chatId, "❌ ይህ እቃ ከክምችት ውጭ ነው።");
+          return;
+        }
+
+        userSessions[chatId] = {
+          ...(userSessions[chatId] || {}),
+          productId,
+          product
+        };
+
         await sendMessage(
           chatId,
-          "📥 ደረሰኙ ተቀብለናል።\n\n" +
-            "⏳ Admin እስኪያረጋግጠው ድረስ እባክዎ ይጠብቁ።"
+          `🛍 ${productName(product)}\n\n` +
+          `💰 ዋጋ: ${productSellPrice(product)}\n` +
+          `📦 የቀረ: ${stock}\n\n` +
+          `የሚፈልጉትን ብዛት ይምረጡ።`,
+          {
+            inline_keyboard: [
+              [
+                { text: "1", callback_data: "qty_1" },
+                { text: "2", callback_data: "qty_2" },
+                { text: "3", callback_data: "qty_3" }
+              ],
+              [
+                { text: "❌ ሰርዝ", callback_data: "cancel" }
+              ]
+            ]
+          }
         );
 
-      await trackTelegramMessage(
-        order.id,
-        chatId,
-        customerMessage
-      );
+        return;
+      }
 
-      if (ADMIN_CHAT_ID) {
-        const caption =
-          `🧾 PAYMENT RECEIPT\n\n` +
-          `🆔 Order: ${order.id}\n` +
-          `👤 ${firstDefined(
-            order.customer_name,
-            "-"
-          )}\n` +
-          `📱 ${firstDefined(
-            order.phone,
-            "-"
-          )}\n` +
-          `💰 ${firstDefined(
-            order.total,
-            0
-          )} ETB`;
+      if (data.startsWith("qty_")) {
+        const quantity = Number(data.replace("qty_", ""));
+        const session = userSessions[chatId];
 
-        const adminReceipt =
-          await telegram(
-            "sendPhoto",
-            {
-              chat_id:
-                ADMIN_CHAT_ID,
-              photo:
-                largest.file_id,
-              caption,
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    {
-                      text:
-                        "✅ Confirm",
-                      callback_data:
-                        `admin_confirm_${order.id}`
-                    },
-                    {
-                      text:
-                        "❌ Reject",
-                      callback_data:
-                        `admin_reject_${order.id}`
-                    }
-                  ]
-                ]
-              }
-            }
-          );
+        if (!session || !session.product) {
+          await sendMessage(chatId, "❌ ኦርደሩ አልተገኘም።");
+          return;
+        }
 
-        await trackTelegramMessage(
-          order.id,
-          ADMIN_CHAT_ID,
-          adminReceipt
+        if (quantity <= 0 || quantity > productStock(session.product)) {
+          await sendMessage(chatId, "❌ የተመረጠው ብዛት ከክምችቱ በላይ ነው።");
+          return;
+        }
+
+        session.quantity = quantity;
+        session.step = "NAME";
+
+        await sendMessage(
+          chatId,
+          "👤 እባክዎ ሙሉ ስምዎን ይጻፉ።"
         );
+
+        return;
+      }
+
+      if (data === "cancel") {
+        delete userSessions[chatId];
+        await sendMessage(chatId, "❌ ኦርደሩ ተሰርዟል።");
+        return;
+      }
+
+      if (data === "order_confirm") {
+        const session = userSessions[chatId];
+                 if (!session || !session.product) {
+          await sendMessage(chatId, "❌ ኦርደሩ አልተገኘም።");
+          return;
+        }
+
+        const p = session.product;
+        const quantity = Number(session.quantity || 1);
+        const buyPrice = productBuyPrice(p);
+        const sellPrice = productSellPrice(p);
+        const total = sellPrice * quantity;
+        const profit = (sellPrice - buyPrice) * quantity;
+
+        const { data: order, error } = await supabase
+          .from("orders")
+          .insert({
+            product_id: p.id,
+            product_name: productName(p),
+            customer_name: session.name || "",
+            phone: session.phone || "",
+            username: callback.from?.username
+              ? `@${callback.from.username}`
+              : "",
+            telegram_chat_id: String(chatId),
+            customer_id: String(fromId || chatId),
+            quantity,
+            buy_price: buyPrice,
+            sell_price: sellPrice,
+            total,
+            profit,
+            address: session.address || "",
+            status: "PAYMENT_PENDING",
+            payment_status: "PENDING",
+            delivery_status: "PENDING"
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        userSessions[chatId] = {
+          ...session,
+          orderId: order.id
+        };
+
+        const payment = await getPaymentSettings();
+
+        const paymentText =
+          `🧾 ኦርደርዎ ተመዝግቧል።\n\n` +
+          `🛍 ${productName(p)}\n` +
+          `🔢 ብዛት: ${quantity}\n` +
+          `💰 ድምር: ${total}\n\n` +
+          `💳 የክፍያ መረጃ\n` +
+          `${payment?.bankName || ""}\n` +
+          `${payment?.accountName || ""}\n` +
+          `${payment?.accountNumber || ""}\n\n` +
+          `ክፍያውን ከፈጸሙ በኋላ የክፍያ ደረሰኝ (Receipt) ፎቶ ይላኩ።`;
+
+        await sendMessage(chatId, paymentText);
+
+        return;
       }
 
       return;
     }
 
-    /* -----------------------------------------
-       START
-    ----------------------------------------- */
+    const message = update.message;
 
-    if (
-      text === "/start" ||
-      text.startsWith("/start ")
-    ) {
-      const payload =
-        text
-          .replace(
-            "/start",
-            ""
-          )
-          .trim();
+    if (!message) return;
 
-      if (
-        payload.startsWith(
-          "product_"
-        )
-      ) {
-        const productId =
-          payload.replace(
-            "product_",
-            ""
-          );
+    const chatId = message.chat.id;
+    const from = message.from || {};
+    const textMessage = String(message.text || "").trim();
 
-        const product =
-          await getProduct(
-            productId
-          );
+    if (message.photo && message.photo.length) {
+      const order = await findPendingOrder(chatId);
 
-        if (product) {
-          const fakeCallback = {
-            id: randomId(
-              "start_"
-            ),
-            from,
-            message: {
-              chat
-            },
-            data:
-              `product_${product.id}`
-          };
-
-          await processTelegram({
-            callback_query:
-              fakeCallback
-          });
-
-          return;
-        }
+      if (!order) {
+        await sendMessage(
+          chatId,
+          "❌ የሚጠብቅ ኦርደር የለም።"
+        );
+        return;
       }
 
-      delete userSessions[
-        chatId
-      ];
+      const photo =
+        message.photo[message.photo.length - 1];
+
+      await supabase
+        .from("orders")
+        .update({
+          status: "RECEIPT_PENDING",
+          payment_status: "RECEIPT_PENDING",
+          receipt_file_id: photo.file_id
+        })
+        .eq("id", order.id);
 
       await sendMessage(
         chatId,
-        `👋 እንኳን ወደ UNI MARKET በደህና መጡ!\n\n` +
-          `🛍️ የሚፈልጉትን ምርት ከታች ይምረጡ።`
+        "✅ ደረሰኙ ተቀብለናል።\n\n" +
+        "⏳ Admin እስኪያረጋግጥ ድረስ ይጠብቁ።"
       );
 
-      await botSendProducts(
-        chatId
-      );
-
-      return;
-    }
-
-    /* -----------------------------------------
-       SESSION INPUT
-    ----------------------------------------- */
-
-    const session =
-      userSessions[
-        chatId
-      ];
-
-    if (!session) {
-      return botSendProducts(
-        chatId
-      );
-    }
-
-    if (
-      session.step ===
-      "NAME"
-    ) {
-      if (!text) {
-        return sendMessage(
-          chatId,
-          "👤 እባክዎ ሙሉ ስም ያስገቡ።"
-        );
-      }
-
-      session.name =
-        text;
-
-      session.step =
-        "PHONE";
-
-      return sendMessage(
-        chatId,
-        "📱 ስልክ ቁጥርዎን ያስገቡ፦"
-      );
-    }
-
-    if (
-      session.step ===
-      "PHONE"
-    ) {
-      if (!text) {
-        return sendMessage(
-          chatId,
-          "📱 እባክዎ ስልክ ቁጥር ያስገቡ።"
-        );
-      }
-
-      session.phone =
-        text;
-
-      session.step =
-        "ADDRESS";
-
-      return sendMessage(
-        chatId,
-        "📍 የመላኪያ አድራሻዎን ያስገቡ፦"
-      );
-    }
-
-    if (
-      session.step ===
-      "ADDRESS"
-    ) {
-      if (!text) {
-        return sendMessage(
-          chatId,
-          "📍 እባክዎ የመላኪያ አድራሻ ያስገቡ።"
-        );
-      }
-
-      session.address =
-        text;
-
-      const product =
-        await getProduct(
-          session.productId
-        );
-
-      if (!product) {
-        delete userSessions[
-          chatId
-        ];
-
-        return sendMessage(
-          chatId,
-          "❌ ምርቱ አልተገኘም።"
-        );
-      }
-
-      const quantity =
-        Math.max(
-          1,
-          Number(
-            session.quantity ||
-              1
-          )
-        );
-
-      const total =
-        productSellPrice(
-          product
-        ) *
-        quantity;
-
-      const review =
-        `📋 **የኦርደር ማረጋገጫ**\n\n` +
-        `📦 ${productName(
-          product
-        )}\n` +
-        `🔢 ብዛት: ${quantity}\n` +
-        `👤 ${session.name}\n` +
-        `📱 ${session.phone}\n` +
-        `📍 ${session.address}\n` +
-        `💰 ${total} ETB`;
-
-      session.step =
-        "REVIEW";
-
-      return sendMessage(
-        chatId,
-        review,
-        {
-          parse_mode:
-            "Markdown",
-          reply_markup: {
+      if (ADMIN_CHAT_ID) {
+        await sendMessage(
+          ADMIN_CHAT_ID,
+          `🧾 አዲስ Receipt መጥቷል\n\n` +
+          `🛍 ${order.product_name || "-"}\n` +
+          `👤 ${order.customer_name || "-"}\n` +
+          `📞 ${order.phone || "-"}\n` +
+          `💰 ${order.total || 0}`,
+          {
             inline_keyboard: [
               [
                 {
-                  text:
-                    "✅ ኦርደር አረጋግጥ",
-                  callback_data:
-                    "order_confirm"
-                }
-              ],
-              [
+                  text: "✅ Confirm",
+                  callback_data: `admin_confirm_${order.id}`
+                },
                 {
-                  text:
-                    "❌ ሰርዝ",
-                  callback_data:
-                    "order_cancel"
+                  text: "❌ Reject",
+                  callback_data: `admin_reject_${order.id}`
                 }
               ]
             ]
           }
+        );
+
+        try {
+          await telegram("sendPhoto", {
+            chat_id: ADMIN_CHAT_ID,
+            photo: photo.file_id,
+            caption: `🧾 Receipt - Order ${order.id}`
+          });
+        } catch (e) {
+          console.error("Admin receipt photo error:", e.message);
         }
-      );
+      }
+
+      return;
     }
 
-    if (
-      session.step ===
-      "PAYMENT_PENDING" ||
-      session.step ===
-      "REVIEW"
-    ) {
-      return sendMessage(
+    if (textMessage === "/start" || textMessage.startsWith("/start ")) {
+      const parts = textMessage.split(/\s+/);
+      const startParam = parts[1] || "";
+
+      if (startParam.startsWith("product_")) {
+        const productId = startParam.replace("product_", "");
+        const product = await getProduct(productId);
+
+        if (!product) {
+          await sendMessage(chatId, "❌ እቃው አልተገኘም።");
+          return;
+        }
+
+        const stock = productStock(product);
+
+        if (stock <= 0) {
+          await sendMessage(chatId, "❌ ይህ እቃ ከክምችት ውጭ ነው።");
+          return;
+        }
+
+        userSessions[chatId] = {
+          productId,
+          product
+        };
+
+        const caption =
+          `🛍 ${productName(product)}\n\n` +
+          `💰 ዋጋ: ${productSellPrice(product)}\n` +
+          `📦 የቀረ: ${stock}`;
+
+        await sendMessage(chatId, caption, {
+          inline_keyboard: [
+            [
+              { text: "1", callback_data: "qty_1" },
+              { text: "2", callback_data: "qty_2" },
+              { text: "3", callback_data: "qty_3" }
+            ]
+          ]
+        });
+
+        return;
+      }
+
+      await sendMessage(
         chatId,
-        "⏳ እባክዎ የአሁኑን ኦርደር ይጨርሱ።"
+        "🛒 እንኳን ወደ UNI MARKET በደህና መጡ!"
       );
+
+      return;
     }
-  } catch (err) {
-    console.error(
-      "PROCESS TELEGRAM ERROR:",
-      err
-    );
 
-    try {
-      const chatId =
-        update?.message?.chat?.id ||
-        update?.callback_query?.message?.chat?.id;
+    const session = userSessions[chatId];
 
-      if (chatId) {
+    if (session) {
+      if (session.step === "NAME") {
+        session.name = textMessage;
+        session.step = "PHONE";
+
         await sendMessage(
           chatId,
-          "❌ የማይጠበቅ ስህተት ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።"
+          "📞 እባክዎ ስልክ ቁጥርዎን ይጻፉ።"
         );
+
+        return;
       }
-    } catch {}
+
+      if (session.step === "PHONE") {
+        session.phone = textMessage;
+        session.step = "ADDRESS";
+
+        await sendMessage(
+          chatId,
+          "📍 እባክዎ የመላኪያ አድራሻዎን ይጻፉ።"
+        );
+
+        return;
+      }
+
+      if (session.step === "ADDRESS") {
+        session.address = textMessage;
+        session.step = "REVIEW";
+
+        const p = session.product;
+        const quantity = Number(session.quantity || 1);
+        const total = productSellPrice(p) * quantity;
+
+        await sendMessage(
+          chatId,
+          `🧾 የኦርደር ማረጋገጫ\n\n` +
+          `🛍 ${productName(p)}\n` +
+          `🔢 ብዛት: ${quantity}\n` +
+          `👤 ${session.name}\n` +
+          `📞 ${session.phone}\n` +
+          `📍 ${session.address}\n` +
+          `💰 ድምር: ${total}`,
+          {
+            inline_keyboard: [
+              [
+                {
+                  text: "✅ ኦርደር አረጋግጥ",
+                  callback_data: "order_confirm"
+                }
+              ],
+              [
+                {
+                  text: "❌ ሰርዝ",
+                  callback_data: "cancel"
+                }
+              ]
+            ]
+          }
+        );
+
+        return;
+      }
+    }
+
+    await sendMessage(
+      chatId,
+      "እባክዎ Product link ይክፈቱ።"
+    );
+  } catch (err) {
+    console.error("processTelegram error:", err);
   }
 }
 
-/* =========================================================
-   TELEGRAM WEBHOOK
-========================================================= */
+app.post("/telegram/webhook", async (req, res) => {
+  res.json({ ok: true });
 
-app.post(
-  "/telegram/webhook",
-  async (req, res) => {
-    res.json({
-      ok: true
-    });
-
-    try {
-      await processTelegram(
-        req.body
-      );
-    } catch (err) {
-      console.error(
-        "WEBHOOK PROCESS ERROR:",
-        err
-      );
-    }
+  try {
+    await processTelegram(req.body);
+  } catch (err) {
+    console.error("Webhook error:", err);
   }
-);
-
-/* =========================================================
-   SET WEBHOOK
-========================================================= */
-
-app.post(
-  "/api/telegram/set-webhook",
-  requirePermission(
-    "telegram_settings"
-  ),
-  async (req, res) => {
-    try {
-      const url =
-        safeString(
-          req.body?.url
-        ) ||
-        WEBHOOK_URL;
-
-      if (!url) {
-        throw new Error(
-          "Webhook URL is required"
-        );
-      }
-
-      const result =
-        await telegram(
-          "setWebhook",
-          {
-            url
-          }
-        );
-
-      res.json({
-        ok: true,
-        result
-      });
-    } catch (err) {
-      res.status(500).json({
-        ok: false,
-        error: err.message
-      });
-    }
-  }
-);
-
-/* =========================================================
-   DELETE WEBHOOK
-========================================================= */
-
-app.post(
-  "/api/telegram/delete-webhook",
-  requirePermission(
-    "telegram_settings"
-  ),
-  async (req, res) => {
-    try {
-      const result =
-        await telegram(
-          "deleteWebhook",
-          {
-            drop_pending_updates:
-              false
-          }
-        );
-
-      res.json({
-        ok: true,
-        result
-      });
-    } catch (err) {
-      res.status(500).json({
-        ok: false,
-        error: err.message
-      });
-    }
-  }
-);
-
-/* =========================================================
-   WEBHOOK INFO
-========================================================= */
-
-app.get(
-  "/api/telegram/webhook-info",
-  requirePermission(
-    "telegram_settings"
-  ),
-  async (req, res) => {
-    try {
-      const result =
-        await telegram(
-          "getWebhookInfo"
-        );
-
-      res.json({
-        ok: true,
-        result
-      });
-    } catch (err) {
-      res.status(500).json({
-        ok: false,
-        error: err.message
-      });
-    }
-  }
-);
-
-/* =========================================================
-   ROOT
-========================================================= */
+});
 
 app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(
-      PUBLIC_DIR,
-      "admin.html"
-    )
+  res.sendFile(path.join(PUBLIC_DIR, "admin.html"));
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    ok: false,
+    error: "Not found"
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error("Global error:", err);
+
+  res.status(500).json({
+    ok: false,
+    error: err.message || "Internal server error"
+  });
+});
+
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(
+    `Telegram Sales Manager running on port ${PORT}`
   );
 });
 
-/* =========================================================
-   404
-========================================================= */
-
-app.use(
-  (req, res) => {
-    if (
-      req.path.startsWith(
-        "/api/"
-      ) ||
-      req.path.startsWith(
-        "/telegram/"
-      )
-    ) {
-      return res.status(404).json({
-        ok: false,
-        error: "Not found"
-      });
-    }
-
-    res.status(404).send(
-      "Page not found"
-    );
-  }
-);
-
-/* =========================================================
-   GLOBAL ERROR
-========================================================= */
-
-app.use(
-  (err, req, res, next) => {
-    console.error(
-      "GLOBAL ERROR:",
-      err
-    );
-
-    if (
-      res.headersSent
-    ) {
-      return next(err);
-    }
-
-    res.status(500).json({
-      ok: false,
-      error:
-        err.message ||
-        "Internal server error"
-    });
-  }
-);
-
-/* =========================================================
-   START SERVER
-========================================================= */
-
-app.listen(
-  PORT,
-  () => {
-    console.log(
-      `Telegram Sales Manager running on port ${PORT}`
-    );
-
-    console.log(
-      `Supabase: ${
-        supabase
-          ? "connected"
-          : "NOT CONFIGURED"
-      }`
-    );
-
-    console.log(
-      `Telegram Bot: ${
-        BOT_TOKEN
-          ? "configured"
-          : "NOT CONFIGURED"
-      }`
-    );
-
-    if (WEBHOOK_URL) {
-      console.log(
-        `Webhook URL: ${WEBHOOK_URL}`
-      );
-    }
-  }
-);
+       
