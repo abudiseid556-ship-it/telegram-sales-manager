@@ -1014,57 +1014,16 @@ button{cursor:pointer}
         <label>Permissions</label>
 
         <div class="permissions">
-
-          <label class="permission">
-            <input type="checkbox" value="view_orders" class="perm">
-            Orders
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="verify_payment" class="perm">
-            Verify Payment
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="confirm_order" class="perm">
-            Confirm Order
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="products" class="perm">
-            Products
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="delete_product" class="perm">
-            Delete Product
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="advertising" class="perm">
-            Advertising
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="payment_settings" class="perm">
-            Payment
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="telegram_settings" class="perm">
-            Telegram
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="employees" class="perm">
-            Employees
-          </label>
-
-          <label class="permission">
-            <input type="checkbox" value="reports" class="perm">
-            Reports
-          </label>
-
+          <label class="permission"><input type="checkbox" value="view_orders" class="perm"> Orders</label>
+          <label class="permission"><input type="checkbox" value="verify_payment" class="perm"> Verify Payment</label>
+          <label class="permission"><input type="checkbox" value="confirm_order" class="perm"> Confirm Order</label>
+          <label class="permission"><input type="checkbox" value="products" class="perm"> Products</label>
+          <label class="permission"><input type="checkbox" value="delete_product" class="perm"> Delete Product</label>
+          <label class="permission"><input type="checkbox" value="advertising" class="perm"> Advertising</label>
+          <label class="permission"><input type="checkbox" value="payment_settings" class="perm"> Payment</label>
+          <label class="permission"><input type="checkbox" value="telegram_settings" class="perm"> Telegram</label>
+          <label class="permission"><input type="checkbox" value="employees" class="perm"> Employees</label>
+          <label class="permission"><input type="checkbox" value="reports" class="perm"> Reports</label>
         </div>
       </div>
 
@@ -1081,7 +1040,7 @@ button{cursor:pointer}
 
 <script>
 /* =========================================================
-   API
+   API CONFIG & STATE
 ========================================================= */
 
 const API = {
@@ -1103,7 +1062,6 @@ let orders = [];
 let ads = [];
 let employees = [];
 let reports = null;
-
 
 /* =========================================================
    HELPERS
@@ -1148,20 +1106,14 @@ function headers(){
 
 async function api(url,options={}){
   options.headers = options.headers || {};
-
   if(!(options.body instanceof FormData)){
     options.headers["Content-Type"] = "application/json";
   }
-
-  const auth = headers();
-  Object.assign(options.headers,auth);
+  Object.assign(options.headers, headers());
 
   const res = await fetch(url,options);
-
   let data = {};
-  try{
-    data = await res.json();
-  }catch(e){}
+  try{ data = await res.json(); }catch(e){}
 
   if(res.status === 401){
     logout();
@@ -1171,18 +1123,26 @@ async function api(url,options={}){
   if(!res.ok){
     throw new Error(data.error || data.message || "Request failed");
   }
-
   return data;
 }
 
+function closeModal(id){
+  document.getElementById(id).classList.remove("open");
+}
+
+function emptyState(icon, text){
+  return `<div style="text-align:center;padding:30px;color:var(--muted)">
+    <div style="font-size:32px;margin-bottom:8px">${icon}</div>
+    <div>${text}</div>
+  </div>`;
+}
 
 /* =========================================================
-   LOGIN
+   LOGIN & AUTH
 ========================================================= */
 
 async function login(){
   clearError();
-
   const username = document.getElementById("loginUser").value.trim();
   const password = document.getElementById("loginPass").value;
 
@@ -1202,7 +1162,6 @@ async function login(){
 
     const me = await api(API.auth + "/me");
     currentUser = me.user || me;
-
     openApp();
   }catch(err){
     errorBox(err.message);
@@ -1211,23 +1170,19 @@ async function login(){
 
 async function checkSession(){
   if(!token) return;
-
   try{
     const d = await api(API.auth + "/me");
     currentUser = d.user || d;
     openApp();
-  }catch(e){}
+  }catch(e){
+    logout();
+  }
 }
 
 function openApp(){
   document.getElementById("loginPage").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-
-  document.getElementById("userPill").textContent =
-    currentUser?.name ||
-    currentUser?.username ||
-    "Admin";
-
+  document.getElementById("userPill").textContent = currentUser?.name || currentUser?.username || "Admin";
   refreshAll();
 }
 
@@ -1235,11 +1190,9 @@ function logout(){
   token="";
   currentUser=null;
   localStorage.removeItem("tsm_token");
-
   document.getElementById("app").classList.add("hidden");
   document.getElementById("loginPage").classList.remove("hidden");
 }
-
 
 /* =========================================================
    NAVIGATION
@@ -1247,12 +1200,11 @@ function logout(){
 
 function showPage(page){
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-
   const target = document.getElementById("page-" + page);
   if(target) target.classList.add("active");
 
   document.querySelectorAll(".nav-btn").forEach(x=>{
-    x.classList.toggle("active",x.dataset.page===page);
+    x.classList.toggle("active", x.dataset.page === page);
   });
 
   if(page==="products") loadProducts();
@@ -1263,11 +1215,6 @@ function showPage(page){
   if(page==="settings") loadSettings();
 }
 
-
-/* =========================================================
-   REFRESH
-========================================================= */
-
 async function refreshAll(){
   await Promise.allSettled([
     loadProducts(),
@@ -1277,10 +1224,8 @@ async function refreshAll(){
     loadReports(),
     loadSettings()
   ]);
-
   updateDashboard();
 }
-
 
 /* =========================================================
    PRODUCTS
@@ -1301,15 +1246,11 @@ function mapProduct(p){
 async function loadProducts(){
   try{
     const d = await api(API.products);
-    products = Array.isArray(d) ? d.map(mapProduct) :
-               Array.isArray(d.products) ? d.products.map(mapProduct) :
-               [];
+    products = Array.isArray(d) ? d.map(mapProduct) : Array.isArray(d.products) ? d.products.map(mapProduct) : [];
     renderProducts();
     updateProductSelect();
     updateDashboard();
-  }catch(e){
-    console.error(e);
-  }
+  }catch(e){ console.error(e); }
 }
 
 function renderProducts(){
@@ -1318,14 +1259,8 @@ function renderProducts(){
   const filter = document.getElementById("stockFilter")?.value || "all";
 
   let arr = products.filter(p=>{
-    const match =
-      p.name.toLowerCase().includes(search);
-
-    const stockMatch =
-      filter==="all" ||
-      (filter==="in" && p.stock>0) ||
-      (filter==="out" && p.stock<=0);
-
+    const match = p.name.toLowerCase().includes(search);
+    const stockMatch = filter==="all" || (filter==="in" && p.stock>0) || (filter==="out" && p.stock<=0);
     return match && stockMatch;
   });
 
@@ -1336,39 +1271,18 @@ function renderProducts(){
 
   box.innerHTML = arr.map(p=>`
     <div class="product-card">
-
-      ${
-        p.photoUrl
-        ? `<img class="product-img" src="${esc(p.photoUrl)}"
-                onerror="this.style.display='none'">`
-        : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:38px">📦</div>`
-      }
-
+      ${p.photoUrl ? `<img class="product-img" src="${esc(p.photoUrl)}" onerror="this.style.display='none'">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:38px">📦</div>`}
       <div class="product-body">
-
         <div class="product-name">${esc(p.name)}</div>
-
         <div class="price-row">
-          <div>
-            <div class="price-buy">Buy</div>
-            <div>${money(p.buyPrice)}</div>
-          </div>
-
-          <div style="text-align:right">
-            <div class="price-buy">Sell</div>
-            <div class="price-sell">${money(p.sellPrice)}</div>
-          </div>
+          <div><div class="price-buy">Buy</div><div>${money(p.buyPrice)}</div></div>
+          <div style="text-align:right"><div class="price-buy">Sell</div><div class="price-sell">${money(p.sellPrice)}</div></div>
         </div>
-
-        <div class="stock">
-          Stock: <b>${p.stock}</b>
-        </div>
-
+        <div class="stock">Stock: <b>${p.stock}</b></div>
         <div class="product-actions">
           <button class="btn btn-blue" onclick="editProduct('${esc(p.id)}')">Edit</button>
           <button class="btn btn-red" onclick="deleteProduct('${esc(p.id)}')">Delete</button>
         </div>
-
       </div>
     </div>
   `).join("");
@@ -1376,10 +1290,7 @@ function renderProducts(){
 
 function openProductModal(p=null){
   document.getElementById("productModal").classList.add("open");
-
-  document.getElementById("productModalTitle").textContent =
-    p ? "Edit Product" : "Add Product";
-
+  document.getElementById("productModalTitle").textContent = p ? "Edit Product" : "Add Product";
   document.getElementById("pId").value = p?.id || "";
   document.getElementById("pName").value = p?.name || "";
   document.getElementById("pBuy").value = p?.buyPrice ?? "";
@@ -1389,7 +1300,6 @@ function openProductModal(p=null){
   document.getElementById("pDescription").value = p?.description || "";
 
   const preview = document.getElementById("pPreview");
-
   if(p?.photoUrl){
     preview.src = p.photoUrl;
     preview.classList.remove("hidden");
@@ -1406,7 +1316,6 @@ function editProduct(id){
 async function saveProduct(){
   try{
     const id = document.getElementById("pId").value;
-
     const payload = {
       name:document.getElementById("pName").value.trim(),
       buyPrice:Number(document.getElementById("pBuy").value || 0),
@@ -1415,45 +1324,26 @@ async function saveProduct(){
       photoUrl:document.getElementById("pPhoto").value.trim(),
       description:document.getElementById("pDescription").value.trim()
     };
+    if(!payload.name){ toast("Product name is required"); return; }
 
-    if(!payload.name){
-      toast("Product name is required");
-      return;
-    }
-
-    await api(
-      id ? API.products + "/" + encodeURIComponent(id) : API.products,
-      {
-        method:id ? "PATCH" : "POST",
-        body:JSON.stringify(payload)
-      }
-    );
-
+    await api(id ? API.products + "/" + encodeURIComponent(id) : API.products, {
+      method:id ? "PATCH" : "POST",
+      body:JSON.stringify(payload)
+    });
     closeModal("productModal");
     toast("Product saved");
     await loadProducts();
-
-  }catch(e){
-    toast(e.message);
-  }
+  }catch(e){ toast(e.message); }
 }
 
 async function deleteProduct(id){
   if(!confirm("Delete this product?")) return;
-
   try{
-    await api(API.products + "/" + encodeURIComponent(id),{
-      method:"DELETE"
-    });
-
+    await api(API.products + "/" + encodeURIComponent(id),{ method:"DELETE" });
     toast("Product deleted");
     await loadProducts();
-
-  }catch(e){
-    toast(e.message);
-  }
+  }catch(e){ toast(e.message); }
 }
-
 
 /* =========================================================
    UPLOAD
@@ -1461,42 +1351,28 @@ async function deleteProduct(id){
 
 async function uploadPhoto(input,context){
   if(!input.files || !input.files[0]) return;
-
   try{
     const fd = new FormData();
     fd.append("photo",input.files[0]);
     fd.append("context",context);
 
-    const d = await api(API.upload,{
-      method:"POST",
-      body:fd
-    });
-
-    if(!d.url){
-      throw new Error("Upload succeeded but no URL returned");
-    }
+    const d = await api(API.upload,{ method:"POST", body:fd });
+    if(!d.url) throw new Error("No URL returned");
 
     if(context==="product"){
       document.getElementById("pPhoto").value=d.url;
-
       const preview=document.getElementById("pPreview");
       preview.src=d.url;
       preview.classList.remove("hidden");
     }else{
       document.getElementById("aPhoto").value=d.url;
-
       const preview=document.getElementById("aPreview");
       preview.src=d.url;
       preview.classList.remove("hidden");
     }
-
     toast("Photo uploaded");
-
-  }catch(e){
-    toast("Upload error: " + e.message);
-  }
+  }catch(e){ toast("Upload error: " + e.message); }
 }
-
 
 /* =========================================================
    ORDERS
@@ -1519,7 +1395,6 @@ function mapOrder(o){
     receiptUrl:o.receiptUrl || o.receipt_url || "",
     receiptFileId:o.receipt_file_id || o.receiptFileId || "",
     createdAt:o.createdAt || o.created_at || "",
-    deliveryStatus:o.delivery_status || o.deliveryStatus || "",
     closedAt:o.closed_at || o.closedAt || ""
   };
 }
@@ -1527,267 +1402,101 @@ function mapOrder(o){
 async function loadOrders(){
   try{
     const d = await api(API.orders);
-
-    orders =
-      Array.isArray(d) ? d.map(mapOrder) :
-      Array.isArray(d.orders) ? d.orders.map(mapOrder) :
-      [];
-
+    orders = Array.isArray(d) ? d.map(mapOrder) : Array.isArray(d.orders) ? d.orders.map(mapOrder) : [];
     renderOrders();
     renderHomeOrders();
     updateDashboard();
-
-  }catch(e){
-    console.error(e);
-  }
+  }catch(e){ console.error(e); }
 }
 
 function isClosed(o){
-  return o.status==="DELIVERED" ||
-         o.deliveryStatus==="DELIVERED" ||
-         !!o.closedAt;
+  return o.status==="DELIVERED" || !!o.closedAt;
 }
 
 function renderOrders(){
   const box=document.getElementById("ordersList");
-
   const search=(document.getElementById("orderSearch")?.value || "").toLowerCase();
   const filter=document.getElementById("orderFilter")?.value || "active";
 
   let arr=orders.filter(o=>{
-    const text=[
-      o.id,
-      o.productName,
-      o.customerName,
-      o.phone,
-      o.username,
-      o.status
-    ].join(" ").toLowerCase();
-
+    const text=[o.id, o.productName, o.customerName, o.phone, o.username, o.status].join(" ").toLowerCase();
     if(search && !text.includes(search)) return false;
-
-    if(filter==="active"){
-      return !isClosed(o) && o.status!=="REJECTED";
-    }
-
+    if(filter==="active") return !isClosed(o) && o.status!=="REJECTED";
     if(filter==="all") return true;
-
     return o.status===filter;
   });
 
-  arr.sort((a,b)=>{
-    return new Date(b.createdAt || 0)-new Date(a.createdAt || 0);
-  });
-
-  if(!arr.length){
-    box.innerHTML=emptyState("🛍️","No orders");
-    return;
-  }
-
+  arr.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+  if(!arr.length){ box.innerHTML=emptyState("🛍️","No orders"); return; }
   box.innerHTML=arr.map(orderCard).join("");
 }
 
 function orderCard(o){
-  const statusLabel={
-    NEW:"NEW",
-    PAYMENT_PENDING:"PAYMENT PENDING",
-    RECEIPT_PENDING:"RECEIPT PENDING",
-    DELIVERY_PENDING:"DELIVERY PENDING",
-    DELIVERED:"DELIVERED",
-    REJECTED:"REJECTED"
-  }[o.status] || o.status;
-
   return `
     <div class="item">
-
       <div class="item-row">
-
         <div class="item-main">
           <div class="item-title">${esc(o.productName)}</div>
-          <div class="item-sub">
-            ${esc(o.customerName || "Customer")}
-            ${o.username ? " • " + esc(o.username) : ""}
-          </div>
-          <div class="item-sub">
-            Qty: ${o.quantity} • ${money(o.total)}
-          </div>
+          <div class="item-sub">${esc(o.customerName || "Customer")} ${o.username ? " • " + esc(o.username) : ""}</div>
+          <div class="item-sub">Qty: ${o.quantity} • ${money(o.total)}</div>
         </div>
-
-        <span class="status ${esc(o.status)}">${esc(statusLabel)}</span>
-
+        <span class="status ${esc(o.status)}">${esc(o.status)}</span>
       </div>
-
       <div class="item-actions">
-
-        <button class="btn btn-blue"
-          onclick="viewOrder('${esc(o.id)}')">
-          Details
-        </button>
-
-        ${
-          o.status==="RECEIPT_PENDING"
-          ? `
-            <button class="btn btn-green"
-              onclick="changeOrder('${esc(o.id)}','CONFIRMED')">
-              ✓ Confirm
-            </button>
-
-            <button class="btn btn-red"
-              onclick="changeOrder('${esc(o.id)}','REJECTED')">
-              ✕ Reject
-            </button>
-          `
-          : ""
-        }
-
-        ${
-          o.receiptFileId || o.receiptUrl
-          ? `
-            <button class="btn btn-orange"
-              onclick="viewReceipt('${esc(o.id)}')">
-              🧾 Receipt
-            </button>
-          `
-          : ""
-        }
-
+        <button class="btn btn-blue" onclick="viewOrder('${esc(o.id)}')">Details</button>
+        ${o.status==="RECEIPT_PENDING" ? `
+          <button class="btn btn-green" onclick="changeOrder('${esc(o.id)}','CONFIRMED')">✓ Confirm</button>
+          <button class="btn btn-red" onclick="changeOrder('${esc(o.id)}','REJECTED')">✕ Reject</button>
+        ` : ""}
+        ${o.receiptFileId || o.receiptUrl ? `<button class="btn btn-orange" onclick="viewReceipt('${esc(o.id)}')">🧾 Receipt</button>` : ""}
       </div>
-
     </div>
   `;
 }
 
 function renderHomeOrders(){
   const box=document.getElementById("homeOrders");
-
-  const arr=orders
-    .filter(o=>!isClosed(o) && o.status!=="REJECTED")
-    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0))
-    .slice(0,5);
-
-  if(!arr.length){
-    box.innerHTML=emptyState("✅","No active orders");
-    return;
-  }
-
+  const arr=orders.filter(o=>!isClosed(o) && o.status!=="REJECTED")
+    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
+  if(!arr.length){ box.innerHTML=emptyState("✅","No active orders"); return; }
   box.innerHTML=arr.map(orderCard).join("");
 }
 
 async function changeOrder(id,status){
-  const question =
-    status==="CONFIRMED"
-    ? "Confirm this payment/order?"
-    : "Reject this order?";
-
-  if(!confirm(question)) return;
-
+  if(!confirm(status==="CONFIRMED" ? "Confirm this order?" : "Reject this order?")) return;
   try{
-    let d;
-
-    try{
-      d=await api(API.orders+"/"+encodeURIComponent(id)+"/status",{
-        method:"PATCH",
-        body:JSON.stringify({status})
-      });
-    }catch(e){
-      d=await api(API.orders+"/"+encodeURIComponent(id),{
-        method:"PATCH",
-        body:JSON.stringify({status})
-      });
-    }
-
-    toast(d.message || "Order updated");
+    await api(API.orders+"/"+encodeURIComponent(id)+"/status",{
+      method:"PATCH",
+      body:JSON.stringify({status})
+    });
+    toast("Order updated");
     await loadOrders();
-    await loadProducts();
-
-  }catch(e){
-    toast(e.message);
-  }
+  }catch(e){ toast(e.message); }
 }
 
 function viewOrder(id){
   const o=orders.find(x=>String(x.id)===String(id));
   if(!o) return;
-
   document.getElementById("orderDetails").innerHTML=`
-
     <div class="item">
-
       <div class="item-title">${esc(o.productName)}</div>
-
-      <div style="margin-top:10px">
-        <b>Order ID:</b> ${esc(o.id)}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Customer:</b> ${esc(o.customerName)}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Username:</b> ${esc(o.username || "-")}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Phone:</b> ${esc(o.phone || "-")}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Quantity:</b> ${o.quantity}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Sell Price:</b> ${money(o.sellPrice)}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Total:</b> ${money(o.total)}
-      </div>
-
-      <div style="margin-top:7px">
-        <b>Profit:</b> ${money(o.profit)}
-      </div>
-
-      <div style="margin-top:10px">
-        <b>Status:</b>
-        <span class="status ${esc(o.status)}">${esc(o.status)}</span>
-      </div>
-
-      ${
-        isClosed(o)
-        ? `
-          <div style="margin-top:12px;padding:10px;background:#e8f8ef;border-radius:10px;color:#087c4f;font-size:12px">
-            ✓ This order is closed/delivered.
-          </div>
-        `
-        : ""
-      }
-
+      <div style="margin-top:10px"><b>Order ID:</b> ${esc(o.id)}</div>
+      <div style="margin-top:7px"><b>Customer:</b> ${esc(o.customerName)}</div>
+      <div style="margin-top:7px"><b>Phone:</b> ${esc(o.phone || "-")}</div>
+      <div style="margin-top:7px"><b>Quantity:</b> ${o.quantity}</div>
+      <div style="margin-top:7px"><b>Total:</b> ${money(o.total)}</div>
+      <div style="margin-top:10px"><b>Status:</b> <span class="status ${esc(o.status)}">${esc(o.status)}</span></div>
     </div>
   `;
-
   document.getElementById("orderModal").classList.add("open");
 }
 
 function viewReceipt(id){
   const o=orders.find(x=>String(x.id)===String(id));
   if(!o) return;
-
-  if(o.receiptUrl){
-    window.open(o.receiptUrl,"_blank");
-    return;
-  }
-
-  if(o.receiptFileId){
-    window.open(
-      API.orders+"/"+encodeURIComponent(id)+"/receipt",
-      "_blank"
-    );
-    return;
-  }
-
-  toast("No receipt available");
+  if(o.receiptUrl) window.open(o.receiptUrl,"_blank");
+  else window.open(API.orders+"/"+encodeURIComponent(id)+"/receipt","_blank");
 }
-
 
 /* =========================================================
    ADS
@@ -1795,95 +1504,41 @@ function viewReceipt(id){
 
 async function loadAds(){
   try{
-    const d=await api(API.ads);
-
-    ads=
-      Array.isArray(d) ? d :
-      Array.isArray(d.ads) ? d.ads :
-      [];
-
+    const d = await api(API.ads);
+    ads = Array.isArray(d) ? d : Array.isArray(d.ads) ? d.ads : [];
     renderAds();
-
-  }catch(e){
-    console.error(e);
-  }
+  }catch(e){ console.error(e); }
 }
 
 function updateProductSelect(){
-  const s=document.getElementById("aProduct");
+  const s = document.getElementById("aProduct");
   if(!s) return;
-
-  s.innerHTML=products.map(p=>
-    `<option value="${esc(p.id)}">${esc(p.name)}</option>`
-  ).join("");
+  s.innerHTML = products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
 }
 
 function renderAds(){
-  const box=document.getElementById("adsList");
-
-  if(!ads.length){
-    box.innerHTML=emptyState("📢","No advertisements");
-    return;
-  }
-
-  box.innerHTML=ads.map(a=>`
-
+  const box = document.getElementById("adsList");
+  if(!ads.length){ box.innerHTML = emptyState("📢","No advertisements"); return; }
+  box.innerHTML = ads.map(a=>`
     <div class="item">
-
       <div class="item-row">
         <div class="item-main">
-          <div class="item-title">
-            ${esc(a.title || "Advertisement")}
-          </div>
-
-          <div class="item-sub">
-            ${esc(a.text || "")}
-          </div>
-
-          <div class="item-sub">
-            Chat: ${esc(a.chat_id || a.chatId || a.target_chat_id || "-")}
-          </div>
+          <div class="item-title">${esc(a.title || "Advertisement")}</div>
+          <div class="item-sub">${esc(a.text || "")}</div>
         </div>
-
-        <span class="status ${a.published ? "DELIVERED" : "PAYMENT_PENDING"}">
-          ${a.published ? "PUBLISHED" : "DRAFT"}
-        </span>
+        <span class="status ${a.published ? "DELIVERED" : "PAYMENT_PENDING"}">${a.published ? "PUBLISHED" : "DRAFT"}</span>
       </div>
-
       <div class="item-actions">
-
-        <button class="btn btn-blue"
-          onclick="publishAd('${esc(a.id)}')">
-          📢 Publish
-        </button>
-
-        <button class="btn btn-red"
-          onclick="deleteAd('${esc(a.id)}')">
-          Delete
-        </button>
-
+        <button class="btn btn-blue" onclick="publishAd('${esc(a.id)}')">📢 Publish</button>
+        <button class="btn btn-red" onclick="deleteAd('${esc(a.id)}')">Delete</button>
       </div>
-
     </div>
-
   `).join("");
 }
 
 function openAdModal(){
   document.getElementById("adModal").classList.add("open");
-
-  document.getElementById("aId").value="";
-  document.getElementById("aTitle").value="";
-  document.getElementById("aText").value="";
-  document.getElementById("aButton").value="Order Now";
-  document.getElementById("aOldPrice").value="";
-  document.getElementById("aDiscount").value="";
-  document.getElementById("aChatId").value="";
-  document.getElementById("aPhoto").value="";
-
   updateProductSelect();
-
-  document.getElementById("aPreview").classList.add("hidden");
 }
 
 async function saveAd(){
@@ -1892,81 +1547,172 @@ async function saveAd(){
       product_id:document.getElementById("aProduct").value,
       title:document.getElementById("aTitle").value.trim(),
       text:document.getElementById("aText").value.trim(),
-      button_text:document.getElementById("aButton").value.trim(),
-      old_price:Number(document.getElementById("aOldPrice").value || 0),
-      discount:Number(document.getElementById("aDiscount").value || 0),
       target_chat_id:document.getElementById("aChatId").value.trim(),
       photo_url:document.getElementById("aPhoto").value.trim()
     };
-
-    await api(API.ads,{
-      method:"POST",
-      body:JSON.stringify(payload)
-    });
-
+    await api(API.ads,{ method:"POST", body:JSON.stringify(payload) });
     closeModal("adModal");
-    toast("Advertisement saved");
-    await loadAds();
-
-  }catch(e){
-    toast(e.message);
-  }
+    toast("Ad saved");
+    loadAds();
+  }catch(e){ toast(e.message); }
 }
 
 async function publishAd(id){
-  if(!confirm("Publish this advertisement to Telegram?")) return;
-
+  if(!confirm("Publish ad?")) return;
   try{
-    await api(API.ads+"/"+encodeURIComponent(id)+"/publish",{
-      method:"POST"
-    });
-
-    toast("Advertisement published");
-    await loadAds();
-
-  }catch(e){
-    toast(e.message);
-  }
+    await api(API.ads+"/"+encodeURIComponent(id)+"/publish",{ method:"POST" });
+    toast("Published");
+    loadAds();
+  }catch(e){ toast(e.message); }
 }
 
 async function deleteAd(id){
-  if(!confirm("Delete this advertisement?")) return;
-
+  if(!confirm("Delete ad?")) return;
   try{
-    await api(API.ads+"/"+encodeURIComponent(id),{
-      method:"DELETE"
-    });
-
-    toast("Advertisement deleted");
-    await loadAds();
-
-  }catch(e){
-    toast(e.message);
-  }
+    await api(API.ads+"/"+encodeURIComponent(id),{ method:"DELETE" });
+    toast("Deleted");
+    loadAds();
+  }catch(e){ toast(e.message); }
 }
-
 
 /* =========================================================
    EMPLOYEES
 ========================================================= */
 
-async function loadEmployees(){
-  try{
-    const d=await api(API.employees);
-
-    employees=
-      Array.isArray(d) ? d :
-      Array.isArray(d.employees) ? d.employees :
-      [];
-
-    renderEmployees();
-
-  }catch(e){
-    console.error(e);
-  }
+function employeeName(e){
+  return e.name || e.full_name || e.username || "Worker";
 }
 
-function employeeName(e){
-  return e.name ||
-         e.full_name ||
-         e.employee
+async function loadEmployees(){
+  try{
+    const d = await api(API.employees);
+    employees = Array.isArray(d) ? d : Array.isArray(d.employees) ? d.employees : [];
+    renderEmployees();
+  }catch(e){ console.error(e); }
+}
+
+function renderEmployees(){
+  const box = document.getElementById("employeesList");
+  if(!employees.length){ box.innerHTML = emptyState("👥","No employees found"); return; }
+  box.innerHTML = employees.map(e=>`
+    <div class="item">
+      <div class="item-row">
+        <div class="item-main">
+          <div class="item-title">${esc(employeeName(e))} (${esc(e.username || "-")})</div>
+          <div class="item-sub">Code: ${esc(e.employee_code || e.employeeCode || "-")}</div>
+        </div>
+        <button class="btn btn-red" onclick="deleteEmployee('${esc(e.id)}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function openEmployeeModal(){
+  document.getElementById("employeeModal").classList.add("open");
+}
+
+async function saveEmployee(){
+  try{
+    const payload={
+      employee_code:document.getElementById("eCode").value.trim(),
+      name:document.getElementById("eName").value.trim(),
+      username:document.getElementById("eUsername").value.trim(),
+      password:document.getElementById("ePassword").value
+    };
+    await api(API.employees,{ method:"POST", body:JSON.stringify(payload) });
+    closeModal("employeeModal");
+    toast("Employee saved");
+    loadEmployees();
+  }catch(e){ toast(e.message); }
+}
+
+async function deleteEmployee(id){
+  if(!confirm("Delete employee?")) return;
+  try{
+    await api(API.employees+"/"+encodeURIComponent(id),{ method:"DELETE" });
+    toast("Deleted");
+    loadEmployees();
+  }catch(e){ toast(e.message); }
+}
+
+/* =========================================================
+   REPORTS & SETTINGS
+========================================================= */
+
+async function loadReports(){
+  try{
+    const d = await api(API.reports);
+    reports = d.summary || {};
+    document.getElementById("repSales").textContent = money(reports.totalSales || 0);
+    document.getElementById("repProfit").textContent = money(reports.totalProfit || 0);
+    document.getElementById("repDelivered").textContent = reports.deliveredOrders || 0;
+    document.getElementById("repDelivery").textContent = reports.pendingOrders || 0;
+    document.getElementById("reportDetails").innerHTML = `<div>Total Orders: <b>${reports.totalOrders || 0}</b></div>`;
+  }catch(e){ console.error(e); }
+}
+
+async function loadSettings(){
+  try{
+    const p = await api(API.payment);
+    if(p){
+      document.getElementById("bankName").value = p.bank_name || "";
+      document.getElementById("accountName").value = p.account_name || "";
+      document.getElementById("accountNumber").value = p.account_number || "";
+      document.getElementById("paymentNote").value = p.payment_note || "";
+    }
+  }catch(e){}
+}
+
+async function savePayment(){
+  try{
+    const payload={
+      bank_name:document.getElementById("bankName").value.trim(),
+      account_name:document.getElementById("accountName").value.trim(),
+      account_number:document.getElementById("accountNumber").value.trim(),
+      payment_note:document.getElementById("paymentNote").value.trim()
+    };
+    await api(API.payment,{ method:"POST", body:JSON.stringify(payload) });
+    toast("Payment settings saved");
+  }catch(e){ toast(e.message); }
+}
+
+async function saveTelegram(){
+  try{
+    const payload={
+      bot_username:document.getElementById("telegramUsername").value.trim(),
+      admin_chat_id:document.getElementById("telegramAdminChatId").value.trim(),
+      webhook_url:document.getElementById("telegramWebhookUrl").value.trim()
+    };
+    await api(API.telegram,{ method:"POST", body:JSON.stringify(payload) });
+    toast("Telegram settings saved");
+  }catch(e){ toast(e.message); }
+}
+
+function updateDashboard(){
+  document.getElementById("statProducts").textContent = products.length;
+  const activeOrdersCount = orders.filter(o=>!isClosed(o) && o.status!=="REJECTED").length;
+  document.getElementById("statOrders").textContent = activeOrdersCount;
+
+  let totalSales = 0;
+  let totalProfit = 0;
+  orders.forEach(o=>{
+    if(isClosed(o)){
+      totalSales += o.total || 0;
+      totalProfit += o.profit || 0;
+    }
+  });
+
+  document.getElementById("statSales").textContent = money(totalSales);
+  document.getElementById("statProfit").textContent = money(totalProfit);
+
+  document.getElementById("headSales").textContent = money(totalSales);
+  document.getElementById("headProfit").textContent = money(totalProfit);
+  document.getElementById("headOrders").textContent = activeOrdersCount;
+}
+
+// Initial session check
+checkSession();
+</script>
+
+</body>
+</html>
