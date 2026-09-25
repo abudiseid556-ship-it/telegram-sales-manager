@@ -1,1 +1,1972 @@
+<!doctype html>
+<html lang="am">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#3157e8">
+<title>UNI MARKET — Master Admin</title>
 
+<style>
+*{box-sizing:border-box}
+:root{
+  --primary:#3157e8;
+  --primary2:#7138d8;
+  --bg:#f4f7fb;
+  --card:#fff;
+  --text:#172033;
+  --muted:#748096;
+  --border:#e7ebf3;
+  --green:#16a36a;
+  --red:#e5484d;
+  --orange:#ed8b19;
+  --blue:#3478f6;
+  --shadow:0 10px 30px rgba(28,45,90,.08);
+  --radius:18px;
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans Ethiopic",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* LOGIN */
+.login-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,#6f8cff 0,transparent 35%),
+    linear-gradient(135deg,#3157e8,#7138d8);
+}
+.login-card{
+  width:min(430px,100%);
+  background:#fff;
+  border-radius:28px;
+  padding:30px 24px;
+  box-shadow:0 25px 70px rgba(0,0,0,.22);
+}
+.login-logo{
+  width:70px;height:70px;border-radius:22px;
+  margin:0 auto 15px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:35px;
+  background:linear-gradient(135deg,#3157e8,#7138d8);
+  color:#fff;
+}
+.login-title{text-align:center;font-size:25px;font-weight:800}
+.login-sub{text-align:center;color:var(--muted);margin:8px 0 25px}
+.field{margin-bottom:15px}
+.field label{
+  display:block;font-size:13px;font-weight:700;
+  margin-bottom:7px;color:#4f5d73;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:13px 14px;
+  outline:none;
+  background:#fafbfe;
+}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(49,87,232,.10);
+}
+.btn{
+  border:0;
+  border-radius:12px;
+  padding:11px 15px;
+  font-weight:700;
+  transition:.15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:#fff;
+}
+.btn-light{background:#f1f4fa;color:#33405a}
+.btn-green{background:#e7f8f0;color:#087c4f}
+.btn-red{background:#ffebed;color:#c5222a}
+.btn-orange{background:#fff2df;color:#a95e00}
+.btn-blue{background:#e8f1ff;color:#185cc8}
+.btn-dark{background:#172033;color:#fff}
+.full{width:100%}
+
+#errorBox{
+  margin-top:12px;
+  background:#fff0f1;
+  color:#bd252c;
+  padding:11px;
+  border-radius:11px;
+  font-size:13px;
+}
+
+/* APP */
+.app{min-height:100vh}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  color:#fff;
+  padding:16px 18px 18px;
+  background:linear-gradient(135deg,#3157e8,#7138d8);
+  box-shadow:0 8px 25px rgba(49,87,232,.20);
+}
+.topbar-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.brand{
+  display:flex;align-items:center;gap:11px;
+}
+.brand-logo{
+  width:43px;height:43px;border-radius:14px;
+  background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.brand-title{font-weight:800;font-size:18px}
+.brand-sub{font-size:11px;opacity:.78;margin-top:2px}
+.user-pill{
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.18);
+  padding:7px 10px;
+  border-radius:12px;
+  font-size:11px;
+}
+.header-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-top:15px;
+}
+.header-stat{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:14px;
+  padding:10px;
+}
+.header-stat small{display:block;opacity:.75;font-size:10px}
+.header-stat strong{font-size:15px;display:block;margin-top:4px}
+
+/* MAIN */
+.main{
+  max-width:1250px;
+  margin:auto;
+  padding:18px 14px 100px;
+}
+.page{display:none}
+.page.active{display:block}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:4px 0 15px;
+}
+.section-title{font-size:21px;font-weight:800}
+.section-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* CARDS */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.card-pad{padding:17px}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.stat-card{
+  padding:16px;
+  border-radius:18px;
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.stat-icon{
+  width:38px;height:38px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:#edf2ff;font-size:18px;
+}
+.stat-label{font-size:11px;color:var(--muted);margin-top:11px}
+.stat-value{font-size:22px;font-weight:800;margin-top:3px}
+
+/* QUICK */
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+}
+.quick{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:15px;
+  padding:13px 7px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.quick-icon{font-size:21px}
+.quick span{display:block;font-size:10px;font-weight:700;margin-top:6px}
+
+/* TABLE/LISTS */
+.list{display:grid;gap:10px}
+.item{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:13px;
+}
+.item-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+}
+.item-main{min-width:0}
+.item-title{font-weight:800;font-size:14px}
+.item-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.item-actions{
+  display:flex;gap:6px;flex-wrap:wrap;
+  margin-top:11px;
+}
+.item-actions .btn{font-size:11px;padding:8px 10px}
+.thumb{
+  width:55px;height:55px;border-radius:13px;
+  object-fit:cover;background:#edf1f7;
+}
+.status{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.status.NEW{background:#edf2ff;color:#3157e8}
+.status.PAYMENT_PENDING{background:#fff5df;color:#a46300}
+.status.RECEIPT_PENDING{background:#fff0dc;color:#a45b00}
+.status.DELIVERY_PENDING{background:#e8f2ff;color:#2461bc}
+.status.DELIVERED{background:#e6f8ef;color:#087c4f}
+.status.REJECTED{background:#ffe9eb;color:#c5222a}
+.status.CONFIRMED{background:#e6f8ef;color:#087c4f}
+
+/* FILTER */
+.filter-bar{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:9px;
+  margin-bottom:13px;
+}
+.search{
+  width:100%;
+  border:1px solid var(--border);
+  background:#fff;
+  padding:12px 14px;
+  border-radius:13px;
+  outline:none;
+}
+.filter-select{
+  border:1px solid var(--border);
+  background:#fff;
+  padding:10px;
+  border-radius:13px;
+}
+
+/* PRODUCT */
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.product-card{
+  overflow:hidden;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+}
+.product-img{
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  background:#edf1f7;
+}
+.product-body{padding:13px}
+.product-name{
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.price-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+}
+.price-buy{font-size:10px;color:var(--muted)}
+.price-sell{font-size:14px;font-weight:800;color:#3157e8}
+.stock{font-size:10px;margin-top:7px;color:var(--muted)}
+.product-actions{display:flex;gap:6px;margin-top:10px}
+.product-actions button{flex:1;padding:8px 5px;font-size:10px}
+
+/* MODAL */
+.modal{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(15,23,42,.62);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+}
+.modal.open{display:flex}
+.modal-box{
+  width:min(680px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:25px 25px 0 0;
+  padding:20px;
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:15px;
+}
+.modal-title{font-size:19px;font-weight:800}
+.close{
+  border:0;background:#f0f3f8;
+  width:35px;height:35px;border-radius:50%;
+  font-size:18px;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+}
+.form-grid .full-col{grid-column:1/-1}
+.file-box{
+  border:2px dashed #dbe2ef;
+  padding:15px;
+  border-radius:14px;
+  text-align:center;
+  background:#fafbfe;
+}
+.preview{
+  width:100%;
+  max-height:190px;
+  object-fit:contain;
+  border-radius:13px;
+  margin-top:10px;
+}
+
+/* PERMISSIONS */
+.permissions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.permission{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  padding:9px;
+  border-radius:10px;
+  font-size:11px;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:60;
+  height:67px;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+}
+.nav-btn{
+  border:0;
+  background:none;
+  color:#7b8495;
+  font-size:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+.nav-btn .ico{font-size:19px}
+.nav-btn.active{color:#3157e8;font-weight:800}
+
+/* TOAST */
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:80px;
+  transform:translateX(-50%) translateY(20px);
+  background:#172033;
+  color:#fff;
+  padding:11px 15px;
+  border-radius:13px;
+  font-size:12px;
+  z-index:300;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  max-width:90%;
+  text-align:center;
+}
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* DESKTOP */
+@media(min-width:800px){
+  .main{padding:25px 24px 50px}
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
+  .product-grid{grid-template-columns:repeat(4,1fr)}
+  .modal{align-items:center;padding:20px}
+  .modal-box{border-radius:25px}
+  .bottom-nav{display:none}
+  .main{padding-bottom:40px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">🛒</div>
+    <div class="login-title">UNI MARKET</div>
+    <div class="login-sub">Master Admin / Employee Login</div>
+
+    <div class="field">
+      <label>Username</label>
+      <input id="loginUser" autocomplete="username" placeholder="admin">
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input id="loginPass" type="password" autocomplete="current-password" placeholder="Password">
+    </div>
+
+    <button class="btn btn-primary full" onclick="login()">Login</button>
+    <div id="errorBox" class="hidden"></div>
+  </div>
+</section>
+
+<!-- APP -->
+<section id="app" class="app hidden">
+
+<header class="topbar">
+  <div class="topbar-row">
+    <div class="brand">
+      <div class="brand-logo">🛒</div>
+      <div>
+        <div class="brand-title">Telegram Sales Manager</div>
+        <div class="brand-sub">UNI MARKET • Master Admin</div>
+      </div>
+    </div>
+
+    <div class="user-pill" id="userPill">Admin</div>
+  </div>
+
+  <div class="header-stats">
+    <div class="header-stat">
+      <small>Sales</small>
+      <strong id="headSales">0 ETB</strong>
+    </div>
+    <div class="header-stat">
+      <small>Profit</small>
+      <strong id="headProfit">0 ETB</strong>
+    </div>
+    <div class="header-stat">
+      <small>Orders</small>
+      <strong id="headOrders">0</strong>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- HOME -->
+<section id="page-home" class="page active">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Dashboard</div>
+      <div class="section-sub">የንግድ ሁኔታዎን በአንድ ቦታ ይቆጣጠሩ</div>
+    </div>
+    <button class="btn btn-light" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-label">Products</div>
+      <div class="stat-value" id="statProducts">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🛍️</div>
+      <div class="stat-label">Active Orders</div>
+      <div class="stat-value" id="statOrders">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-label">Sales</div>
+      <div class="stat-value" id="statSales">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-label">Profit</div>
+      <div class="stat-value" id="statProfit">0</div>
+    </div>
+  </div>
+
+  <div style="height:18px"></div>
+
+  <div class="section-head">
+    <div>
+      <div class="section-title" style="font-size:17px">Quick Actions</div>
+    </div>
+  </div>
+
+  <div class="quick-grid">
+    <button class="quick" onclick="openProductModal()">
+      <div class="quick-icon">➕</div>
+      <span>Product</span>
+    </button>
+
+    <button class="quick" onclick="showPage('orders')">
+      <div class="quick-icon">🛍️</div>
+      <span>Orders</span>
+    </button>
+
+    <button class="quick" onclick="openAdModal()">
+      <div class="quick-icon">📢</div>
+      <span>Advertise</span>
+    </button>
+
+    <button class="quick" onclick="showPage('employees')">
+      <div class="quick-icon">👥</div>
+      <span>Workers</span>
+    </button>
+  </div>
+
+  <div style="height:18px"></div>
+
+  <div class="section-head">
+    <div>
+      <div class="section-title" style="font-size:17px">Latest Orders</div>
+    </div>
+    <button class="btn btn-light" onclick="showPage('orders')">View all</button>
+  </div>
+
+  <div id="homeOrders" class="list"></div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+<section id="page-products" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Products</div>
+      <div class="section-sub">Telegram shop products & stock</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="openProductModal()">＋ Add</button>
+  </div>
+
+  <div class="filter-bar">
+    <input id="productSearch" class="search" placeholder="Search product..." oninput="renderProducts()">
+    <select id="stockFilter" class="filter-select" onchange="renderProducts()">
+      <option value="all">All</option>
+      <option value="in">In stock</option>
+      <option value="out">Out</option>
+    </select>
+  </div>
+
+  <div id="productsList" class="product-grid"></div>
+
+</section>
+
+
+<!-- ORDERS -->
+<section id="page-orders" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Orders</div>
+      <div class="section-sub">Telegram customer orders</div>
+    </div>
+    <button class="btn btn-light" onclick="loadOrders()">↻</button>
+  </div>
+
+  <div class="filter-bar">
+    <input id="orderSearch" class="search" placeholder="Search order / customer / phone..." oninput="renderOrders()">
+    <select id="orderFilter" class="filter-select" onchange="renderOrders()">
+      <option value="active">Active</option>
+      <option value="all">All</option>
+      <option value="RECEIPT_PENDING">Receipt</option>
+      <option value="DELIVERY_PENDING">Delivery</option>
+      <option value="DELIVERED">Delivered</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+
+  <div id="ordersList" class="list"></div>
+
+</section>
+
+
+<!-- ADS -->
+<section id="page-ads" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Advertising</div>
+      <div class="section-sub">Telegram channel / group publishing</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="openAdModal()">＋ Ad</button>
+  </div>
+
+  <div id="adsList" class="list"></div>
+
+</section>
+
+
+<!-- EMPLOYEES -->
+<section id="page-employees" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Employees</div>
+      <div class="section-sub">ሰራተኛ ስም • ኮድ • Username • Permissions</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="openEmployeeModal()">＋ Worker</button>
+  </div>
+
+  <div id="employeesList" class="list"></div>
+
+</section>
+
+
+<!-- REPORTS -->
+<section id="page-reports" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Reports</div>
+      <div class="section-sub">Sales, profit and order lifecycle</div>
+    </div>
+
+    <button class="btn btn-light" onclick="loadReports()">↻</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">💵</div>
+      <div class="stat-label">Confirmed Sales</div>
+      <div class="stat-value" id="repSales">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-label">Profit</div>
+      <div class="stat-value" id="repProfit">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🚚</div>
+      <div class="stat-label">Delivery Pending</div>
+      <div class="stat-value" id="repDelivery">0</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-label">Delivered</div>
+      <div class="stat-value" id="repDelivered">0</div>
+    </div>
+  </div>
+
+  <div style="height:18px"></div>
+
+  <div class="card card-pad">
+    <div style="font-weight:800;margin-bottom:12px">Order Summary</div>
+    <div id="reportDetails"></div>
+  </div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section id="page-settings" class="page">
+
+  <div class="section-head">
+    <div>
+      <div class="section-title">Settings</div>
+      <div class="section-sub">Payment & Telegram configuration</div>
+    </div>
+  </div>
+
+  <div class="card card-pad">
+
+    <h3>💳 Payment Settings</h3>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Bank Name</label>
+        <input id="bankName">
+      </div>
+
+      <div class="field">
+        <label>Account Name</label>
+        <input id="accountName">
+      </div>
+
+      <div class="field">
+        <label>Account Number</label>
+        <input id="accountNumber">
+      </div>
+
+      <div class="field">
+        <label>Payment Note</label>
+        <input id="paymentNote">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+  </div>
+
+  <div style="height:15px"></div>
+
+  <div class="card card-pad">
+
+    <h3>🤖 Telegram Settings</h3>
+
+    <div class="field">
+      <label>Bot Username</label>
+      <input id="telegramUsername" placeholder="uni_market_shop_bot">
+    </div>
+
+    <div class="field">
+      <label>Admin Chat ID</label>
+      <input id="telegramAdminChatId" placeholder="Telegram Admin Chat ID">
+    </div>
+
+    <div class="field">
+      <label>Webhook URL</label>
+      <input id="telegramWebhookUrl" placeholder="https://.../telegram/webhook">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveTelegram()">Save Telegram</button>
+  </div>
+
+  <div style="height:15px"></div>
+
+  <div class="card card-pad">
+    <h3>🔐 Session</h3>
+    <button class="btn btn-red" onclick="logout()">Logout</button>
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="home" onclick="showPage('home')">
+    <span class="ico">⌂</span>
+    Home
+  </button>
+
+  <button class="nav-btn" data-page="products" onclick="showPage('products')">
+    <span class="ico">📦</span>
+    Products
+  </button>
+
+  <button class="nav-btn" data-page="orders" onclick="showPage('orders')">
+    <span class="ico">🛍️</span>
+    Orders
+  </button>
+
+  <button class="nav-btn" data-page="employees" onclick="showPage('employees')">
+    <span class="ico">👥</span>
+    Workers
+  </button>
+
+  <button class="nav-btn" data-page="settings" onclick="showPage('settings')">
+    <span class="ico">⚙️</span>
+    Settings
+  </button>
+</nav>
+
+</section>
+
+
+<!-- PRODUCT MODAL -->
+<div id="productModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-title" id="productModalTitle">Add Product</div>
+      <button class="close" onclick="closeModal('productModal')">×</button>
+    </div>
+
+    <input type="hidden" id="pId">
+
+    <div class="form-grid">
+
+      <div class="field full-col">
+        <label>Product Name</label>
+        <input id="pName" placeholder="Product name">
+      </div>
+
+      <div class="field">
+        <label>Buy Price</label>
+        <input id="pBuy" type="number" min="0" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>Sell Price</label>
+        <input id="pSell" type="number" min="0" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>Stock</label>
+        <input id="pStock" type="number" min="0" step="1">
+      </div>
+
+      <div class="field">
+        <label>Photo URL</label>
+        <input id="pPhoto" placeholder="https://...">
+      </div>
+
+      <div class="field full-col">
+        <label>Product Photo</label>
+        <div class="file-box">
+          <input id="pImageFile" type="file" accept="image/*"
+                 onchange="uploadPhoto(this,'product')">
+          <div id="pUploadText" style="font-size:11px;color:#748096;margin-top:7px">
+            Select product image
+          </div>
+          <img id="pPreview" class="preview hidden">
+        </div>
+      </div>
+
+      <div class="field full-col">
+        <label>Description</label>
+        <textarea id="pDescription" placeholder="Product description"></textarea>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary full" onclick="saveProduct()">Save Product</button>
+  </div>
+</div>
+
+
+<!-- ORDER MODAL -->
+<div id="orderModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-title">Order Details</div>
+      <button class="close" onclick="closeModal('orderModal')">×</button>
+    </div>
+
+    <div id="orderDetails"></div>
+
+  </div>
+</div>
+
+
+<!-- AD MODAL -->
+<div id="adModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-title">Create Advertisement</div>
+      <button class="close" onclick="closeModal('adModal')">×</button>
+    </div>
+
+    <input type="hidden" id="aId">
+
+    <div class="form-grid">
+
+      <div class="field full-col">
+        <label>Product</label>
+        <select id="aProduct"></select>
+      </div>
+
+      <div class="field">
+        <label>Title</label>
+        <input id="aTitle">
+      </div>
+
+      <div class="field">
+        <label>Button Text</label>
+        <input id="aButton" value="Order Now">
+      </div>
+
+      <div class="field full-col">
+        <label>Advertisement Text</label>
+        <textarea id="aText"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Old Price</label>
+        <input id="aOldPrice" type="number">
+      </div>
+
+      <div class="field">
+        <label>Discount</label>
+        <input id="aDiscount" type="number">
+      </div>
+
+      <div class="field full-col">
+        <label>Telegram Chat ID</label>
+        <input id="aChatId" placeholder="@channel or -100...">
+      </div>
+
+      <div class="field full-col">
+        <label>Photo URL</label>
+        <input id="aPhoto">
+      </div>
+
+      <div class="field full-col">
+        <label>Advertisement Photo</label>
+        <div class="file-box">
+          <input id="aImageFile" type="file" accept="image/*"
+                 onchange="uploadPhoto(this,'ad')">
+          <div style="font-size:11px;color:#748096;margin-top:7px">
+            Select advertisement image
+          </div>
+          <img id="aPreview" class="preview hidden">
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary full" onclick="saveAd()">Save Advertisement</button>
+  </div>
+</div>
+
+
+<!-- EMPLOYEE MODAL -->
+<div id="employeeModal" class="modal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-title" id="employeeModalTitle">Add Employee</div>
+      <button class="close" onclick="closeModal('employeeModal')">×</button>
+    </div>
+
+    <input type="hidden" id="eId">
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Employee Code</label>
+        <input id="eCode" placeholder="EMP-001">
+      </div>
+
+      <div class="field">
+        <label>Employee Name</label>
+        <input id="eName" placeholder="Full name">
+      </div>
+
+      <div class="field">
+        <label>Username</label>
+        <input id="eUsername" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="ePassword" type="password" autocomplete="new-password">
+      </div>
+
+      <div class="field full-col">
+        <label>Permissions</label>
+
+        <div class="permissions">
+
+          <label class="permission">
+            <input type="checkbox" value="view_orders" class="perm">
+            Orders
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="verify_payment" class="perm">
+            Verify Payment
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="confirm_order" class="perm">
+            Confirm Order
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="products" class="perm">
+            Products
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="delete_product" class="perm">
+            Delete Product
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="advertising" class="perm">
+            Advertising
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="payment_settings" class="perm">
+            Payment
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="telegram_settings" class="perm">
+            Telegram
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="employees" class="perm">
+            Employees
+          </label>
+
+          <label class="permission">
+            <input type="checkbox" value="reports" class="perm">
+            Reports
+          </label>
+
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary full" onclick="saveEmployee()">Save Employee</button>
+
+  </div>
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+/* =========================================================
+   API
+========================================================= */
+
+const API = {
+  auth:"/api/auth",
+  products:"/api/products",
+  orders:"/api/orders",
+  upload:"/api/upload",
+  ads:"/api/advertisements",
+  payment:"/api/payment-settings",
+  telegram:"/api/telegram-settings",
+  employees:"/api/employees",
+  reports:"/api/reports"
+};
+
+let token = localStorage.getItem("tsm_token") || "";
+let currentUser = null;
+let products = [];
+let orders = [];
+let ads = [];
+let employees = [];
+let reports = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function money(v){
+  const n = Number(v || 0);
+  return n.toLocaleString("en-US",{maximumFractionDigits:2}) + " ETB";
+}
+
+function esc(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2500);
+}
+
+function errorBox(msg){
+  const el = document.getElementById("errorBox");
+  el.textContent = msg;
+  el.classList.remove("hidden");
+}
+
+function clearError(){
+  document.getElementById("errorBox").classList.add("hidden");
+}
+
+function headers(){
+  const h = {};
+  if(token) h.Authorization = "Bearer " + token;
+  return h;
+}
+
+async function api(url,options={}){
+  options.headers = options.headers || {};
+
+  if(!(options.body instanceof FormData)){
+    options.headers["Content-Type"] = "application/json";
+  }
+
+  const auth = headers();
+  Object.assign(options.headers,auth);
+
+  const res = await fetch(url,options);
+
+  let data = {};
+  try{
+    data = await res.json();
+  }catch(e){}
+
+  if(res.status === 401){
+    logout();
+    throw new Error("Session expired");
+  }
+
+  if(!res.ok){
+    throw new Error(data.error || data.message || "Request failed");
+  }
+
+  return data;
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(){
+  clearError();
+
+  const username = document.getElementById("loginUser").value.trim();
+  const password = document.getElementById("loginPass").value;
+
+  if(!username || !password){
+    errorBox("Username and password are required.");
+    return;
+  }
+
+  try{
+    const d = await api(API.auth + "/login",{
+      method:"POST",
+      body:JSON.stringify({username,password})
+    });
+
+    token = d.token || "";
+    localStorage.setItem("tsm_token",token);
+
+    const me = await api(API.auth + "/me");
+    currentUser = me.user || me;
+
+    openApp();
+  }catch(err){
+    errorBox(err.message);
+  }
+}
+
+async function checkSession(){
+  if(!token) return;
+
+  try{
+    const d = await api(API.auth + "/me");
+    currentUser = d.user || d;
+    openApp();
+  }catch(e){}
+}
+
+function openApp(){
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  document.getElementById("userPill").textContent =
+    currentUser?.name ||
+    currentUser?.username ||
+    "Admin";
+
+  refreshAll();
+}
+
+function logout(){
+  token="";
+  currentUser=null;
+  localStorage.removeItem("tsm_token");
+
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+
+  const target = document.getElementById("page-" + page);
+  if(target) target.classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(x=>{
+    x.classList.toggle("active",x.dataset.page===page);
+  });
+
+  if(page==="products") loadProducts();
+  if(page==="orders") loadOrders();
+  if(page==="ads") loadAds();
+  if(page==="employees") loadEmployees();
+  if(page==="reports") loadReports();
+  if(page==="settings") loadSettings();
+}
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+async function refreshAll(){
+  await Promise.allSettled([
+    loadProducts(),
+    loadOrders(),
+    loadAds(),
+    loadEmployees(),
+    loadReports(),
+    loadSettings()
+  ]);
+
+  updateDashboard();
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+function mapProduct(p){
+  return {
+    id:p.id,
+    name:p.name || p.productName || "",
+    buyPrice:Number(p.buyPrice ?? p.buy_price ?? 0),
+    sellPrice:Number(p.sellPrice ?? p.sell_price ?? 0),
+    stock:Number(p.stock ?? 0),
+    photoUrl:p.photoUrl || p.photo_url || p.photo || "",
+    description:p.description || ""
+  };
+}
+
+async function loadProducts(){
+  try{
+    const d = await api(API.products);
+    products = Array.isArray(d) ? d.map(mapProduct) :
+               Array.isArray(d.products) ? d.products.map(mapProduct) :
+               [];
+    renderProducts();
+    updateProductSelect();
+    updateDashboard();
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function renderProducts(){
+  const box = document.getElementById("productsList");
+  const search = (document.getElementById("productSearch")?.value || "").toLowerCase();
+  const filter = document.getElementById("stockFilter")?.value || "all";
+
+  let arr = products.filter(p=>{
+    const match =
+      p.name.toLowerCase().includes(search);
+
+    const stockMatch =
+      filter==="all" ||
+      (filter==="in" && p.stock>0) ||
+      (filter==="out" && p.stock<=0);
+
+    return match && stockMatch;
+  });
+
+  if(!arr.length){
+    box.innerHTML = emptyState("📦","No products found");
+    return;
+  }
+
+  box.innerHTML = arr.map(p=>`
+    <div class="product-card">
+
+      ${
+        p.photoUrl
+        ? `<img class="product-img" src="${esc(p.photoUrl)}"
+                onerror="this.style.display='none'">`
+        : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:38px">📦</div>`
+      }
+
+      <div class="product-body">
+
+        <div class="product-name">${esc(p.name)}</div>
+
+        <div class="price-row">
+          <div>
+            <div class="price-buy">Buy</div>
+            <div>${money(p.buyPrice)}</div>
+          </div>
+
+          <div style="text-align:right">
+            <div class="price-buy">Sell</div>
+            <div class="price-sell">${money(p.sellPrice)}</div>
+          </div>
+        </div>
+
+        <div class="stock">
+          Stock: <b>${p.stock}</b>
+        </div>
+
+        <div class="product-actions">
+          <button class="btn btn-blue" onclick="editProduct('${esc(p.id)}')">Edit</button>
+          <button class="btn btn-red" onclick="deleteProduct('${esc(p.id)}')">Delete</button>
+        </div>
+
+      </div>
+    </div>
+  `).join("");
+}
+
+function openProductModal(p=null){
+  document.getElementById("productModal").classList.add("open");
+
+  document.getElementById("productModalTitle").textContent =
+    p ? "Edit Product" : "Add Product";
+
+  document.getElementById("pId").value = p?.id || "";
+  document.getElementById("pName").value = p?.name || "";
+  document.getElementById("pBuy").value = p?.buyPrice ?? "";
+  document.getElementById("pSell").value = p?.sellPrice ?? "";
+  document.getElementById("pStock").value = p?.stock ?? "";
+  document.getElementById("pPhoto").value = p?.photoUrl || "";
+  document.getElementById("pDescription").value = p?.description || "";
+
+  const preview = document.getElementById("pPreview");
+
+  if(p?.photoUrl){
+    preview.src = p.photoUrl;
+    preview.classList.remove("hidden");
+  }else{
+    preview.classList.add("hidden");
+  }
+}
+
+function editProduct(id){
+  const p = products.find(x=>String(x.id)===String(id));
+  if(p) openProductModal(p);
+}
+
+async function saveProduct(){
+  try{
+    const id = document.getElementById("pId").value;
+
+    const payload = {
+      name:document.getElementById("pName").value.trim(),
+      buyPrice:Number(document.getElementById("pBuy").value || 0),
+      sellPrice:Number(document.getElementById("pSell").value || 0),
+      stock:Number(document.getElementById("pStock").value || 0),
+      photoUrl:document.getElementById("pPhoto").value.trim(),
+      description:document.getElementById("pDescription").value.trim()
+    };
+
+    if(!payload.name){
+      toast("Product name is required");
+      return;
+    }
+
+    await api(
+      id ? API.products + "/" + encodeURIComponent(id) : API.products,
+      {
+        method:id ? "PATCH" : "POST",
+        body:JSON.stringify(payload)
+      }
+    );
+
+    closeModal("productModal");
+    toast("Product saved");
+    await loadProducts();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+async function deleteProduct(id){
+  if(!confirm("Delete this product?")) return;
+
+  try{
+    await api(API.products + "/" + encodeURIComponent(id),{
+      method:"DELETE"
+    });
+
+    toast("Product deleted");
+    await loadProducts();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+async function uploadPhoto(input,context){
+  if(!input.files || !input.files[0]) return;
+
+  try{
+    const fd = new FormData();
+    fd.append("photo",input.files[0]);
+    fd.append("context",context);
+
+    const d = await api(API.upload,{
+      method:"POST",
+      body:fd
+    });
+
+    if(!d.url){
+      throw new Error("Upload succeeded but no URL returned");
+    }
+
+    if(context==="product"){
+      document.getElementById("pPhoto").value=d.url;
+
+      const preview=document.getElementById("pPreview");
+      preview.src=d.url;
+      preview.classList.remove("hidden");
+    }else{
+      document.getElementById("aPhoto").value=d.url;
+
+      const preview=document.getElementById("aPreview");
+      preview.src=d.url;
+      preview.classList.remove("hidden");
+    }
+
+    toast("Photo uploaded");
+
+  }catch(e){
+    toast("Upload error: " + e.message);
+  }
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function mapOrder(o){
+  return {
+    id:o.id,
+    productId:o.productId || o.product_id,
+    productName:o.productName || o.product_name || "Product",
+    customerName:o.customerName || o.customer_name || "",
+    phone:o.phone || "",
+    username:o.username || "",
+    quantity:Number(o.quantity || 0),
+    buyPrice:Number(o.buyPrice ?? o.buy_price ?? 0),
+    sellPrice:Number(o.sellPrice ?? o.sell_price ?? 0),
+    total:Number(o.total ?? 0),
+    profit:Number(o.profit ?? 0),
+    status:String(o.status || "NEW").toUpperCase(),
+    receiptUrl:o.receiptUrl || o.receipt_url || "",
+    receiptFileId:o.receipt_file_id || o.receiptFileId || "",
+    createdAt:o.createdAt || o.created_at || "",
+    deliveryStatus:o.delivery_status || o.deliveryStatus || "",
+    closedAt:o.closed_at || o.closedAt || ""
+  };
+}
+
+async function loadOrders(){
+  try{
+    const d = await api(API.orders);
+
+    orders =
+      Array.isArray(d) ? d.map(mapOrder) :
+      Array.isArray(d.orders) ? d.orders.map(mapOrder) :
+      [];
+
+    renderOrders();
+    renderHomeOrders();
+    updateDashboard();
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function isClosed(o){
+  return o.status==="DELIVERED" ||
+         o.deliveryStatus==="DELIVERED" ||
+         !!o.closedAt;
+}
+
+function renderOrders(){
+  const box=document.getElementById("ordersList");
+
+  const search=(document.getElementById("orderSearch")?.value || "").toLowerCase();
+  const filter=document.getElementById("orderFilter")?.value || "active";
+
+  let arr=orders.filter(o=>{
+    const text=[
+      o.id,
+      o.productName,
+      o.customerName,
+      o.phone,
+      o.username,
+      o.status
+    ].join(" ").toLowerCase();
+
+    if(search && !text.includes(search)) return false;
+
+    if(filter==="active"){
+      return !isClosed(o) && o.status!=="REJECTED";
+    }
+
+    if(filter==="all") return true;
+
+    return o.status===filter;
+  });
+
+  arr.sort((a,b)=>{
+    return new Date(b.createdAt || 0)-new Date(a.createdAt || 0);
+  });
+
+  if(!arr.length){
+    box.innerHTML=emptyState("🛍️","No orders");
+    return;
+  }
+
+  box.innerHTML=arr.map(orderCard).join("");
+}
+
+function orderCard(o){
+  const statusLabel={
+    NEW:"NEW",
+    PAYMENT_PENDING:"PAYMENT PENDING",
+    RECEIPT_PENDING:"RECEIPT PENDING",
+    DELIVERY_PENDING:"DELIVERY PENDING",
+    DELIVERED:"DELIVERED",
+    REJECTED:"REJECTED"
+  }[o.status] || o.status;
+
+  return `
+    <div class="item">
+
+      <div class="item-row">
+
+        <div class="item-main">
+          <div class="item-title">${esc(o.productName)}</div>
+          <div class="item-sub">
+            ${esc(o.customerName || "Customer")}
+            ${o.username ? " • " + esc(o.username) : ""}
+          </div>
+          <div class="item-sub">
+            Qty: ${o.quantity} • ${money(o.total)}
+          </div>
+        </div>
+
+        <span class="status ${esc(o.status)}">${esc(statusLabel)}</span>
+
+      </div>
+
+      <div class="item-actions">
+
+        <button class="btn btn-blue"
+          onclick="viewOrder('${esc(o.id)}')">
+          Details
+        </button>
+
+        ${
+          o.status==="RECEIPT_PENDING"
+          ? `
+            <button class="btn btn-green"
+              onclick="changeOrder('${esc(o.id)}','CONFIRMED')">
+              ✓ Confirm
+            </button>
+
+            <button class="btn btn-red"
+              onclick="changeOrder('${esc(o.id)}','REJECTED')">
+              ✕ Reject
+            </button>
+          `
+          : ""
+        }
+
+        ${
+          o.receiptFileId || o.receiptUrl
+          ? `
+            <button class="btn btn-orange"
+              onclick="viewReceipt('${esc(o.id)}')">
+              🧾 Receipt
+            </button>
+          `
+          : ""
+        }
+
+      </div>
+
+    </div>
+  `;
+}
+
+function renderHomeOrders(){
+  const box=document.getElementById("homeOrders");
+
+  const arr=orders
+    .filter(o=>!isClosed(o) && o.status!=="REJECTED")
+    .sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0))
+    .slice(0,5);
+
+  if(!arr.length){
+    box.innerHTML=emptyState("✅","No active orders");
+    return;
+  }
+
+  box.innerHTML=arr.map(orderCard).join("");
+}
+
+async function changeOrder(id,status){
+  const question =
+    status==="CONFIRMED"
+    ? "Confirm this payment/order?"
+    : "Reject this order?";
+
+  if(!confirm(question)) return;
+
+  try{
+    let d;
+
+    try{
+      d=await api(API.orders+"/"+encodeURIComponent(id)+"/status",{
+        method:"PATCH",
+        body:JSON.stringify({status})
+      });
+    }catch(e){
+      d=await api(API.orders+"/"+encodeURIComponent(id),{
+        method:"PATCH",
+        body:JSON.stringify({status})
+      });
+    }
+
+    toast(d.message || "Order updated");
+    await loadOrders();
+    await loadProducts();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+function viewOrder(id){
+  const o=orders.find(x=>String(x.id)===String(id));
+  if(!o) return;
+
+  document.getElementById("orderDetails").innerHTML=`
+
+    <div class="item">
+
+      <div class="item-title">${esc(o.productName)}</div>
+
+      <div style="margin-top:10px">
+        <b>Order ID:</b> ${esc(o.id)}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Customer:</b> ${esc(o.customerName)}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Username:</b> ${esc(o.username || "-")}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Phone:</b> ${esc(o.phone || "-")}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Quantity:</b> ${o.quantity}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Sell Price:</b> ${money(o.sellPrice)}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Total:</b> ${money(o.total)}
+      </div>
+
+      <div style="margin-top:7px">
+        <b>Profit:</b> ${money(o.profit)}
+      </div>
+
+      <div style="margin-top:10px">
+        <b>Status:</b>
+        <span class="status ${esc(o.status)}">${esc(o.status)}</span>
+      </div>
+
+      ${
+        isClosed(o)
+        ? `
+          <div style="margin-top:12px;padding:10px;background:#e8f8ef;border-radius:10px;color:#087c4f;font-size:12px">
+            ✓ This order is closed/delivered.
+          </div>
+        `
+        : ""
+      }
+
+    </div>
+  `;
+
+  document.getElementById("orderModal").classList.add("open");
+}
+
+function viewReceipt(id){
+  const o=orders.find(x=>String(x.id)===String(id));
+  if(!o) return;
+
+  if(o.receiptUrl){
+    window.open(o.receiptUrl,"_blank");
+    return;
+  }
+
+  if(o.receiptFileId){
+    window.open(
+      API.orders+"/"+encodeURIComponent(id)+"/receipt",
+      "_blank"
+    );
+    return;
+  }
+
+  toast("No receipt available");
+}
+
+
+/* =========================================================
+   ADS
+========================================================= */
+
+async function loadAds(){
+  try{
+    const d=await api(API.ads);
+
+    ads=
+      Array.isArray(d) ? d :
+      Array.isArray(d.ads) ? d.ads :
+      [];
+
+    renderAds();
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function updateProductSelect(){
+  const s=document.getElementById("aProduct");
+  if(!s) return;
+
+  s.innerHTML=products.map(p=>
+    `<option value="${esc(p.id)}">${esc(p.name)}</option>`
+  ).join("");
+}
+
+function renderAds(){
+  const box=document.getElementById("adsList");
+
+  if(!ads.length){
+    box.innerHTML=emptyState("📢","No advertisements");
+    return;
+  }
+
+  box.innerHTML=ads.map(a=>`
+
+    <div class="item">
+
+      <div class="item-row">
+        <div class="item-main">
+          <div class="item-title">
+            ${esc(a.title || "Advertisement")}
+          </div>
+
+          <div class="item-sub">
+            ${esc(a.text || "")}
+          </div>
+
+          <div class="item-sub">
+            Chat: ${esc(a.chat_id || a.chatId || a.target_chat_id || "-")}
+          </div>
+        </div>
+
+        <span class="status ${a.published ? "DELIVERED" : "PAYMENT_PENDING"}">
+          ${a.published ? "PUBLISHED" : "DRAFT"}
+        </span>
+      </div>
+
+      <div class="item-actions">
+
+        <button class="btn btn-blue"
+          onclick="publishAd('${esc(a.id)}')">
+          📢 Publish
+        </button>
+
+        <button class="btn btn-red"
+          onclick="deleteAd('${esc(a.id)}')">
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  `).join("");
+}
+
+function openAdModal(){
+  document.getElementById("adModal").classList.add("open");
+
+  document.getElementById("aId").value="";
+  document.getElementById("aTitle").value="";
+  document.getElementById("aText").value="";
+  document.getElementById("aButton").value="Order Now";
+  document.getElementById("aOldPrice").value="";
+  document.getElementById("aDiscount").value="";
+  document.getElementById("aChatId").value="";
+  document.getElementById("aPhoto").value="";
+
+  updateProductSelect();
+
+  document.getElementById("aPreview").classList.add("hidden");
+}
+
+async function saveAd(){
+  try{
+    const payload={
+      product_id:document.getElementById("aProduct").value,
+      title:document.getElementById("aTitle").value.trim(),
+      text:document.getElementById("aText").value.trim(),
+      button_text:document.getElementById("aButton").value.trim(),
+      old_price:Number(document.getElementById("aOldPrice").value || 0),
+      discount:Number(document.getElementById("aDiscount").value || 0),
+      target_chat_id:document.getElementById("aChatId").value.trim(),
+      photo_url:document.getElementById("aPhoto").value.trim()
+    };
+
+    await api(API.ads,{
+      method:"POST",
+      body:JSON.stringify(payload)
+    });
+
+    closeModal("adModal");
+    toast("Advertisement saved");
+    await loadAds();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+async function publishAd(id){
+  if(!confirm("Publish this advertisement to Telegram?")) return;
+
+  try{
+    await api(API.ads+"/"+encodeURIComponent(id)+"/publish",{
+      method:"POST"
+    });
+
+    toast("Advertisement published");
+    await loadAds();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+async function deleteAd(id){
+  if(!confirm("Delete this advertisement?")) return;
+
+  try{
+    await api(API.ads+"/"+encodeURIComponent(id),{
+      method:"DELETE"
+    });
+
+    toast("Advertisement deleted");
+    await loadAds();
+
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+
+/* =========================================================
+   EMPLOYEES
+========================================================= */
+
+async function loadEmployees(){
+  try{
+    const d=await api(API.employees);
+
+    employees=
+      Array.isArray(d) ? d :
+      Array.isArray(d.employees) ? d.employees :
+      [];
+
+    renderEmployees();
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function employeeName(e){
+  return e.name ||
+         e.full_name ||
+         e.employee
