@@ -2612,3 +2612,1794 @@ app.get(
 
       user.permissions =
         (data || []).map(
+                 user.permissions =
+        (data || [])
+          .map((x) => x.permission)
+          .filter(Boolean);
+    } else {
+      user.permissions = ["*"];
+    }
+
+    res.json({
+      ok: true,
+      user
+    });
+  } catch (err) {
+    console.error(
+      "AUTH ME ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      ok: false,
+      error: err.message
+    });
+  }
+});
+
+/* =========================================================
+   HEALTH
+========================================================= */
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "Telegram Sales Manager",
+    supabase: !!supabase,
+    telegram: !!BOT_TOKEN,
+    time: nowISO()
+  });
+});
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+app.get(
+  "/api/reports",
+  requirePermission("reports"),
+  async (req, res) => {
+    try {
+      if (!supabase) {
+        throw new Error(
+          "Supabase unavailable"
+        );
+      }
+
+      const { data: orders, error } =
+        await supabase
+          .from("orders")
+          .select("*")
+          .order("created_at", {
+            ascending: false
+          });
+
+      if (error) throw error;
+
+      const rows = orders || [];
+
+      const delivered =
+        rows.filter(
+          (o) =>
+            safeString(o.status)
+              .toUpperCase() ===
+            "DELIVERED"
+        );
+
+      const confirmed =
+        rows.filter((o) =>
+          [
+            "DELIVERY_PENDING",
+            "DELIVERED"
+          ].includes(
+            safeString(o.status).toUpperCase()
+          )
+        );
+
+      const totalSales =
+        delivered.reduce(
+          (sum, o) =>
+            sum +
+            numberValue(
+              firstDefined(
+                o.total,
+                o.sell_total,
+                o.sellTotal
+              ),
+              0
+            ),
+          0
+        );
+
+      const totalBuy =
+        delivered.reduce(
+          (sum, o) =>
+            sum +
+            numberValue(
+              firstDefined(
+                o.buy_total,
+                o.buyTotal,
+                numberValue(
+                  o.buy_price,
+                  0
+                ) *
+                  numberValue(
+                    o.quantity,
+                    1
+                  )
+              ),
+              0
+            ),
+          0
+        );
+
+      const totalProfit =
+        delivered.reduce(
+          (sum, o) => {
+            const storedProfit =
+              firstDefined(
+                o.profit,
+                o.total_profit
+              );
+
+            if (
+              storedProfit !== null &&
+              storedProfit !== undefined &&
+              storedProfit !== ""
+            ) {
+              return (
+                sum +
+                numberValue(
+                  storedProfit,
+                  0
+                )
+              );
+            }
+
+            const total =
+              numberValue(
+                firstDefined(
+                  o.total,
+                  o.sell_total
+                ),
+                0
+              );
+
+            const buy =
+              numberValue(
+                firstDefined(
+                  o.buy_total,
+                  o.buyTotal
+                ),
+                numberValue(
+                  o.buy_price,
+                  0
+                ) *
+                  numberValue(
+                    o.quantity,
+                    1
+                  )
+              );
+
+            return sum + (total - buy);
+          },
+          0
+        );
+
+      const activeOrders =
+        rows.filter(
+          (o) =>
+            ![
+              "DELIVERED",
+              "CLOSED",
+              "REJECTED"
+            ].includes(
+              safeString(
+                o.status
+              ).toUpperCase()
+            )
+        );
+
+      res.json({
+        ok: true,
+        summary: {
+          totalOrders: rows.length,
+          activeOrders:
+            activeOrders.length,
+          confirmedOrders:
+            confirmed.length,
+          deliveredOrders:
+            delivered.length,
+          totalSales,
+          totalBuy,
+          totalProfit
+        },
+        orders: rows
+      });
+    } catch (err) {
+      console.error(
+        "REPORT ERROR:",
+        err
+      );
+
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   TELEGRAM BOT HELPERS
+========================================================= */
+
+async function botSendProducts(
+  chatId,
+  extraText = ""
+) {
+  if (!supabase) {
+    return null;
+  }
+
+  const { data: products, error } =
+    await supabase
+      .from("products")
+      .select("*")
+      .gt("stock", 0)
+      .order("created_at", {
+        ascending: false
+      });
+
+  if (error) {
+    console.error(
+      "BOT PRODUCTS ERROR:",
+      error.message
+    );
+
+    return sendMessage(
+      chatId,
+      "❌ ምርቶችን ማምጣት አልተቻለም።"
+    );
+  }
+
+  const list = products || [];
+
+  if (!list.length) {
+    return sendMessage(
+      chatId,
+      "📦 አሁን ላይ የሚገኝ ምርት የለም።\n\nአዲስ ምርት ሲጨመር እንደገና ይመልከቱ።"
+    );
+  }
+
+  const buttons = list.map(
+    (product) => {
+      const name =
+        productName(product);
+
+      const price =
+        productSellPrice(product);
+
+      const stock =
+        productStock(product);
+
+      return [
+        {
+          text:
+            `${name} — ${price} ETB (${stock})`,
+          callback_data:
+            `product_${product.id}`
+        }
+      ];
+    }
+  );
+
+  return sendMessage(
+    chatId,
+    extraText ||
+      "🛍️ **UNI MARKET**\n\nየሚፈልጉትን ምርት ይምረጡ፦",
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard:
+          buttons
+      }
+    }
+  );
+}
+
+async function sendDeliveryPendingMessage(
+  order
+) {
+  const chatId =
+    firstDefined(
+      order.telegram_chat_id,
+      order.customer_id,
+      order.chat_id
+    );
+
+  if (!chatId) return null;
+
+  const name =
+    firstDefined(
+      order.product_name,
+      order.productName,
+      "ምርት"
+    );
+
+  const quantity =
+    numberValue(
+      order.quantity,
+      1
+    );
+
+  const total =
+    numberValue(
+      order.total,
+      0
+    );
+
+  const message =
+    `✅ ክፍያዎ ተረጋግጧል!\n\n` +
+    `📦 ምርት: ${name}\n` +
+    `🔢 ብዛት: ${quantity}\n` +
+    `💰 ጠቅላላ: ${total} ETB\n\n` +
+    `🚚 ኦርደርዎ ወደ ማድረሻ ሂደት ገብቷል።\n\n` +
+    `ምርቱ ሲደርስዎት ከታች ያለውን **ደርሶኛል** ቁልፍ ይጫኑ።`;
+
+  const result =
+    await sendMessage(
+      chatId,
+      message,
+      {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text:
+                  "📦 ደርሶኛል",
+                callback_data:
+                  `order_received_${order.id}`
+              }
+            ]
+          ]
+        }
+      }
+    );
+
+  await trackTelegramMessage(
+    order.id,
+    chatId,
+    result
+  );
+
+  return result;
+}
+
+/* =========================================================
+   TELEGRAM ADMIN ACTION
+========================================================= */
+
+async function telegramAdminAction(
+  action,
+  orderId
+) {
+  if (!orderId) return null;
+
+  const order =
+    await getOrderById(orderId);
+
+  if (!order) return null;
+
+  const status =
+    action === "confirm"
+      ? "CONFIRMED"
+      : "REJECTED";
+
+  return changeOrderStatus(
+    orderId,
+    status,
+    {
+      role: "MASTER_ADMIN",
+      username: "telegram_admin",
+      name: "Telegram Admin"
+    }
+  );
+}
+
+/* =========================================================
+   PENDING ORDER SEARCH
+========================================================= */
+
+async function findPendingOrder(
+  chatId
+) {
+  if (!supabase) return null;
+
+  const { data, error } =
+    await supabase
+      .from("orders")
+      .select("*")
+      .eq(
+        "telegram_chat_id",
+        String(chatId)
+      )
+      .in("status", [
+        "NEW",
+        "PAYMENT_PENDING",
+        "RECEIPT_PENDING"
+      ])
+      .order("created_at", {
+        ascending: false
+      })
+      .limit(1)
+      .maybeSingle();
+
+  if (error) {
+    console.error(
+      "findPendingOrder:",
+      error.message
+    );
+
+    return null;
+  }
+
+  return data || null;
+}
+
+/* =========================================================
+   TELEGRAM UPDATE PROCESSOR
+========================================================= */
+
+async function processTelegram(
+  update
+) {
+  try {
+    /* -----------------------------------------
+       CHANNEL POSTS
+    ----------------------------------------- */
+
+    if (update.channel_post) {
+      return;
+    }
+
+    /* -----------------------------------------
+       CALLBACK QUERY
+    ----------------------------------------- */
+
+    const callback =
+      update.callback_query;
+
+    if (callback) {
+      const callbackId =
+        callback.id;
+
+      const from =
+        callback.from || {};
+
+      const message =
+        callback.message || {};
+
+      const chat =
+        message.chat || {};
+
+      const chatId =
+        chat.id;
+
+      const data =
+        safeString(
+          callback.data
+        );
+
+      try {
+        await telegram(
+          "answerCallbackQuery",
+          {
+            callback_query_id:
+              callbackId
+          }
+        );
+      } catch {}
+
+      /* ADMIN CONFIRM */
+
+      if (
+        data.startsWith(
+          "admin_confirm_"
+        )
+      ) {
+        if (
+          ADMIN_CHAT_ID &&
+          String(chatId) !==
+            String(ADMIN_CHAT_ID)
+        ) {
+          return;
+        }
+
+        const orderId =
+          data.replace(
+            "admin_confirm_",
+            ""
+          );
+
+        try {
+          await telegramAdminAction(
+            "confirm",
+            orderId
+          );
+
+          await sendMessage(
+            chatId,
+            "✅ ክፍያው ተረጋግጧል።"
+          );
+        } catch (err) {
+          await sendMessage(
+            chatId,
+            `❌ ${err.message}`
+          );
+        }
+
+        return;
+      }
+
+      /* ADMIN REJECT */
+
+      if (
+        data.startsWith(
+          "admin_reject_"
+        )
+      ) {
+        if (
+          ADMIN_CHAT_ID &&
+          String(chatId) !==
+            String(ADMIN_CHAT_ID)
+        ) {
+          return;
+        }
+
+        const orderId =
+          data.replace(
+            "admin_reject_",
+            ""
+          );
+
+        try {
+          await telegramAdminAction(
+            "reject",
+            orderId
+          );
+
+          await sendMessage(
+            chatId,
+            "❌ የክፍያ ደረሰኙ ተከልክሏል።"
+          );
+        } catch (err) {
+          await sendMessage(
+            chatId,
+            `❌ ${err.message}`
+          );
+        }
+
+        return;
+      }
+
+      /* CUSTOMER RECEIVED */
+
+      if (
+        data.startsWith(
+          "order_received_"
+        )
+      ) {
+        const orderId =
+          data.replace(
+            "order_received_",
+            ""
+          );
+
+        const order =
+          await getOrderById(
+            orderId
+          );
+
+        if (!order) {
+          return sendMessage(
+            chatId,
+            "❌ ኦርደሩ አልተገኘም።"
+          );
+        }
+
+        const ownerChatId =
+          firstDefined(
+            order.telegram_chat_id,
+            order.customer_id,
+            order.chat_id
+          );
+
+        if (
+          String(ownerChatId) !==
+          String(chatId)
+        ) {
+          return sendMessage(
+            chatId,
+            "❌ ይህ ኦርደር የእርስዎ አይደለም።"
+          );
+        }
+
+        if (
+          safeString(
+            order.status
+          ).toUpperCase() !==
+          "DELIVERY_PENDING"
+        ) {
+          return sendMessage(
+            chatId,
+            "ℹ️ ይህ ኦርደር አሁን ላይ ሊዘጋ አይችልም።"
+          );
+        }
+
+        const { data: closedOrder, error } =
+          await supabase
+            .from("orders")
+            .update({
+              status: "DELIVERED",
+              delivery_status:
+                "DELIVERED",
+              delivered_at:
+                nowISO(),
+              closed_at:
+                nowISO()
+            })
+            .eq(
+              "id",
+              orderId
+            )
+            .eq(
+              "status",
+              "DELIVERY_PENDING"
+            )
+            .select("*")
+            .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!closedOrder) {
+          return sendMessage(
+            chatId,
+            "ℹ️ ኦርደሩ ቀድሞ ተዘግቷል።"
+          );
+        }
+
+        await deleteTrackedOrderMessages(
+          orderId,
+          chatId
+        );
+
+        delete userSessions[
+          chatId
+        ];
+
+        await sendMessage(
+          chatId,
+          "🎉 እናመሰግናለን!\n\n" +
+            "ኦርደርዎ በትክክል ተዘግቷል። ❤️"
+        );
+
+        if (ADMIN_CHAT_ID) {
+          await sendMessage(
+            ADMIN_CHAT_ID,
+            `✅ ኦርደር #${orderId}\n\n` +
+              `ደንበኛው “ደርሶኛል” ብሎ ኦርደሩን ዘግቷል።`
+          );
+        }
+
+        return;
+      }
+
+      /* PRODUCT */
+
+      if (
+        data.startsWith(
+          "product_"
+        )
+      ) {
+        const productId =
+          data.replace(
+            "product_",
+            ""
+          );
+
+        const product =
+          await getProduct(
+            productId
+          );
+
+        if (!product) {
+          return sendMessage(
+            chatId,
+            "❌ ምርቱ አልተገኘም።"
+          );
+        }
+
+        const stock =
+          productStock(
+            product
+          );
+
+        if (stock <= 0) {
+          return sendMessage(
+            chatId,
+            "❌ ይህ ምርት አሁን አልቋል።"
+          );
+        }
+
+        const name =
+          productName(
+            product
+          );
+
+        const price =
+          productSellPrice(
+            product
+          );
+
+        const photo =
+          productPhoto(
+            product
+          );
+
+        userSessions[
+          chatId
+        ] = {
+          step: "QUANTITY",
+          productId,
+          quantity: 1
+        };
+
+        const text =
+          `🛍️ ${name}\n\n` +
+          `💰 ዋጋ: ${price} ETB\n` +
+          `📦 የቀረ: ${stock}\n\n` +
+          `ስንት ቁጥር ይፈልጋሉ?`;
+
+        const buttons = [];
+
+        if (stock >= 1) {
+          buttons.push([
+            {
+              text: "1",
+              callback_data:
+                "qty_1"
+            }
+          ]);
+        }
+
+        if (stock >= 2) {
+          buttons.push([
+            {
+              text: "2",
+              callback_data:
+                "qty_2"
+            }
+          ]);
+        }
+
+        if (stock >= 3) {
+          buttons.push([
+            {
+              text: "3",
+              callback_data:
+                "qty_3"
+            }
+          ]);
+        }
+
+        buttons.push([
+          {
+            text: "❌ ሰርዝ",
+            callback_data:
+              "order_cancel"
+          }
+        ]);
+
+        if (photo) {
+          try {
+            await telegram(
+              "sendPhoto",
+              {
+                chat_id: chatId,
+                photo,
+                caption: text,
+                reply_markup: {
+                  inline_keyboard:
+                    buttons
+                }
+              }
+            );
+          } catch {
+            await sendMessage(
+              chatId,
+              text,
+              {
+                reply_markup: {
+                  inline_keyboard:
+                    buttons
+                }
+              }
+            );
+          }
+        } else {
+          await sendMessage(
+            chatId,
+            text,
+            {
+              reply_markup: {
+                inline_keyboard:
+                  buttons
+              }
+            }
+          );
+        }
+
+        return;
+      }
+
+      /* QUANTITY */
+
+      if (
+        data.startsWith(
+          "qty_"
+        )
+      ) {
+        const quantity =
+          Number(
+            data.replace(
+              "qty_",
+              ""
+            )
+          );
+
+        const session =
+          userSessions[
+            chatId
+          ];
+
+        if (!session) {
+          return botSendProducts(
+            chatId
+          );
+        }
+
+        const product =
+          await getProduct(
+            session.productId
+          );
+
+        if (!product) {
+          return sendMessage(
+            chatId,
+            "❌ ምርቱ አልተገኘም።"
+          );
+        }
+
+        if (
+          quantity < 1 ||
+          quantity >
+            productStock(
+              product
+            )
+        ) {
+          return sendMessage(
+            chatId,
+            "❌ የተጠየቀው ብዛት ከStock በላይ ነው።"
+          );
+        }
+
+        session.quantity =
+          quantity;
+
+        session.step =
+          "NAME";
+
+        return sendMessage(
+          chatId,
+          "👤 ሙሉ ስምዎን ያስገቡ፦"
+        );
+      }
+
+      /* CANCEL */
+
+      if (
+        data ===
+        "order_cancel"
+      ) {
+        delete userSessions[
+          chatId
+        ];
+
+        return sendMessage(
+          chatId,
+          "❌ ኦርደሩ ተሰርዟል።"
+        );
+      }
+
+      /* CONFIRM ORDER */
+
+      if (
+        data ===
+        "order_confirm"
+      ) {
+        const session =
+          userSessions[
+            chatId
+          ];
+
+        if (!session) {
+          return botSendProducts(
+            chatId
+          );
+        }
+
+        const product =
+          await getProduct(
+            session.productId
+          );
+
+        if (!product) {
+          return sendMessage(
+            chatId,
+            "❌ ምርቱ አልተገኘም።"
+          );
+        }
+
+        const quantity =
+          Math.max(
+            1,
+            Number(
+              session.quantity ||
+                1
+            )
+          );
+
+        if (
+          productStock(
+            product
+          ) < quantity
+        ) {
+          return sendMessage(
+            chatId,
+            "❌ የሚፈልጉት ብዛት አሁን በStock የለም።"
+          );
+        }
+
+        const sellPrice =
+          productSellPrice(
+            product
+          );
+
+        const buyPrice =
+          productBuyPrice(
+            product
+          );
+
+        const total =
+          sellPrice *
+          quantity;
+
+        const profit =
+          (sellPrice -
+            buyPrice) *
+          quantity;
+
+        const customerName =
+          safeString(
+            session.name
+          );
+
+        const phone =
+          safeString(
+            session.phone
+          );
+
+        const address =
+          safeString(
+            session.address
+          );
+
+        const username =
+          callback.from?.username
+            ? `@${callback.from.username}`
+            : null;
+
+        const row = {
+          product_id:
+            product.id,
+          product_name:
+            productName(
+              product
+            ),
+          customer_name:
+            customerName,
+          phone,
+          username,
+          telegram_chat_id:
+            String(chatId),
+          customer_id:
+            String(chatId),
+          quantity,
+          buy_price:
+            buyPrice,
+          sell_price:
+            sellPrice,
+          total,
+          profit,
+          address:
+            address || null,
+          status:
+            "PAYMENT_PENDING",
+          payment_status:
+            "PENDING",
+          delivery_status:
+            "NOT_READY",
+          created_at:
+            nowISO()
+        };
+
+        const { data: order, error } =
+          await supabase
+            .from("orders")
+            .insert(row)
+            .select("*")
+            .single();
+
+        if (error) {
+          console.error(
+            "CREATE ORDER ERROR:",
+            error
+          );
+
+          return sendMessage(
+            chatId,
+            "❌ ኦርደር መፍጠር አልተቻለም።"
+          );
+        }
+
+        const payment =
+          await getPaymentSettings();
+
+        const bankName =
+          firstDefined(
+            payment.bank_name,
+            payment.bankName,
+            "የባንክ ስም"
+          );
+
+        const accountName =
+          firstDefined(
+            payment.account_name,
+            payment.accountName,
+            "UNI MARKET"
+          );
+
+        const accountNumber =
+          firstDefined(
+            payment.account_number,
+            payment.accountNumber,
+            "የሂሳብ ቁጥር"
+          );
+
+        const paymentText =
+          `🧾 ኦርደርዎ ተመዝግቧል!\n\n` +
+          `📦 ${productName(
+            product
+          )}\n` +
+          `🔢 ብዛት: ${quantity}\n` +
+          `💰 ጠቅላላ: ${total} ETB\n\n` +
+          `🏦 ${bankName}\n` +
+          `👤 ${accountName}\n` +
+          `💳 ${accountNumber}\n\n` +
+          `ክፍያውን ከፈጸሙ በኋላ የክፍያ ደረሰኙን Photo ይላኩ።`;
+
+        const sent =
+          await sendMessage(
+            chatId,
+            paymentText
+          );
+
+        await trackTelegramMessage(
+          order.id,
+          chatId,
+          sent
+        );
+
+        if (ADMIN_CHAT_ID) {
+          const adminText =
+            `🆕 NEW ORDER\n\n` +
+            `🆔 ${order.id}\n` +
+            `📦 ${productName(
+              product
+            )}\n` +
+            `👤 ${customerName}\n` +
+            `📱 ${phone}\n` +
+            `🔢 ${quantity}\n` +
+            `💰 ${total} ETB\n` +
+            `📍 ${address || "-"}`;
+
+          const adminMessage =
+            await sendMessage(
+              ADMIN_CHAT_ID,
+              adminText,
+              {
+                reply_markup: {
+                  inline_keyboard: [
+                    [
+                      {
+                        text:
+                          "✅ Confirm",
+                        callback_data:
+                          `admin_confirm_${order.id}`
+                      },
+                      {
+                        text:
+                          "❌ Reject",
+                        callback_data:
+                          `admin_reject_${order.id}`
+                      }
+                    ]
+                  ]
+                }
+              }
+            );
+
+          await trackTelegramMessage(
+            order.id,
+            ADMIN_CHAT_ID,
+            adminMessage
+          );
+        }
+
+        session.orderId =
+          order.id;
+
+        session.step =
+          "PAYMENT_PENDING";
+
+        return;
+      }
+
+      return;
+    }
+
+    /* -----------------------------------------
+       MESSAGE
+    ----------------------------------------- */
+
+    const message =
+      update.message;
+
+    if (!message) {
+      return;
+    }
+
+    const chat =
+      message.chat || {};
+
+    const chatId =
+      chat.id;
+
+    const from =
+      message.from || {};
+
+    const text =
+      safeString(
+        message.text
+      );
+
+    /* -----------------------------------------
+       PHOTO RECEIPT
+    ----------------------------------------- */
+
+    if (
+      message.photo &&
+      Array.isArray(
+        message.photo
+      ) &&
+      message.photo.length
+    ) {
+      const order =
+        await findPendingOrder(
+          chatId
+        );
+
+      if (!order) {
+        return sendMessage(
+          chatId,
+          "❌ የሚጠባበቅ ኦርደር የለዎትም።"
+        );
+      }
+
+      const largest =
+        message.photo[
+          message.photo.length - 1
+        ];
+
+      const { data, error } =
+        await supabase
+          .from("orders")
+          .update({
+            receipt_file_id:
+              largest.file_id,
+            receipt_status:
+              "PENDING",
+            payment_status:
+              "RECEIPT_PENDING",
+            status:
+              "RECEIPT_PENDING",
+            receipt_uploaded_at:
+              nowISO()
+          })
+          .eq(
+            "id",
+            order.id
+          )
+          .select("*")
+          .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const customerMessage =
+        await sendMessage(
+          chatId,
+          "📥 ደረሰኙ ተቀብለናል።\n\n" +
+            "⏳ Admin እስኪያረጋግጠው ድረስ እባክዎ ይጠብቁ።"
+        );
+
+      await trackTelegramMessage(
+        order.id,
+        chatId,
+        customerMessage
+      );
+
+      if (ADMIN_CHAT_ID) {
+        const caption =
+          `🧾 PAYMENT RECEIPT\n\n` +
+          `🆔 Order: ${order.id}\n` +
+          `👤 ${firstDefined(
+            order.customer_name,
+            "-"
+          )}\n` +
+          `📱 ${firstDefined(
+            order.phone,
+            "-"
+          )}\n` +
+          `💰 ${firstDefined(
+            order.total,
+            0
+          )} ETB`;
+
+        const adminReceipt =
+          await telegram(
+            "sendPhoto",
+            {
+              chat_id:
+                ADMIN_CHAT_ID,
+              photo:
+                largest.file_id,
+              caption,
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text:
+                        "✅ Confirm",
+                      callback_data:
+                        `admin_confirm_${order.id}`
+                    },
+                    {
+                      text:
+                        "❌ Reject",
+                      callback_data:
+                        `admin_reject_${order.id}`
+                    }
+                  ]
+                ]
+              }
+            }
+          );
+
+        await trackTelegramMessage(
+          order.id,
+          ADMIN_CHAT_ID,
+          adminReceipt
+        );
+      }
+
+      return;
+    }
+
+    /* -----------------------------------------
+       START
+    ----------------------------------------- */
+
+    if (
+      text === "/start" ||
+      text.startsWith("/start ")
+    ) {
+      const payload =
+        text
+          .replace(
+            "/start",
+            ""
+          )
+          .trim();
+
+      if (
+        payload.startsWith(
+          "product_"
+        )
+      ) {
+        const productId =
+          payload.replace(
+            "product_",
+            ""
+          );
+
+        const product =
+          await getProduct(
+            productId
+          );
+
+        if (product) {
+          const fakeCallback = {
+            id: randomId(
+              "start_"
+            ),
+            from,
+            message: {
+              chat
+            },
+            data:
+              `product_${product.id}`
+          };
+
+          await processTelegram({
+            callback_query:
+              fakeCallback
+          });
+
+          return;
+        }
+      }
+
+      delete userSessions[
+        chatId
+      ];
+
+      await sendMessage(
+        chatId,
+        `👋 እንኳን ወደ UNI MARKET በደህና መጡ!\n\n` +
+          `🛍️ የሚፈልጉትን ምርት ከታች ይምረጡ።`
+      );
+
+      await botSendProducts(
+        chatId
+      );
+
+      return;
+    }
+
+    /* -----------------------------------------
+       SESSION INPUT
+    ----------------------------------------- */
+
+    const session =
+      userSessions[
+        chatId
+      ];
+
+    if (!session) {
+      return botSendProducts(
+        chatId
+      );
+    }
+
+    if (
+      session.step ===
+      "NAME"
+    ) {
+      if (!text) {
+        return sendMessage(
+          chatId,
+          "👤 እባክዎ ሙሉ ስም ያስገቡ።"
+        );
+      }
+
+      session.name =
+        text;
+
+      session.step =
+        "PHONE";
+
+      return sendMessage(
+        chatId,
+        "📱 ስልክ ቁጥርዎን ያስገቡ፦"
+      );
+    }
+
+    if (
+      session.step ===
+      "PHONE"
+    ) {
+      if (!text) {
+        return sendMessage(
+          chatId,
+          "📱 እባክዎ ስልክ ቁጥር ያስገቡ።"
+        );
+      }
+
+      session.phone =
+        text;
+
+      session.step =
+        "ADDRESS";
+
+      return sendMessage(
+        chatId,
+        "📍 የመላኪያ አድራሻዎን ያስገቡ፦"
+      );
+    }
+
+    if (
+      session.step ===
+      "ADDRESS"
+    ) {
+      if (!text) {
+        return sendMessage(
+          chatId,
+          "📍 እባክዎ የመላኪያ አድራሻ ያስገቡ።"
+        );
+      }
+
+      session.address =
+        text;
+
+      const product =
+        await getProduct(
+          session.productId
+        );
+
+      if (!product) {
+        delete userSessions[
+          chatId
+        ];
+
+        return sendMessage(
+          chatId,
+          "❌ ምርቱ አልተገኘም።"
+        );
+      }
+
+      const quantity =
+        Math.max(
+          1,
+          Number(
+            session.quantity ||
+              1
+          )
+        );
+
+      const total =
+        productSellPrice(
+          product
+        ) *
+        quantity;
+
+      const review =
+        `📋 **የኦርደር ማረጋገጫ**\n\n` +
+        `📦 ${productName(
+          product
+        )}\n` +
+        `🔢 ብዛት: ${quantity}\n` +
+        `👤 ${session.name}\n` +
+        `📱 ${session.phone}\n` +
+        `📍 ${session.address}\n` +
+        `💰 ${total} ETB`;
+
+      session.step =
+        "REVIEW";
+
+      return sendMessage(
+        chatId,
+        review,
+        {
+          parse_mode:
+            "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text:
+                    "✅ ኦርደር አረጋግጥ",
+                  callback_data:
+                    "order_confirm"
+                }
+              ],
+              [
+                {
+                  text:
+                    "❌ ሰርዝ",
+                  callback_data:
+                    "order_cancel"
+                }
+              ]
+            ]
+          }
+        }
+      );
+    }
+
+    if (
+      session.step ===
+      "PAYMENT_PENDING" ||
+      session.step ===
+      "REVIEW"
+    ) {
+      return sendMessage(
+        chatId,
+        "⏳ እባክዎ የአሁኑን ኦርደር ይጨርሱ።"
+      );
+    }
+  } catch (err) {
+    console.error(
+      "PROCESS TELEGRAM ERROR:",
+      err
+    );
+
+    try {
+      const chatId =
+        update?.message?.chat?.id ||
+        update?.callback_query?.message?.chat?.id;
+
+      if (chatId) {
+        await sendMessage(
+          chatId,
+          "❌ የማይጠበቅ ስህተት ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።"
+        );
+      }
+    } catch {}
+  }
+}
+
+/* =========================================================
+   TELEGRAM WEBHOOK
+========================================================= */
+
+app.post(
+  "/telegram/webhook",
+  async (req, res) => {
+    res.json({
+      ok: true
+    });
+
+    try {
+      await processTelegram(
+        req.body
+      );
+    } catch (err) {
+      console.error(
+        "WEBHOOK PROCESS ERROR:",
+        err
+      );
+    }
+  }
+);
+
+/* =========================================================
+   SET WEBHOOK
+========================================================= */
+
+app.post(
+  "/api/telegram/set-webhook",
+  requirePermission(
+    "telegram_settings"
+  ),
+  async (req, res) => {
+    try {
+      const url =
+        safeString(
+          req.body?.url
+        ) ||
+        WEBHOOK_URL;
+
+      if (!url) {
+        throw new Error(
+          "Webhook URL is required"
+        );
+      }
+
+      const result =
+        await telegram(
+          "setWebhook",
+          {
+            url
+          }
+        );
+
+      res.json({
+        ok: true,
+        result
+      });
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   DELETE WEBHOOK
+========================================================= */
+
+app.post(
+  "/api/telegram/delete-webhook",
+  requirePermission(
+    "telegram_settings"
+  ),
+  async (req, res) => {
+    try {
+      const result =
+        await telegram(
+          "deleteWebhook",
+          {
+            drop_pending_updates:
+              false
+          }
+        );
+
+      res.json({
+        ok: true,
+        result
+      });
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   WEBHOOK INFO
+========================================================= */
+
+app.get(
+  "/api/telegram/webhook-info",
+  requirePermission(
+    "telegram_settings"
+  ),
+  async (req, res) => {
+    try {
+      const result =
+        await telegram(
+          "getWebhookInfo"
+        );
+
+      res.json({
+        ok: true,
+        result
+      });
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(
+      PUBLIC_DIR,
+      "admin.html"
+    )
+  );
+});
+
+/* =========================================================
+   404
+========================================================= */
+
+app.use(
+  (req, res) => {
+    if (
+      req.path.startsWith(
+        "/api/"
+      ) ||
+      req.path.startsWith(
+        "/telegram/"
+      )
+    ) {
+      return res.status(404).json({
+        ok: false,
+        error: "Not found"
+      });
+    }
+
+    res.status(404).send(
+      "Page not found"
+    );
+  }
+);
+
+/* =========================================================
+   GLOBAL ERROR
+========================================================= */
+
+app.use(
+  (err, req, res, next) => {
+    console.error(
+      "GLOBAL ERROR:",
+      err
+    );
+
+    if (
+      res.headersSent
+    ) {
+      return next(err);
+    }
+
+    res.status(500).json({
+      ok: false,
+      error:
+        err.message ||
+        "Internal server error"
+    });
+  }
+);
+
+/* =========================================================
+   START SERVER
+========================================================= */
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Telegram Sales Manager running on port ${PORT}`
+    );
+
+    console.log(
+      `Supabase: ${
+        supabase
+          ? "connected"
+          : "NOT CONFIGURED"
+      }`
+    );
+
+    console.log(
+      `Telegram Bot: ${
+        BOT_TOKEN
+          ? "configured"
+          : "NOT CONFIGURED"
+      }`
+    );
+
+    if (WEBHOOK_URL) {
+      console.log(
+        `Webhook URL: ${WEBHOOK_URL}`
+      );
+    }
+  }
+);
