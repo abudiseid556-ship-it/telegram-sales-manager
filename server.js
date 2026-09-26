@@ -674,26 +674,53 @@ async function processTelegram(update) {
       return;
     }
 
-    const message = update.message;
-    if (!message) return;
-    const chatId = message.chat.id;
-    const textMessage = String(message.text || "").trim();
-
-    if (message.photo && message.photo.length) {
-      const order = await findPendingOrder(chatId);
-      if (!order) { await sendMessage(chatId, "❌ የሚጠብቅ ኦርደር የለም።"); return; }
+        if (message.photo && message.photo.length) {
+      let order = await findPendingOrder(chatId);
       const photo = message.photo[message.photo.length - 1];
-      await supabase.from("orders").update({ status: "RECEIPT_PENDING", payment_status: "RECEIPT_PENDING", receipt_file_id: photo.file_id }).eq("id", order.id);
+      
+      // ኦርደር በቁጥጥር ካልተገኘ የቅርብ ጊዜውን የደንበኛውን ኦርደር መውሰድ
+      if (!order) {
+        const { data: recentOrders } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("telegram_chat_id", String(chatId))
+          .order("created_at", { ascending: false })
+          .limit(1);
+          
+        if (recentOrders && recentOrders.length > 0) {
+          order = recentOrders[0];
+        }
+      }
+
+      if (!order) {
+        await sendMessage(chatId, "❌ እባክዎ መጀመሪያ ከካታሎግ ውስጥ እቃ ይምረጡና ኦርደር ያድርጉ።");
+        return;
+      }
+
+      await supabase.from("orders").update({ 
+        status: "RECEIPT_PENDING", 
+        payment_status: "RECEIPT_PENDING", 
+        receipt_file_id: photo.file_id 
+      }).eq("id", order.id);
+
       await sendMessage(chatId, "✅ ደረሰኙ ተቀብለናል።\n\n⏳ Admin እስኪያረጋግጥ ድረስ ይጠብቁ።");
+
       if (ADMIN_CHAT_ID) {
         await sendMessage(ADMIN_CHAT_ID, `🧾 <b>አዲስ Receipt መጥቷል</b>\n\n🛍 ${order.product_name}\n👤 ${order.customer_name}\n💰 ${order.total} ETB`, {
           parse_mode: "HTML",
           reply_markup: { inline_keyboard: [[{ text: "✅ Confirm", callback_data: `admin_confirm_${order.id}` }, { text: "❌ Reject", callback_data: `admin_reject_${order.id}` }]] }
         });
-        try { await telegram("sendPhoto", { chat_id: ADMIN_CHAT_ID, photo: photo.file_id, caption: `Receipt for Order ${order.id}` }); } catch (e) {}
+        try { 
+          await telegram("sendPhoto", { 
+            chat_id: ADMIN_CHAT_ID, 
+            photo: photo.file_id, 
+            caption: `Receipt for Order ${order.id}` 
+          }); 
+        } catch (e) {}
       }
       return;
     }
+
 
     if (textMessage === "/start" || textMessage.startsWith("/start ")) {
       const parts = textMessage.split(/\s+/);
