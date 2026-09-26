@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Sales Manager - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Login Section -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">አድሚን መግቢያ</h2>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">ዩዘርኔም (Username)</label>
+                    <input type="text" id="username" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">የይለፍ ቃል (Password)</label>
+                    <input type="password" id="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">ግባ</button>
+            </form>
+            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard Section (Hidden by default) -->
+    <div id="dashboard-section" class="hidden min-h-screen flex flex-col">
+        <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">የሽያጭ ማስተዳደሪያ ፓነል</h1>
+            <button onclick="handleLogout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">ውጣ</button>
+        </header>
+        <main class="p-6 flex-1">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-gray-500 text-sm font-medium">አጠቃላይ ሽያጭ</h3>
+                    <p id="total-sales" class="text-2xl font-bold text-gray-800 mt-2">0.00 ብር</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-gray-500 text-sm font-medium">ጠቅላላ ትርፍ</h3>
+                    <p id="total-profit" class="text-2xl font-bold text-gray-800 mt-2">0.00 ብር</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-gray-500 text-sm font-medium">ጠቅላላ ትዕዛዞች</h3>
+                    <p id="total-orders" class="text-2xl font-bold text-gray-800 mt-2">0</p>
+                </div>
+            </div>
+            <!-- ተጨማሪ የዳሽቦርድ መዋቅሮች እዚህ ሊኖሩ ይችላሉ -->
+        </main>
+    </div>
+
+    <script>
+        // ** ጠቃሚ ማስታወሻ: የራስዎን የ Render ዌብሳይት ሊንክ ከታች ባለው መስመር ያስገቡ (በስተመጨረሻ ላይ / (slash) አያስቀምጡ) **
+        const RENDER_URL = "https://your-app-name.onrender.com";
+
+        const API = {
+            auth: RENDER_URL + "/api/auth/login",
+            me: RENDER_URL + "/api/auth/me",
+            products: RENDER_URL + "/api/products",
+            orders: RENDER_URL + "/api/orders",
+            upload: RENDER_URL + "/api/upload",
+            ads: RENDER_URL + "/api/advertisements",
+            payment: RENDER_URL + "/api/payment-settings",
+            telegram: RENDER_URL + "/api/telegram-settings",
+            employees: RENDER_URL + "/api/employees",
+            reports: RENDER_URL + "/api/reports"
+        };
+
+        // ሎጊን ለማድረግ የሚሰራ ፊርማ
+        async function handleLogin(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById("username").value;
+            const passwordInput = document.getElementById("password").value;
+            const errorElement = document.getElementById("login-error");
+            
+            errorElement.classList.add("hidden");
+
+            try {
+                const response = await fetch(API.auth, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    localStorage.setItem("auth_token", data.token);
+                    document.getElementById("login-section").classList.add("hidden");
+                    document.getElementById("dashboard-section").classList.remove("hidden");
+                    loadReports();
+                } else {
+                    errorElement.textContent = data.error || "የተሳሳተ ዩዘርኔም ወይም የይለፍ ቃል";
+                    errorElement.classList.remove("hidden");
+                }
+            } catch (err) {
+                errorElement.textContent = "ሰርቨሩን ማግኘት አልተቻለም። እባክዎ ትንሽ ቆይተው እንደገና ይሞክሩ።";
+                errorElement.classList.remove("hidden");
+            }
+        }
+
+        async function loadReports() {
+            try {
+                const token = localStorage.getItem("auth_token");
+                const response = await fetch(API.reports, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const data = await response.json();
+                if (data.ok && data.summary) {
+                    document.getElementById("total-sales").textContent = (data.summary.totalSales || 0) + " ብር";
+                    document.getElementById("total-profit").textContent = (data.summary.totalProfit || 0) + " ብር";
+                    document.getElementById("total-orders").textContent = data.summary.totalOrders || 0;
+                }
+            } catch (err) {
+                console.error("Report load error:", err);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("auth_token");
+            document.getElementById("dashboard-section").classList.add("hidden");
+            document.getElementById("login-section").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
 
