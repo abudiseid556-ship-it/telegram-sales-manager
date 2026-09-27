@@ -574,6 +574,8 @@ app.post("/api/products", async (req, res) => {
     const body = req.body || {};
 
     const row = {
+      id: crypto.randomUUID(),
+      
       name: firstDefined(
         body.name,
         body.productName,
