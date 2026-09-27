@@ -716,149 +716,6 @@ app.post(
 );
 
 
-/* ORDERS API */
-
-app.get("/api/orders", async (req, res) => {
-  try {
-    const { data, error } =
-      await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", {
-          ascending: false
-        });
-
-    if (error) {
-      throw error;
-    }
-
-    res.json(data || []);
-
-  } catch (err) {
-    res.status(500).json({
-      ok: false,
-      error: err.message
-    });
-  }
-});
-
-
-async function changeOrderStatus(
-  orderId,
-  newStatus,
-  actorName
-) {
-  const order =
-    await getOrderById(orderId);
-
-  if (!order) {
-    throw new Error("Order not found");
-  }
-
-  newStatus =
-    safeString(newStatus).toUpperCase();
-
-  if (newStatus === "CONFIRMED") {
-
-    const {
-      data,
-      error
-    } = await supabase
-      .from("orders")
-      .update({
-        status: "DELIVERY_PENDING",
-        payment_status: "CONFIRMED",
-        confirmed_at: nowISO(),
-        confirmed_by:
-          actorName || "Admin"
-      })
-      .eq("id", orderId)
-      .select("*")
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    const customerChatId =
-      firstDefined(
-        data.telegram_chat_id,
-        data.customer_id
-      );
-
-    if (customerChatId) {
-      await sendMessage(
-        customerChatId,
-        `✅ ክፍያዎ ተረጋግጧል!\n\n📦 እቃዎ በማድረስ ሂደት ላይ ነው።`,
-        {
-          parse_mode: "HTML",
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: "📦 ደርሶኛል",
-                  callback_data:
-                    `order_received_${data.id}`
-                }
-              ]
-            ]
-          }
-        }
-      );
-    }
-
-    return data;
-  }
-
-  const {
-    data,
-    error
-  } = await supabase
-    .from("orders")
-    .update({
-      status: newStatus
-    })
-    .eq("id", orderId)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-
-app.patch(
-  "/api/orders/:id/status",
-  async (req, res) => {
-    try {
-      const status =
-        req.body?.status ||
-        req.body?.newStatus;
-
-      const order =
-        await changeOrderStatus(
-          req.params.id,
-          status,
-          "Admin"
-        );
-
-      res.json({
-        ok: true,
-        order
-      });
-
-    } catch (err) {
-      res.status(400).json({
-        ok: false,
-        error: err.message
-      });
-    }
-  }
-);
-
 
 /* SETTINGS API */
 
@@ -871,7 +728,95 @@ app.get(
   }
 );
 
+/* UPLOAD API */
 
+app.post(
+  "/api/upload",
+  upload.single("photo"),
+  async (req, res) => {
+    try {
+      if (!supabase) {
+        return res.status(500).json({
+          ok: false,
+          error: "Supabase unavailable"
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          ok: false,
+          error: "ፎቶ አልተመረጠም"
+        });
+      }
+
+      const ext =
+        path.extname(
+          req.file.originalname || ""
+        ).toLowerCase() || ".jpg";
+
+      const filePath =
+        `products/${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
+
+      const { error } =
+        await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(
+            filePath,
+            req.file.buffer,
+            {
+              contentType:
+                req.file.mimetype ||
+                "image/jpeg",
+              upsert: false
+            }
+          );
+
+      if (error) {
+        console.error(
+          "PRODUCT PHOTO UPLOAD ERROR:",
+          error.message
+        );
+
+        return res.status(500).json({
+          ok: false,
+          error:
+            "ፎቶው ወደ Storage መጫን አልተቻለም: " +
+            error.message
+        });
+      }
+
+      const publicUrl =
+        supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(filePath)
+          ?.data
+          ?.publicUrl;
+
+      if (!publicUrl) {
+        return res.status(500).json({
+          ok: false,
+          error: "የፎቶ ሊንክ መፍጠር አልተቻለም"
+        });
+      }
+
+      res.json({
+        ok: true,
+        url: publicUrl
+      });
+
+    } catch (err) {
+      console.error(
+        "UPLOAD ERROR:",
+        err.message
+      );
+
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
 app.post(
   "/api/payment-settings",
   async (req, res) => {
