@@ -1221,4 +1221,171 @@ app.delete(
   "/api/advertisements/:id",
   async (req, res) => {
     try {
-      if (supabase
+      if (supabase) {
+        await supabase
+          .from("advertisements")
+          .delete()
+          .eq("id", req.params.id);
+      }
+    } catch {}
+
+    res.json({
+      ok: true
+    });
+  }
+);
+
+
+/* EMPLOYEES API */
+
+app.get(
+  "/api/employees",
+  async (req, res) => {
+    try {
+      if (!supabase) {
+        return res.json([]);
+      }
+
+      const { data } =
+        await supabase
+          .from("employees")
+          .select(
+            "id, employee_code, name, username, role, active, created_at"
+          )
+          .order("created_at", {
+            ascending: false
+          });
+
+      res.json(data || []);
+
+    } catch {
+      res.json([]);
+    }
+  }
+);
+
+
+app.post(
+  "/api/employees",
+  async (req, res) => {
+    try {
+      const body = req.body || {};
+
+      const passwordHash =
+        await hashPassword(
+          body.password || "123456"
+        );
+
+      const {
+        data: newEmp,
+        error
+      } = await supabase
+        .from("employees")
+        .insert({
+          employee_code:
+            body.employee_code ||
+            `EMP-${Math.floor(
+              100 + Math.random() * 900
+            )}`,
+
+          name:
+            body.name || "Worker",
+
+          username:
+            body.username || "worker",
+
+          password_hash:
+            passwordHash,
+
+          role:
+            body.role || "EMPLOYEE",
+
+          active: true
+        })
+        .select("*")
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      res.json({
+        ok: true,
+        employee: newEmp
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+
+app.delete(
+  "/api/employees/:id",
+  async (req, res) => {
+    try {
+      if (supabase) {
+        await supabase
+          .from("employees")
+          .delete()
+          .eq("id", req.params.id);
+      }
+
+      res.json({
+        ok: true
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: err.message
+      });
+    }
+  }
+);
+
+
+/* HEALTH */
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "Telegram Sales Manager",
+    time: nowISO()
+  });
+});
+
+
+/* ADMIN PAGE */
+
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(
+      PUBLIC_DIR,
+      "admin.html"
+    )
+  );
+});
+
+
+/* 404 */
+
+app.use((req, res) => {
+  res.status(404).json({
+    ok: false,
+    error: "Not found"
+  });
+});
+
+
+/* START SERVER */
+
+app.listen(PORT, () => {
+  console.log(
+    `Telegram Sales Manager running on port ${PORT}`
+  );
+});
