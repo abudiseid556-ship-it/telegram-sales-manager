@@ -1,128 +1,1111 @@
 <!DOCTYPE html>
 <html lang="am">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Sales Manager - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>UNI MARKET — Sales Manager</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
+.gradient{background:linear-gradient(135deg,#1477ff,#655cff)}
+.card{background:#fff;border-radius:18px;box-shadow:0 5px 20px rgba(20,40,80,.07)}
+.nav-active{color:#1769ff;background:#eef5ff}
+.modal{background:rgba(0,0,0,.45)}
+input,select,textarea{outline:none}
+input:focus,select:focus,textarea:focus{border-color:#2878ff;box-shadow:0 0 0 3px rgba(40,120,255,.1)}
+.hide{display:none!important}
+</style>
 </head>
-<body class="bg-gray-100 font-sans">
 
-    <!-- Login Section -->
-    <div id="login-section" class="flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-lg shadow-md w-96">
-            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">አድሚን መግቢያ</h2>
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">ዩዘርኔም (Username)</label>
-                    <input type="text" id="username" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">የይለፍ ቃል (Password)</label>
-                    <input type="password" id="password" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">ግባ</button>
-            </form>
-            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+<body>
+
+<!-- LOGIN -->
+<section id="login-section" class="min-h-screen flex items-center justify-center p-5 gradient">
+  <div class="card w-full max-w-md p-7">
+    <div class="text-center mb-7">
+      <div class="w-20 h-20 mx-auto rounded-3xl gradient flex items-center justify-center text-white text-3xl font-black shadow-lg">U</div>
+      <h1 class="text-2xl font-black mt-4">UNI MARKET</h1>
+      <p class="text-gray-500 mt-1">የሽያጭ ማስተዳደሪያ</p>
+    </div>
+
+    <form id="login-form">
+      <label class="block text-sm font-bold mb-2">ዩዘርኔም</label>
+      <input id="username" type="text" required
+        class="w-full border rounded-xl px-4 py-3 mb-4"
+        placeholder="admin">
+
+      <label class="block text-sm font-bold mb-2">የይለፍ ቃል</label>
+      <input id="password" type="password" required
+        class="w-full border rounded-xl px-4 py-3 mb-5"
+        placeholder="Password">
+
+      <button id="login-btn" class="w-full gradient text-white py-3 rounded-xl font-bold">
+        ግባ
+      </button>
+    </form>
+
+    <div id="login-error" class="hide mt-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm text-center"></div>
+  </div>
+</section>
+
+
+<!-- APP -->
+<section id="app-section" class="hide min-h-screen pb-24">
+
+  <!-- HEADER -->
+  <header class="gradient text-white px-5 pt-6 pb-8 rounded-b-[30px]">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm opacity-80">እንኳን ደህና መጡ</p>
+        <h1 class="text-2xl font-black mt-1">UNI MARKET</h1>
+        <p id="user-role" class="text-xs opacity-80 mt-1">Master Admin</p>
+      </div>
+      <button onclick="logout()" class="bg-white/20 px-4 py-2 rounded-xl text-sm">
+        ውጣ
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <div class="bg-white/15 rounded-2xl p-4">
+        <p class="text-xs opacity-80">የዛሬ ሽያጭ</p>
+        <p id="today-sales" class="text-xl font-black mt-1">0 ብር</p>
+      </div>
+      <div class="bg-white/15 rounded-2xl p-4">
+        <p class="text-xs opacity-80">የዛሬ ትርፍ</p>
+        <p id="today-profit" class="text-xl font-black mt-1">0 ብር</p>
+      </div>
+      <div class="bg-white/15 rounded-2xl p-4">
+        <p class="text-xs opacity-80">ትዕዛዞች</p>
+        <p id="total-orders" class="text-xl font-black mt-1">0</p>
+      </div>
+      <div class="bg-white/15 rounded-2xl p-4">
+        <p class="text-xs opacity-80">እቃዎች</p>
+        <p id="total-products" class="text-xl font-black mt-1">0</p>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- CONTENT -->
+  <main class="p-4 max-w-6xl mx-auto">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard">
+
+      <h2 class="text-xl font-black mb-4">ዋና ገጽ</h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+
+        <button onclick="showPage('products')" class="card p-5 text-left">
+          <div class="text-2xl">📦</div>
+          <p class="font-bold mt-3">ምርቶች</p>
+          <p class="text-xs text-gray-500 mt-1">እቃ አስተዳድር</p>
+        </button>
+
+        <button onclick="showPage('orders')" class="card p-5 text-left">
+          <div class="text-2xl">🛒</div>
+          <p class="font-bold mt-3">ትዕዛዞች</p>
+          <p class="text-xs text-gray-500 mt-1">Orders</p>
+        </button>
+
+        <button onclick="showPage('payments')" class="card p-5 text-left">
+          <div class="text-2xl">💳</div>
+          <p class="font-bold mt-3">ክፍያ</p>
+          <p class="text-xs text-gray-500 mt-1">Payment</p>
+        </button>
+
+        <button onclick="showPage('ads')" class="card p-5 text-left">
+          <div class="text-2xl">📢</div>
+          <p class="font-bold mt-3">ማስታወቂያ</p>
+          <p class="text-xs text-gray-500 mt-1">Telegram Ads</p>
+        </button>
+
+        <button onclick="showPage('employees')" class="card p-5 text-left">
+          <div class="text-2xl">👥</div>
+          <p class="font-bold mt-3">ሰራተኞች</p>
+          <p class="text-xs text-gray-500 mt-1">Employees</p>
+        </button>
+
+        <button onclick="showPage('reports')" class="card p-5 text-left">
+          <div class="text-2xl">📊</div>
+          <p class="font-bold mt-3">ሪፖርት</p>
+          <p class="text-xs text-gray-500 mt-1">Sales & Profit</p>
+        </button>
+
+        <button onclick="showPage('delivery')" class="card p-5 text-left">
+          <div class="text-2xl">🚚</div>
+          <p class="font-bold mt-3">ዴሊቨሪ</p>
+          <p class="text-xs text-gray-500 mt-1">Delivery</p>
+        </button>
+
+        <button onclick="showPage('settings')" class="card p-5 text-left">
+          <div class="text-2xl">⚙️</div>
+          <p class="font-bold mt-3">ቅንብሮች</p>
+          <p class="text-xs text-gray-500 mt-1">Settings</p>
+        </button>
+
+      </div>
+
+      <div class="card p-5">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="font-black">የቅርብ ጊዜ ትዕዛዞች</h3>
+            <p class="text-xs text-gray-500 mt-1">Latest orders</p>
+          </div>
+          <button onclick="showPage('orders')" class="text-blue-600 text-sm font-bold">ሁሉንም</button>
         </div>
+        <div id="recent-orders" class="mt-4">
+          <p class="text-gray-400 text-center py-6">በመጫን ላይ...</p>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Dashboard Section (Hidden by default) -->
-    <div id="dashboard-section" class="hidden min-h-screen flex flex-col">
-        <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-gray-800">የሽያጭ ማስተዳደሪያ ፓነል</h1>
-            <button onclick="handleLogout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">ውጣ</button>
-        </header>
-        <main class="p-6 flex-1">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-gray-500 text-sm font-medium">አጠቃላይ ሽያጭ</h3>
-                    <p id="total-sales" class="text-2xl font-bold text-gray-800 mt-2">0.00 ብር</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-gray-500 text-sm font-medium">ጠቅላላ ትርፍ</h3>
-                    <p id="total-profit" class="text-2xl font-bold text-gray-800 mt-2">0.00 ብር</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-gray-500 text-sm font-medium">ጠቅላላ ትዕዛዞች</h3>
-                    <p id="total-orders" class="text-2xl font-bold text-gray-800 mt-2">0</p>
-                </div>
+
+    <!-- PRODUCTS -->
+    <div id="page-products" class="hide">
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="text-xl font-black">📦 ምርቶች</h2>
+          <p class="text-sm text-gray-500">Products & Stock</p>
+        </div>
+        <button onclick="openProductModal()" class="gradient text-white px-4 py-3 rounded-xl font-bold">
+          + አዲስ
+        </button>
+      </div>
+
+      <div id="products-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+
+    <!-- ORDERS -->
+    <div id="page-orders" class="hide">
+      <h2 class="text-xl font-black mb-5">🛒 ትዕዛዞች</h2>
+      <div id="orders-list" class="space-y-4"></div>
+    </div>
+
+
+    <!-- PAYMENTS -->
+    <div id="page-payments" class="hide">
+      <h2 class="text-xl font-black mb-5">💳 ክፍያ & ደረሰኝ</h2>
+
+      <div class="card p-5 mb-4">
+        <h3 class="font-black mb-4">የክፍያ መረጃ</h3>
+        <div id="payment-settings-box"></div>
+      </div>
+
+      <div class="card p-5">
+        <h3 class="font-black mb-4">የሚጠባበቁ ክፍያዎች</h3>
+        <div id="pending-payments">
+          <p class="text-gray-400 text-center py-6">በመጫን ላይ...</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ADS -->
+    <div id="page-ads" class="hide">
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="text-xl font-black">📢 ማስታወቂያ</h2>
+          <p class="text-sm text-gray-500">Telegram Advertising</p>
+        </div>
+        <button onclick="openAdModal()" class="gradient text-white px-4 py-3 rounded-xl font-bold">
+          + አዲስ
+        </button>
+      </div>
+      <div id="ads-list" class="space-y-4"></div>
+    </div>
+
+
+    <!-- EMPLOYEES -->
+    <div id="page-employees" class="hide">
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="text-xl font-black">👥 ሰራተኞች</h2>
+          <p class="text-sm text-gray-500">Employees & Permissions</p>
+        </div>
+        <button onclick="openEmployeeModal()" class="gradient text-white px-4 py-3 rounded-xl font-bold">
+          + ሰራተኛ
+        </button>
+      </div>
+      <div id="employees-list" class="space-y-4"></div>
+    </div>
+
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="hide">
+      <h2 class="text-xl font-black mb-5">📊 ሪፖርቶች</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">ጠቅላላ ሽያጭ</p>
+          <p id="report-sales" class="text-2xl font-black mt-2">0 ብር</p>
+        </div>
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">ጠቅላላ ትርፍ</p>
+          <p id="report-profit" class="text-2xl font-black mt-2">0 ብር</p>
+        </div>
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">ጠቅላላ ትዕዛዝ</p>
+          <p id="report-orders" class="text-2xl font-black mt-2">0</p>
+        </div>
+      </div>
+
+      <div class="card p-5 mt-5">
+        <h3 class="font-black mb-3">ማጠቃለያ</h3>
+        <p class="text-gray-500 text-sm">
+          ሪፖርቱ ከSupabase የሚመጣውን የሽያጭ መረጃ ያሳያል።
+        </p>
+      </div>
+    </div>
+
+
+    <!-- DELIVERY -->
+    <div id="page-delivery" class="hide">
+      <h2 class="text-xl font-black mb-5">🚚 ዴሊቨሪ</h2>
+
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">Pending</p>
+          <p id="delivery-pending" class="text-2xl font-black mt-2">0</p>
+        </div>
+
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">In Delivery</p>
+          <p id="delivery-transit" class="text-2xl font-black mt-2">0</p>
+        </div>
+
+        <div class="card p-5">
+          <p class="text-sm text-gray-500">Delivered</p>
+          <p id="delivery-done" class="text-2xl font-black mt-2">0</p>
+        </div>
+
+      </div>
+
+      <div id="delivery-list" class="space-y-4 mt-5"></div>
+    </div>
+
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="hide">
+      <h2 class="text-xl font-black mb-5">⚙️ ቅንብሮች</h2>
+
+      <div class="card p-5 mb-4">
+        <h3 class="font-black">Telegram</h3>
+        <p class="text-sm text-gray-500 mt-2">
+          Telegram bot እና channel/group settings ከserver ጋር ይገናኛሉ።
+        </p>
+        <div id="telegram-settings-box" class="mt-4"></div>
+      </div>
+
+      <div class="card p-5">
+        <h3 class="font-black">System</h3>
+        <p class="text-sm text-gray-500 mt-2">UNI MARKET Sales Manager</p>
+        <p id="system-status" class="text-green-600 font-bold mt-3">Server Connected</p>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- BOTTOM NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t z-40">
+    <div class="max-w-3xl mx-auto grid grid-cols-5">
+      <button onclick="showPage('dashboard')" class="nav-btn py-3 text-xs font-bold" data-page="dashboard">
+        🏠<br>ዋና
+      </button>
+      <button onclick="showPage('products')" class="nav-btn py-3 text-xs font-bold" data-page="products">
+        📦<br>ምርት
+      </button>
+      <button onclick="showPage('orders')" class="nav-btn py-3 text-xs font-bold" data-page="orders">
+        🛒<br>ትዕዛዝ
+      </button>
+      <button onclick="showPage('reports')" class="nav-btn py-3 text-xs font-bold" data-page="reports">
+        📊<br>ሪፖርት
+      </button>
+      <button onclick="showPage('settings')" class="nav-btn py-3 text-xs font-bold" data-page="settings">
+        ⚙️<br>ቅንብር
+      </button>
+    </div>
+  </nav>
+
+</section>
+
+
+<!-- PRODUCT MODAL -->
+<div id="product-modal" class="hide fixed inset-0 modal z-50 p-4 flex items-center justify-center">
+  <div class="bg-white rounded-3xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-5">
+      <h3 class="text-xl font-black">አዲስ ምርት</h3>
+      <button onclick="closeModal('product-modal')" class="text-2xl">×</button>
+    </div>
+
+    <form id="product-form">
+      <input type="hidden" id="product-id">
+
+      <label class="text-sm font-bold">ምርት ስም</label>
+      <input id="product-name" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">መግለጫ</label>
+      <textarea id="product-description" class="w-full border rounded-xl px-4 py-3 mt-2 mb-4"></textarea>
+
+      <label class="text-sm font-bold">የግዢ ዋጋ</label>
+      <input id="buy-price" type="number" step="0.01" min="0" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">የሽያጭ ዋጋ</label>
+      <input id="sell-price" type="number" step="0.01" min="0" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">Stock</label>
+      <input id="product-stock" type="number" step="1" min="0" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-5">
+
+      <button class="w-full gradient text-white py-3 rounded-xl font-bold">
+        አስቀምጥ
+      </button>
+    </form>
+  </div>
+</div>
+
+
+<!-- EMPLOYEE MODAL -->
+<div id="employee-modal" class="hide fixed inset-0 modal z-50 p-4 flex items-center justify-center">
+  <div class="bg-white rounded-3xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-5">
+      <h3 class="text-xl font-black">አዲስ ሰራተኛ</h3>
+      <button onclick="closeModal('employee-modal')" class="text-2xl">×</button>
+    </div>
+
+    <form id="employee-form">
+      <label class="text-sm font-bold">ስም</label>
+      <input id="employee-name" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">Username</label>
+      <input id="employee-username" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">Password</label>
+      <input id="employee-password" type="password" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold mb-3 block">Permissions</label>
+
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <label><input type="checkbox" value="view_orders" class="perm"> Orders</label>
+        <label><input type="checkbox" value="verify_payment" class="perm"> Payments</label>
+        <label><input type="checkbox" value="confirm_order" class="perm"> Confirm</label>
+        <label><input type="checkbox" value="products" class="perm"> Products</label>
+        <label><input type="checkbox" value="delete_product" class="perm"> Delete Product</label>
+        <label><input type="checkbox" value="advertising" class="perm"> Advertising</label>
+        <label><input type="checkbox" value="payment_settings" class="perm"> Payment Settings</label>
+        <label><input type="checkbox" value="telegram_settings" class="perm"> Telegram</label>
+        <label><input type="checkbox" value="employees" class="perm"> Employees</label>
+        <label><input type="checkbox" value="reports" class="perm"> Reports</label>
+      </div>
+
+      <button class="w-full gradient text-white py-3 rounded-xl font-bold mt-6">
+        ሰራተኛ ፍጠር
+      </button>
+    </form>
+  </div>
+</div>
+
+
+<!-- AD MODAL -->
+<div id="ad-modal" class="hide fixed inset-0 modal z-50 p-4 flex items-center justify-center">
+  <div class="bg-white rounded-3xl w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-5">
+      <h3 class="text-xl font-black">አዲስ ማስታወቂያ</h3>
+      <button onclick="closeModal('ad-modal')" class="text-2xl">×</button>
+    </div>
+
+    <form id="ad-form">
+      <label class="text-sm font-bold">Title</label>
+      <input id="ad-title" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4">
+
+      <label class="text-sm font-bold">Message</label>
+      <textarea id="ad-message" required class="w-full border rounded-xl px-4 py-3 mt-2 mb-4"></textarea>
+
+      <button class="w-full gradient text-white py-3 rounded-xl font-bold">
+        ማስታወቂያ ፍጠር
+      </button>
+    </form>
+  </div>
+</div>
+
+
+<script>
+
+const API = {
+  auth: "/api/auth/login",
+  me: "/api/auth/me",
+  products: "/api/products",
+  orders: "/api/orders",
+  upload: "/api/upload",
+  ads: "/api/advertisements",
+  payment: "/api/payment-settings",
+  telegram: "/api/telegram-settings",
+  employees: "/api/employees",
+  reports: "/api/reports"
+};
+
+let token = localStorage.getItem("auth_token");
+let products = [];
+let orders = [];
+let currentPage = "dashboard";
+
+function authHeaders(json=true){
+  const h = {};
+  if(json) h["Content-Type"]="application/json";
+  if(token) h["Authorization"]="Bearer "+token;
+  return h;
+}
+
+async function api(url, options={}){
+  options.headers = {...authHeaders(!(options.body instanceof FormData)), ...(options.headers||{})};
+  const r = await fetch(url, options);
+
+  let data = {};
+  try { data = await r.json(); } catch(e) {}
+
+  if(r.status === 401 || r.status === 403){
+    logout();
+    throw new Error(data.error || "Unauthorized");
+  }
+
+  if(!r.ok || data.ok === false){
+    throw new Error(data.error || "Request failed");
+  }
+
+  return data;
+}
+
+
+/* LOGIN */
+
+document.getElementById("login-form").addEventListener("submit", async e=>{
+  e.preventDefault();
+
+  const btn=document.getElementById("login-btn");
+  const err=document.getElementById("login-error");
+
+  btn.disabled=true;
+  btn.textContent="በመግባት ላይ...";
+  err.classList.add("hide");
+
+  try{
+    const data=await fetch(API.auth,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        username:document.getElementById("username").value.trim(),
+        password:document.getElementById("password").value
+      })
+    }).then(async r=>{
+      const d=await r.json();
+      if(!r.ok) throw new Error(d.error||"Login failed");
+      return d;
+    });
+
+    if(!data.ok || !data.token) throw new Error(data.error||"Login failed");
+
+    token=data.token;
+    localStorage.setItem("auth_token",token);
+
+    await startApp();
+
+  }catch(e){
+    err.textContent=e.message==="Failed to fetch"
+      ?"ሰርቨሩን ማግኘት አልተቻለም።"
+      :e.message;
+    err.classList.remove("hide");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="ግባ";
+  }
+});
+
+
+async function startApp(){
+
+  document.getElementById("login-section").classList.add("hide");
+  document.getElementById("app-section").classList.remove("hide");
+
+  try{
+    const me=await api(API.me);
+    const user=me.user||me;
+    document.getElementById("user-role").textContent =
+      user.role==="master" ? "Master Admin" : "Employee";
+
+  }catch(e){}
+
+  await Promise.all([
+    loadProducts(),
+    loadOrders(),
+    loadReports()
+  ]);
+
+  renderDashboard();
+}
+
+
+/* NAVIGATION */
+
+function showPage(page){
+
+  currentPage=page;
+
+  document.querySelectorAll('[id^="page-"]').forEach(x=>{
+    x.classList.add("hide");
+  });
+
+  const target=document.getElementById("page-"+page);
+  if(target) target.classList.remove("hide");
+
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    btn.classList.remove("nav-active");
+    if(btn.dataset.page===page) btn.classList.add("nav-active");
+  });
+
+  if(page==="products") loadProducts();
+  if(page==="orders") loadOrders();
+  if(page==="reports") loadReports();
+  if(page==="payments") loadPayments();
+  if(page==="ads") loadAds();
+  if(page==="employees") loadEmployees();
+  if(page==="delivery") renderDelivery();
+  if(page==="settings") loadSettings();
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.add("hide");
+}
+
+function openProductModal(){
+  document.getElementById("product-form").reset();
+  document.getElementById("product-id").value="";
+  document.getElementById("product-modal").classList.remove("hide");
+}
+
+function openEmployeeModal(){
+  document.getElementById("employee-form").reset();
+  document.getElementById("employee-modal").classList.remove("hide");
+}
+
+function openAdModal(){
+  document.getElementById("ad-form").reset();
+  document.getElementById("ad-modal").classList.remove("hide");
+}
+
+
+/* PRODUCTS */
+
+async function loadProducts(){
+
+  try{
+    const data=await api(API.products);
+    products=data.products||data.data||[];
+    renderProducts();
+    document.getElementById("total-products").textContent=products.length;
+  }catch(e){
+    document.getElementById("products-list").innerHTML=
+      `<div class="card p-5 text-red-500">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderProducts(){
+
+  const box=document.getElementById("products-list");
+
+  if(!products.length){
+    box.innerHTML=`<div class="card p-8 text-center text-gray-400 md:col-span-3">
+      ምንም ምርት የለም
+    </div>`;
+    return;
+  }
+
+  box.innerHTML=products.map(p=>`
+    <div class="card overflow-hidden">
+      ${p.photo_url
+        ? `<img src="${escapeAttr(p.photo_url)}" class="w-full h-44 object-cover">`
+        : `<div class="h-44 gradient flex items-center justify-center text-white text-5xl">📦</div>`
+      }
+
+      <div class="p-5">
+        <h3 class="font-black text-lg">${escapeHtml(p.name||"Unnamed")}</h3>
+
+        <p class="text-sm text-gray-500 mt-1">
+          ${escapeHtml(p.description||"")}
+        </p>
+
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <div class="bg-gray-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500">ግዢ</p>
+            <p class="font-black">${money(p.buy_price)}</p>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500">ሽያጭ</p>
+            <p class="font-black">${money(p.sell_price)}</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-4">
+          <span class="font-bold ${Number(p.stock)<=0?'text-red-500':'text-green-600'}">
+            Stock: ${Number(p.stock||0)}
+          </span>
+
+          <button onclick="deleteProduct('${escapeAttr(p.id)}')"
+            class="text-red-500 text-sm font-bold">
+            ሰርዝ
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("product-form").addEventListener("submit",async e=>{
+  e.preventDefault();
+
+  try{
+
+    const body={
+      name:document.getElementById("product-name").value.trim(),
+      description:document.getElementById("product-description").value.trim(),
+      buy_price:Number(document.getElementById("buy-price").value),
+      sell_price:Number(document.getElementById("sell-price").value),
+      stock:Number(document.getElementById("product-stock").value)
+    };
+
+    const id=document.getElementById("product-id").value;
+
+    await api(id?`${API.products}/${encodeURIComponent(id)}`:API.products,{
+      method:id?"PATCH":"POST",
+      body:JSON.stringify(body)
+    });
+
+    closeModal("product-modal");
+    await loadProducts();
+
+  }catch(e){
+    alert(e.message);
+  }
+});
+
+
+async function deleteProduct(id){
+
+  if(!confirm("ይህን ምርት ለመሰረዝ እርግጠኛ ነህ?")) return;
+
+  try{
+    await api(`${API.products}/${encodeURIComponent(id)}`,{
+      method:"DELETE"
+    });
+    await loadProducts();
+  }catch(e){
+    alert(e.message);
+  }
+}
+
+
+/* ORDERS */
+
+async function loadOrders(){
+
+  try{
+    const data=await api(API.orders);
+    orders=data.orders||data.data||[];
+
+    document.getElementById("total-orders").textContent=orders.length;
+
+    renderOrders();
+    renderRecentOrders();
+    renderDelivery();
+
+  }catch(e){
+
+    document.getElementById("orders-list").innerHTML=
+      `<div class="card p-5 text-red-500">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderOrders(){
+
+  const box=document.getElementById("orders-list");
+
+  if(!orders.length){
+    box.innerHTML=`<div class="card p-8 text-center text-gray-400">ምንም ትዕዛዝ የለም</div>`;
+    return;
+  }
+
+  box.innerHTML=orders.map(o=>{
+
+    const status=o.status||"NEW";
+
+    return `
+      <div class="card p-5">
+        <div class="flex justify-between gap-3">
+          <div>
+            <h3 class="font-black">${escapeHtml(o.customer_name||o.name||"Customer")}</h3>
+            <p class="text-sm text-gray-500">${escapeHtml(o.customer_phone||o.phone||"")}</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">
+            ${escapeHtml(status)}
+          </span>
+        </div>
+
+        <div class="mt-4 p-3 bg-gray-50 rounded-xl">
+          <p class="font-bold">${escapeHtml(o.product_name||o.product?.name||"Product")}</p>
+          <p class="text-sm text-gray-500 mt-1">
+            Qty: ${Number(o.quantity||1)}
+          </p>
+        </div>
+
+        <div class="flex justify-between mt-4">
+          <span class="font-black">${money(o.total_amount||o.total||0)}</span>
+          <span class="text-sm text-gray-500">
+            ${escapeHtml(o.payment_status||"Payment pending")}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <button onclick="changeOrderStatus('${escapeAttr(o.id)}','CONFIRMED')"
+            class="bg-green-500 text-white py-3 rounded-xl font-bold">
+            ✓ አረጋግጥ
+          </button>
+
+          <button onclick="changeOrderStatus('${escapeAttr(o.id)}','REJECTED')"
+            class="bg-red-500 text-white py-3 rounded-xl font-bold">
+            × አልተቀበለም
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function changeOrderStatus(id,status){
+
+  try{
+
+    await api(`${API.orders}/${encodeURIComponent(id)}`,{
+      method:"PATCH",
+      body:JSON.stringify({status})
+    });
+
+    await loadOrders();
+    await loadProducts();
+
+  }catch(e){
+    alert(e.message);
+  }
+}
+
+function renderRecentOrders(){
+
+  const box=document.getElementById("recent-orders");
+  const recent=orders.slice(0,5);
+
+  if(!recent.length){
+    box.innerHTML=`<p class="text-gray-400 text-center py-5">ትዕዛዝ የለም</p>`;
+    return;
+  }
+
+  box.innerHTML=recent.map(o=>`
+    <div class="flex justify-between items-center py-3 border-b">
+      <div>
+        <p class="font-bold text-sm">${escapeHtml(o.customer_name||o.name||"Customer")}</p>
+        <p class="text-xs text-gray-500">${escapeHtml(o.product_name||"Product")}</p>
+      </div>
+      <span class="text-xs font-bold">${escapeHtml(o.status||"NEW")}</span>
+    </div>
+  `).join("");
+}
+
+
+/* REPORTS */
+
+async function loadReports(){
+
+  try{
+
+    const data=await api(API.reports);
+    const s=data.summary||data.data||{};
+
+    const sales=Number(s.totalSales||s.total_sales||0);
+    const profit=Number(s.totalProfit||s.total_profit||0);
+    const count=Number(s.totalOrders||s.total_orders||orders.length||0);
+
+    document.getElementById("today-sales").textContent=money(sales);
+    document.getElementById("today-profit").textContent=money(profit);
+
+    document.getElementById("report-sales").textContent=money(sales);
+    document.getElementById("report-profit").textContent=money(profit);
+    document.getElementById("report-orders").textContent=count;
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function renderDashboard(){
+  renderRecentOrders();
+}
+
+
+/* PAYMENTS */
+
+async function loadPayments(){
+
+  try{
+    const data=await api(API.payment);
+    const s=data.settings||data.payment_settings||data.data||data;
+
+    document.getElementById("payment-settings-box").innerHTML=`
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between">
+          <span class="text-gray-500">Payment status</span>
+          <b>${escapeHtml(JSON.stringify(s))}</b>
+        </div>
+      </div>
+    `;
+
+    const pending=orders.filter(o=>
+      String(o.payment_status||"").toLowerCase().includes("pending")
+    );
+
+    document.getElementById("pending-payments").innerHTML=
+      pending.length
+      ? pending.map(o=>`
+        <div class="border-b py-4">
+          <p class="font-bold">${escapeHtml(o.customer_name||"Customer")}</p>
+          <p class="text-sm text-gray-500">${money(o.total_amount||0)}</p>
+        </div>
+      `).join("")
+      : `<p class="text-gray-400 text-center py-5">የሚጠባበቅ ክፍያ የለም</p>`;
+
+  }catch(e){
+    document.getElementById("payment-settings-box").innerHTML=
+      `<p class="text-red-500">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+
+/* ADS */
+
+async function loadAds(){
+
+  try{
+
+    const data=await api(API.ads);
+    const ads=data.advertisements||data.ads||data.data||[];
+
+    document.getElementById("ads-list").innerHTML=
+
+      ads.length
+      ? ads.map(a=>`
+        <div class="card p-5">
+          <div class="flex justify-between">
+            <h3 class="font-black">${escapeHtml(a.title||"Advertisement")}</h3>
+            <span class="text-xs text-gray-500">${escapeHtml(a.status||"")}</span>
+          </div>
+          <p class="text-sm text-gray-500 mt-2">${escapeHtml(a.message||a.content||"")}</p>
+        </div>
+      `).join("")
+      : `<div class="card p-8 text-center text-gray-400">ማስታወቂያ የለም</div>`;
+
+  }catch(e){
+    document.getElementById("ads-list").innerHTML=
+      `<div class="card p-5 text-red-500">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+document.getElementById("ad-form").addEventListener("submit",async e=>{
+
+  e.preventDefault();
+
+  try{
+
+    await api(API.ads,{
+      method:"POST",
+      body:JSON.stringify({
+        title:document.getElementById("ad-title").value.trim(),
+        message:document.getElementById("ad-message").value.trim()
+      })
+    });
+
+    closeModal("ad-modal");
+    await loadAds();
+
+  }catch(e){
+    alert(e.message);
+  }
+});
+
+
+/* EMPLOYEES */
+
+async function loadEmployees(){
+
+  try{
+
+    const data=await api(API.employees);
+    const list=data.employees||data.data||[];
+
+    document.getElementById("employees-list").innerHTML=
+
+      list.length
+      ? list.map(e=>`
+        <div class="card p-5">
+          <div class="flex justify-between">
+            <div>
+              <h3 class="font-black">${escapeHtml(e.name||e.full_name||"Employee")}</h3>
+              <p class="text-sm text-gray-500">@${escapeHtml(e.username||"")}</p>
             </div>
-        </main>
-    </div>
+            <span class="text-xs font-bold ${e.is_active===false?'text-red-500':'text-green-600'}">
+              ${e.is_active===false?'Inactive':'Active'}
+            </span>
+          </div>
+          <p class="text-sm text-gray-500 mt-3">
+            Permissions: ${escapeHtml((e.permissions||[]).join(", "))}
+          </p>
+        </div>
+      `).join("")
+      : `<div class="card p-8 text-center text-gray-400">ሰራተኛ የለም</div>`;
 
-    <script>
-        // ** ትኩረት: ከታች ባለው መስመር ውስጥ የምስሉ ላይ ያለውን የራብዎን የ Render ሊንክ በትክክል ያስገቡ (በመጨረሻ ላይ / አያስቀምጡ) **
-        const RENDER_URL = "https://telegram-sales-manager-ga96.onrender.com";
+  }catch(e){
+    document.getElementById("employees-list").innerHTML=
+      `<div class="card p-5 text-red-500">${escapeHtml(e.message)}</div>`;
+  }
+}
 
-        const API = {
-            auth: RENDER_URL + "/api/auth/login",
-            me: RENDER_URL + "/api/auth/me",
-            products: RENDER_URL + "/api/products",
-            orders: RENDER_URL + "/api/orders",
-            upload: RENDER_URL + "/api/upload",
-            ads: RENDER_URL + "/api/advertisements",
-            payment: RENDER_URL + "/api/payment-settings",
-            telegram: RENDER_URL + "/api/telegram-settings",
-            employees: RENDER_URL + "/api/employees",
-            reports: RENDER_URL + "/api/reports"
-        };
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            const usernameInput = document.getElementById("username").value;
-            const passwordInput = document.getElementById("password").value;
-            const errorElement = document.getElementById("login-error");
-            
-            errorElement.classList.add("hidden");
+document.getElementById("employee-form").addEventListener("submit",async e=>{
 
-            try {
-                const response = await fetch(API.auth, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
-                });
+  e.preventDefault();
 
-                const data = await response.json();
+  try{
 
-                if (data.ok) {
-                    localStorage.setItem("auth_token", data.token);
-                    document.getElementById("login-section").classList.add("hidden");
-                    document.getElementById("dashboard-section").classList.remove("hidden");
-                    loadReports();
-                } else {
-                    errorElement.textContent = data.error || "የተሳሳተ ዩዘርኔም ወይም የይለፍ ቃል";
-                    errorElement.classList.remove("hidden");
-                }
-            } catch (err) {
-                errorElement.textContent = "ሰርቨሩን ማግኘት አልተቻለም። እባክዎ ትንሽ ቆይተው እንደገና ይሞክሩ።";
-                errorElement.classList.remove("hidden");
-            }
-        }
+    const permissions=[...document.querySelectorAll(".perm:checked")].map(x=>x.value);
 
-        async function loadReports() {
-            try {
-                const token = localStorage.getItem("auth_token");
-                const response = await fetch(API.reports, {
-                    headers: { "Authorization": "Bearer " + token }
-                });
-                const data = await response.json();
-                if (data.ok && data.summary) {
-                    document.getElementById("total-sales").textContent = (data.summary.totalSales || 0) + " ብር";
-                    document.getElementById("total-profit").textContent = (data.summary.totalProfit || 0) + " ብር";
-                    document.getElementById("total-orders").textContent = data.summary.totalOrders || 0;
-                }
-            } catch (err) {
-                console.error("Report load error:", err);
-            }
-        }
+    await api(API.employees,{
+      method:"POST",
+      body:JSON.stringify({
+        name:document.getElementById("employee-name").value.trim(),
+        username:document.getElementById("employee-username").value.trim(),
+        password:document.getElementById("employee-password").value,
+        permissions
+      })
+    });
 
-        function handleLogout() {
-            localStorage.removeItem("auth_token");
-            document.getElementById("dashboard-section").classList.add("hidden");
-            document.getElementById("login-section").classList.remove("hidden");
-        }
-    </script>
+    closeModal("employee-modal");
+    await loadEmployees();
+
+  }catch(e){
+    alert(e.message);
+  }
+});
+
+
+/* DELIVERY */
+
+function renderDelivery(){
+
+  const pending=orders.filter(o=>
+    ["NEW","PENDING","CONFIRMED"].includes(String(o.status||"").toUpperCase())
+  );
+
+  const transit=orders.filter(o=>
+    ["IN_DELIVERY","OUT_FOR_DELIVERY","DELIVERING"].includes(String(o.delivery_status||"").toUpperCase())
+  );
+
+  const done=orders.filter(o=>
+    ["DELIVERED","COMPLETED"].includes(String(o.delivery_status||"").toUpperCase())
+  );
+
+  document.getElementById("delivery-pending").textContent=pending.length;
+  document.getElementById("delivery-transit").textContent=transit.length;
+  document.getElementById("delivery-done").textContent=done.length;
+
+  document.getElementById("delivery-list").innerHTML=orders.length
+    ? orders.map(o=>`
+      <div class="card p-5">
+        <div class="flex justify-between">
+          <div>
+            <h3 class="font-black">${escapeHtml(o.customer_name||"Customer")}</h3>
+            <p class="text-sm text-gray-500">${escapeHtml(o.customer_phone||o.phone||"")}</p>
+          </div>
+          <span class="text-xs font-bold">${escapeHtml(o.delivery_status||"Pending")}</span>
+        </div>
+        <p class="text-sm mt-3">${escapeHtml(o.address||o.delivery_address||"አድራሻ አልተሞላም")}</p>
+      </div>
+    `).join("")
+    : `<div class="card p-8 text-center text-gray-400">ዴሊቨሪ የለም</div>`;
+}
+
+
+/* SETTINGS */
+
+async function loadSettings(){
+
+  try{
+
+    const data=await api(API.telegram);
+
+    document.getElementById("telegram-settings-box").innerHTML=`
+      <pre class="bg-gray-50 rounded-xl p-4 text-xs overflow-auto">${escapeHtml(JSON.stringify(data,null,2))}</pre>
+    `;
+
+  }catch(e){
+
+    document.getElementById("telegram-settings-box").innerHTML=
+      `<p class="text-red-500">${escapeHtml(e.message)}</p>`;
+  }
+}
+
+
+/* LOGOUT */
+
+function logout(){
+
+  token=null;
+  localStorage.removeItem("auth_token");
+
+  document.getElementById("app-section").classList.add("hide");
+  document.getElementById("login-section").classList.remove("hide");
+
+  document.getElementById("password").value="";
+}
+
+
+/* HELPERS */
+
+function money(v){
+  return `${Number(v||0).toLocaleString("en-US",{maximumFractionDigits:2})} ብር`;
+}
+
+function escapeHtml(v){
+  return String(v??"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function escapeAttr(v){
+  return escapeHtml(v);
+}
+
+
+/* AUTO LOGIN */
+
+if(token){
+  startApp().catch(()=>{
+    logout();
+  });
+}
+
+</script>
+
 </body>
 </html>
-
