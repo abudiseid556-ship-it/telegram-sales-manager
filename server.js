@@ -649,7 +649,6 @@ app.delete("/api/products/:id", async (req, res) => {
   }
 });
 
-
 /* UPLOAD API */
 
 app.post(
@@ -657,10 +656,17 @@ app.post(
   upload.single("photo"),
   async (req, res) => {
     try {
-      if (!supabase || !req.file) {
-        return res.json({
-          ok: true,
-          url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+      if (!supabase) {
+        return res.status(500).json({
+          ok: false,
+          error: "Supabase unavailable"
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          ok: false,
+          error: "ፎቶ አልተመረጠም"
         });
       }
 
@@ -672,7 +678,7 @@ app.post(
       const filePath =
         `products/${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`;
 
-      const { data, error } =
+      const { error } =
         await supabase.storage
           .from(STORAGE_BUCKET)
           .upload(
@@ -680,16 +686,22 @@ app.post(
             req.file.buffer,
             {
               contentType:
-                req.file.mimetype ||
-                "image/jpeg",
+                req.file.mimetype || "image/jpeg",
               upsert: false
             }
           );
 
       if (error) {
-        return res.json({
-          ok: true,
-          url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+        console.error(
+          "PRODUCT PHOTO UPLOAD ERROR:",
+          error.message
+        );
+
+        return res.status(500).json({
+          ok: false,
+          error:
+            "ፎቶው ወደ Storage መጫን አልተቻለም: " +
+            error.message
         });
       }
 
@@ -698,24 +710,40 @@ app.post(
           .from(STORAGE_BUCKET)
           .getPublicUrl(filePath)
           ?.data
-          ?.publicUrl ||
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
+          ?.publicUrl;
 
-      res.json({
+      if (!publicUrl) {
+        return res.status(500).json({
+          ok: false,
+          error: "የፎቶ ሊንክ መፍጠር አልተቻለም"
+        });
+      }
+
+      console.log(
+        "PRODUCT PHOTO UPLOADED:",
+        req.file.originalname,
+        "=>",
+        publicUrl
+      );
+
+      return res.json({
         ok: true,
         url: publicUrl
       });
 
     } catch (err) {
-      res.json({
-        ok: true,
-        url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+      console.error(
+        "UPLOAD ERROR:",
+        err.message
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: err.message
       });
     }
   }
 );
-
-
 
 /* SETTINGS API */
 
