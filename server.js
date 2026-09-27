@@ -564,6 +564,13 @@ app.get("/api/products", async (req, res) => {
 
 app.post("/api/products", async (req, res) => {
   try {
+    if (!supabase) {
+      return res.status(500).json({
+        ok: false,
+        error: "Supabase unavailable"
+      });
+    }
+
     const body = req.body || {};
 
     const row = {
@@ -601,55 +608,51 @@ app.post("/api/products", async (req, res) => {
       )
     };
 
-    if (body.description !== undefined) {
-      row.description =
-        body.description || null;
-    }
+    /*
+     * IMPORTANT:
+     * products table ውስጥ description column
+     * ስለሌለ እዚህ አንጨምርም።
+     */
 
-    const { data, error } = await supabase
+    const {
+      data,
+      error
+    } = await supabase
       .from("products")
       .insert(row)
       .select("*")
       .single();
 
     if (error) {
-      throw error;
+      console.error(
+        "PRODUCT CREATE ERROR:",
+        error.message
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: error.message
+      });
     }
 
-    res.json({
+    return res.json({
       ok: true,
       product: data
     });
 
   } catch (err) {
-    res.status(500).json({
+    console.error(
+      "PRODUCT CREATE ERROR:",
+      err.message
+    );
+
+    return res.status(500).json({
       ok: false,
       error: err.message
     });
   }
 });
 
-
-app.delete("/api/products/:id", async (req, res) => {
-  try {
-    await supabase
-      .from("products")
-      .delete()
-      .eq("id", req.params.id);
-
-    res.json({
-      ok: true
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      ok: false,
-      error: err.message
-    });
-  }
-});
-
-/* UPLOAD API */
 
 app.post(
   "/api/upload",
@@ -699,9 +702,7 @@ app.post(
 
         return res.status(500).json({
           ok: false,
-          error:
-            "ፎቶው ወደ Storage መጫን አልተቻለም: " +
-            error.message
+          error: error.message
         });
       }
 
@@ -715,14 +716,17 @@ app.post(
       if (!publicUrl) {
         return res.status(500).json({
           ok: false,
-          error: "የፎቶ ሊንክ መፍጠር አልተቻለም"
+          error: "የፎቶ URL መፍጠር አልተቻለም"
         });
       }
 
       console.log(
-        "PRODUCT PHOTO UPLOADED:",
-        req.file.originalname,
-        "=>",
+        "PHOTO UPLOADED:",
+        filePath
+      );
+
+      console.log(
+        "PHOTO URL:",
         publicUrl
       );
 
@@ -744,7 +748,6 @@ app.post(
     }
   }
 );
-
 /* SETTINGS API */
 
 app.get(
