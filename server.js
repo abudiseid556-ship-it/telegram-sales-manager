@@ -1371,7 +1371,703 @@ app.get("/", (req, res) => {
   );
 });
 
+/* ==================================================
+   TELEGRAM BOT
+   UNI MARKET CATEGORY DASHBOARD + WEBHOOK
+   ================================================== */
 
+const TELEGRAM_WEBHOOK_URL =
+  (process.env.WEBHOOK_URL || "").trim();
+
+const BOT_CATEGORIES = [
+  {
+    id: "clothes",
+    name: "👕 Clothes"
+  },
+  {
+    id: "electronics",
+    name: "📱 Electronics"
+  },
+  {
+    id: "children",
+    name: "🧒 Children's"
+  },
+  {
+    id: "women",
+    name: "👩 Women's"
+  },
+  {
+    id: "furniture",
+    name: "🛋️ Furniture"
+  },
+  {
+    id: "others",
+    name: "📦 Others"
+  }
+];
+
+
+/* ---------- Telegram keyboard ---------- */
+
+function categoryKeyboard() {
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: "👕 Clothes",
+          callback_data: "category_clothes"
+        },
+        {
+          text: "📱 Electronics",
+          callback_data: "category_electronics"
+        }
+      ],
+      [
+        {
+          text: "🧒 Children's",
+          callback_data: "category_children"
+        },
+        {
+          text: "👩 Women's",
+          callback_data: "category_women"
+        }
+      ],
+      [
+        {
+          text: "🛋️ Furniture",
+          callback_data: "category_furniture"
+        },
+        {
+          text: "📦 Others",
+          callback_data: "category_others"
+        }
+      ]
+    ]
+  };
+}
+
+
+/* ---------- Main UNI MARKET dashboard ---------- */
+
+async function sendCategoryDashboard(chatId) {
+  return sendMessage(
+    chatId,
+    `🛍️ <b>UNI MARKET</b>\n\nSelect the product category you are looking for:`,
+    {
+      parse_mode: "HTML",
+      reply_markup: categoryKeyboard()
+    }
+  );
+}
+
+
+/* ---------- Product category matching ---------- */
+
+function normalizeCategory(value) {
+  return safeString(value)
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/\s+/g, "_");
+}
+
+
+function getProductCategory(product) {
+  return normalizeCategory(
+    firstDefined(
+      product?.category,
+      product?.category_name,
+      product?.product_category,
+      product?.type,
+      "others"
+    )
+  );
+}
+
+
+function categoryMatches(product, category) {
+  const pCategory = getProductCategory(product);
+  const wanted = normalizeCategory(category);
+
+  if (wanted === "others") {
+    return ![
+      "clothes",
+      "clothing",
+      "electronics",
+      "electronic",
+      "children",
+      "childrens",
+      "kids",
+      "women",
+      "womens",
+      "furniture"
+    ].includes(pCategory);
+  }
+
+  const aliases = {
+    clothes: [
+      "clothes",
+      "clothing",
+      "cloth"
+    ],
+
+    electronics: [
+      "electronics",
+      "electronic"
+    ],
+
+    children: [
+      "children",
+      "childrens",
+      "kids",
+      "children_products"
+    ],
+
+    women: [
+      "women",
+      "womens",
+      "woman"
+    ],
+
+    furniture: [
+      "furniture"
+    ]
+  };
+
+  return (
+    aliases[wanted] || [wanted]
+  ).includes(pCategory);
+}
+
+
+/* ---------- Get products for category ---------- */
+
+async function getBotProducts(category) {
+  if (!supabase) {
+    return [];
+  }
+
+  try {
+    const { data, error } =
+      await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", {
+          ascending: false
+        });
+
+    if (error) {
+      console.error(
+        "BOT PRODUCTS ERROR:",
+        error.message
+      );
+
+      return [];
+    }
+
+    return (data || []).filter((product) =>
+      categoryMatches(
+        product,
+        category
+      )
+    );
+
+  } catch (err) {
+    console.error(
+      "BOT PRODUCTS ERROR:",
+      err.message
+    );
+
+    return [];
+  }
+}
+
+
+/* ---------- Product keyboard ---------- */
+
+function productKeyboard(products) {
+  return {
+    inline_keyboard:
+      products.map((product) => [
+        {
+          text:
+            `🛍️ ${productName(product)}`,
+          callback_data:
+            `product_${product.id}`
+        }
+      ])
+  };
+}
+
+
+/* ---------- Show category products ---------- */
+
+async function showCategoryProducts(
+  chatId,
+  category
+) {
+  const products =
+    await getBotProducts(category);
+
+  const categoryName =
+    BOT_CATEGORIES.find(
+      (item) =>
+        item.id === category
+    )?.name ||
+    "📦 Products";
+
+  if (!products.length) {
+    return sendMessage(
+      chatId,
+      `${categoryName}\n\n❌ በዚህ ዘርፍ ላይ አሁን ምንም ምርት የለም።\n\n👇 ሌላ ዘርፍ ይምረጡ።`,
+      {
+        reply_markup:
+          categoryKeyboard()
+      }
+    );
+  }
+
+  return sendMessage(
+    chatId,
+    `${categoryName}\n\n🛍️ የሚገኙ ምርቶች፦`,
+    {
+      reply_markup:
+        productKeyboard(products)
+    }
+  );
+}
+
+
+/* ---------- Product details ---------- */
+
+async function showBotProduct(
+  chatId,
+  productId
+) {
+  const product =
+    await getProduct(productId);
+
+  if (!product) {
+    return sendMessage(
+      chatId,
+      "❌ ምርቱ አልተገኘም።"
+    );
+  }
+
+  const name =
+    productName(product);
+
+  const price =
+    productSellPrice(product);
+
+  const stock =
+    productStock(product);
+
+  const photo =
+    firstDefined(
+      product.photo_url,
+      product.photo,
+      product.image_url
+    );
+
+  const text =
+    `🛍️ <b>${name}</b>\n\n` +
+    `💰 Price: <b>${price.toLocaleString()} ETB</b>\n` +
+    `📦 Stock: <b>${stock}</b>\n\n` +
+    (
+      stock > 0
+        ? "🟢 Available"
+        : "🔴 Out of stock"
+    );
+
+  const replyMarkup = {
+    inline_keyboard: [
+      ...(stock > 0
+        ? [
+            [
+              {
+                text: "🛒 Order Now",
+                callback_data:
+                  `order_${product.id}`
+              }
+            ]
+          ]
+        : []),
+      [
+        {
+          text: "⬅️ Categories",
+          callback_data:
+            "show_categories"
+        }
+      ]
+    ]
+  };
+
+  if (photo) {
+    try {
+      return await telegram(
+        "sendPhoto",
+        {
+          chat_id: chatId,
+          photo,
+          caption: text,
+          parse_mode: "HTML",
+          reply_markup:
+            replyMarkup
+        }
+      );
+    } catch {
+      /* If photo fails, send text instead */
+    }
+  }
+
+  return sendMessage(
+    chatId,
+    text,
+    {
+      parse_mode: "HTML",
+      reply_markup:
+        replyMarkup
+    }
+  );
+}
+
+
+/* ---------- Simple order start ---------- */
+
+async function startBotOrder(
+  chatId,
+  productId
+) {
+  const product =
+    await getProduct(productId);
+
+  if (!product) {
+    return sendMessage(
+      chatId,
+      "❌ ምርቱ አልተገኘም።"
+    );
+  }
+
+  if (productStock(product) <= 0) {
+    return sendMessage(
+      chatId,
+      "❌ ይህ ምርት አሁን ከStock ውጭ ነው።"
+    );
+  }
+
+  return sendMessage(
+    chatId,
+    `🛒 <b>Order</b>\n\n` +
+    `📦 ${productName(product)}\n` +
+    `💰 ${productSellPrice(product).toLocaleString()} ETB\n\n` +
+    `ኦርደርዎን ለመቀጠል ስምዎን ይላኩ።`,
+    {
+      parse_mode: "HTML",
+      reply_markup: {
+        force_reply: true
+      }
+    }
+  );
+}
+
+
+/* ---------- Callback queries ---------- */
+
+async function handleBotCallback(
+  callback
+) {
+  const callbackId =
+    callback.id;
+
+  const chatId =
+    callback.message?.chat?.id;
+
+  const data =
+    safeString(callback.data);
+
+  if (!chatId) {
+    return;
+  }
+
+  /* Answer immediately */
+  try {
+    await telegram(
+      "answerCallbackQuery",
+      {
+        callback_query_id:
+          callbackId
+      }
+    );
+  } catch {}
+
+
+  /* Categories */
+
+  if (data === "show_categories") {
+    return sendCategoryDashboard(
+      chatId
+    );
+  }
+
+
+  if (
+    data.startsWith(
+      "category_"
+    )
+  ) {
+    const category =
+      data.replace(
+        "category_",
+        ""
+      );
+
+    return showCategoryProducts(
+      chatId,
+      category
+    );
+  }
+
+
+  /* Product */
+
+  if (
+    data.startsWith(
+      "product_"
+    )
+  ) {
+    const productId =
+      data.replace(
+        "product_",
+        ""
+      );
+
+    return showBotProduct(
+      chatId,
+      productId
+    );
+  }
+
+
+  /* Order */
+
+  if (
+    data.startsWith(
+      "order_"
+    )
+  ) {
+    const productId =
+      data.replace(
+        "order_",
+        ""
+      );
+
+    return startBotOrder(
+      chatId,
+      productId
+    );
+  }
+}
+
+
+/* ---------- /start and text messages ---------- */
+
+async function handleBotMessage(
+  message
+) {
+  const chatId =
+    message.chat?.id;
+
+  if (!chatId) {
+    return;
+  }
+
+  const text =
+    safeString(message.text);
+
+
+  /* /start */
+
+  if (
+    text === "/start" ||
+    text.startsWith("/start ")
+  ) {
+    return sendCategoryDashboard(
+      chatId
+    );
+  }
+
+
+  /* Menu / categories */
+
+  if (
+    text === "/menu" ||
+    text === "/categories" ||
+    text === "Menu" ||
+    text === "Categories"
+  ) {
+    return sendCategoryDashboard(
+      chatId
+    );
+  }
+
+
+  /* Normal message */
+
+  return sendMessage(
+    chatId,
+    `🛍️ <b>UNI MARKET</b>\n\n` +
+    `እባክዎ ከታች ያለውን የምርት ዘርፍ ይምረጡ።`,
+    {
+      parse_mode: "HTML",
+      reply_markup:
+        categoryKeyboard()
+    }
+  );
+}
+
+
+/* ---------- Telegram update processor ---------- */
+
+async function processTelegramUpdate(
+  update
+) {
+  try {
+    if (update.callback_query) {
+      await handleBotCallback(
+        update.callback_query
+      );
+      return;
+    }
+
+    if (update.message) {
+      await handleBotMessage(
+        update.message
+      );
+      return;
+    }
+
+  } catch (err) {
+    console.error(
+      "TELEGRAM UPDATE ERROR:",
+      err.message
+    );
+  }
+}
+
+
+/* ---------- Webhook ---------- */
+
+app.post(
+  "/api/telegram/webhook",
+  (req, res) => {
+
+    /*
+      Telegram እንዳይጠብቅ፣
+      ወዲያውኑ 200 OK እንመልሳለን።
+      Bot processing ከዚያ በኋላ ይቀጥላል።
+    */
+
+    const update =
+      req.body;
+
+    res.sendStatus(200);
+
+    setImmediate(() => {
+      processTelegramUpdate(
+        update
+      ).catch((err) => {
+        console.error(
+          "BOT PROCESS ERROR:",
+          err.message
+        );
+      });
+    });
+  }
+);
+
+
+/* ---------- Set Telegram webhook ---------- */
+
+async function setupTelegramWebhook() {
+  if (
+    !BOT_TOKEN ||
+    !TELEGRAM_WEBHOOK_URL
+  ) {
+    console.log(
+      "Telegram webhook not configured: BOT_TOKEN or WEBHOOK_URL missing"
+    );
+
+    return;
+  }
+
+  const webhookUrl =
+    `${TELEGRAM_WEBHOOK_URL.replace(/\/$/, "")}/api/telegram/webhook`;
+
+  try {
+    const result =
+      await telegram(
+        "setWebhook",
+        {
+          url: webhookUrl,
+          allowed_updates: [
+            "message",
+            "callback_query"
+          ],
+          drop_pending_updates: false
+        }
+      );
+
+    console.log(
+      "Telegram webhook configured:",
+      webhookUrl
+    );
+
+    return result;
+
+  } catch (err) {
+    console.error(
+      "Telegram webhook setup failed:",
+      err.message
+    );
+  }
+}
+
+
+/* ---------- Telegram bot health ---------- */
+
+app.get(
+  "/api/telegram/status",
+  async (req, res) => {
+    try {
+      if (!BOT_TOKEN) {
+        return res.status(500).json({
+          ok: false,
+          connected: false,
+          error:
+            "TELEGRAM_BOT_TOKEN is missing"
+        });
+      }
+
+      const me =
+        await telegram(
+          "getMe"
+        );
+
+      res.json({
+        ok: true,
+        connected: true,
+        bot: me
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        connected: false,
+        error: err.message
+      });
+    }
+  }
+);
 /* 404 */
 
 app.use((req, res) => {
@@ -1384,8 +2080,10 @@ app.use((req, res) => {
 
 /* START SERVER */
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(
     `Telegram Sales Manager running on port ${PORT}`
   );
+
+  await setupTelegramWebhook();
 });
