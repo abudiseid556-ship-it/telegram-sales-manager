@@ -1382,29 +1382,77 @@ const TELEGRAM_WEBHOOK_URL =
 const BOT_CATEGORIES = [
   {
     id: "clothes",
-    name: "👕 Clothes"
+    name: "👕 አልባሳት"
   },
   {
     id: "electronics",
-    name: "📱 Electronics"
+    name: "📱 ኤሌክትሮኒክስ"
   },
   {
     id: "children",
-    name: "🧒 Children's"
+    name: "🧒 የህፃናት"
   },
   {
     id: "women",
-    name: "👩 Women's"
+    name: "👩 የሴቶች"
   },
   {
     id: "furniture",
-    name: "🛋️ Furniture"
+    name: "🛋️ የቤት እቃዎች"
   },
   {
     id: "others",
-    name: "📦 Others"
+    name: "📦 ሌሎች"
   }
 ];
+
+function categoryKeyboard() {
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: "👕 አልባሳት",
+          callback_data: "category_clothes"
+        },
+        {
+          text: "📱 ኤሌክትሮኒክስ",
+          callback_data: "category_electronics"
+        }
+      ],
+      [
+        {
+          text: "🧒 የህፃናት",
+          callback_data: "category_children"
+        },
+        {
+          text: "👩 የሴቶች",
+          callback_data: "category_women"
+        }
+      ],
+      [
+        {
+          text: "🛋️ የቤት እቃዎች",
+          callback_data: "category_furniture"
+        },
+        {
+          text: "📦 ሌሎች",
+          callback_data: "category_others"
+        }
+      ]
+    ]
+  };
+}
+
+async function sendCategoryDashboard(chatId) {
+  return sendMessage(
+    chatId,
+    `🛍️ <b>UNI ገበያ</b>\n\nየሚፈልጉትን የምርት ምድብ ይምረጡ፦`,
+    {
+      parse_mode: "HTML",
+      reply_markup: categoryKeyboard()
+    }
+  );
+}
 
 
 /* ---------- Telegram keyboard ---------- */
