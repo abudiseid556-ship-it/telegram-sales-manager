@@ -76,13 +76,8 @@ const MASTER_ADMIN_USERNAME =
     "admin"
   ).trim();
 
-const MASTER_ADMIN_PASSWORD =
-  String(
-    process.env.MASTER_ADMIN_PASS ||
-    process.env.MASTER_ADMIN_PASSWORD ||
-    process.env.WEB_PASSWORD ||
-    "123456"
-  ).trim();
+const MASTER_ADMIN_USERNAME = process.env.MASTER_ADMIN_USERNAME || "admin";
+const MASTER_ADMIN_PASSWORD = process.env.MASTER_ADMIN_PASS || process.env.MASTER_ADMIN_PASSWORD || "123456";
 
 const STORAGE_BUCKET =
   String(
