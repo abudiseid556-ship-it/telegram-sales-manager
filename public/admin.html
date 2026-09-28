@@ -1,1 +1,3723 @@
+<!doctype html>
 
+<html lang="am">  
+<head>  
+<meta charset="utf-8">  
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">  
+<title>Telegram Sales Manager — Master Admin</title>  <style>  
+*{box-sizing:border-box}  
+  
+body{  
+  margin:0;  
+  background:#f4f7fb;  
+  color:#172033;  
+  font-family:Arial,"Noto Sans Ethiopic",sans-serif  
+}  
+  
+button,input,textarea,select{font:inherit}  
+button{cursor:pointer}  
+  
+.app{  
+  max-width:820px;  
+  margin:auto;  
+  min-height:100vh;  
+  padding-bottom:85px  
+}  
+  
+.hero{  
+  background:linear-gradient(135deg,#1769ff,#6758f5);  
+  color:#fff;  
+  padding:20px 16px 18px;  
+  border-radius:0 0 28px 28px  
+}  
+  
+.row{  
+  display:flex;  
+  align-items:center;  
+  justify-content:space-between;  
+  gap:10px  
+}  
+  
+.hero h1{  
+  margin:0;  
+  font-size:21px  
+}  
+  
+.hero p{  
+  margin:5px 0 0;  
+  font-size:12px;  
+  opacity:.86  
+}  
+  
+.refresh,.logout{  
+  border:0;  
+  border-radius:13px;  
+  padding:9px 12px;  
+  background:#ffffff20;  
+  color:#fff  
+}  
+  
+.stats{  
+  display:grid;  
+  grid-template-columns:1fr 1fr;  
+  gap:9px;  
+  margin-top:16px  
+}  
+  
+.stat{  
+  background:#ffffff18;  
+  border:1px solid #ffffff35;  
+  border-radius:16px;  
+  padding:12px  
+}  
+  
+.stat b{  
+  display:block;  
+  font-size:19px  
+}  
+  
+.stat span{  
+  font-size:11px;  
+  opacity:.82  
+}  
+  
+.content{padding:14px}  
+  
+.card{  
+  background:#fff;  
+  border:1px solid #e5eaf2;  
+  border-radius:18px;  
+  padding:14px;  
+  margin-bottom:11px;  
+  box-shadow:0 5px 18px #1b31500a  
+}  
+  
+.grid{  
+  display:grid;  
+  grid-template-columns:1fr 1fr;  
+  gap:10px  
+}  
+  
+.quick{  
+  border:1px solid #e4eaf3;  
+  background:#fff;  
+  border-radius:17px;  
+  padding:15px;  
+  text-align:left;  
+  min-height:105px;  
+  box-shadow:0 5px 18px #1b31500a  
+}  
+  
+.quick b{  
+  display:block;  
+  margin-top:8px  
+}  
+  
+.quick small{color:#8490a0}  
+  
+.btn{  
+  border:0;  
+  border-radius:11px;  
+  padding:10px 13px;  
+  font-weight:700;  
+  background:#edf3ff;  
+  color:#1664e8  
+}  
+  
+.primary{  
+  background:#1769ff;  
+  color:#fff  
+}  
+  
+.green{  
+  background:#e8fbf2;  
+  color:#087b51  
+}  
+  
+.red{  
+  background:#fff0f0;  
+  color:#d63737  
+}  
+  
+.orange{  
+  background:#fff5df;  
+  color:#9a6900  
+}  
+  
+.dark{  
+  background:#172033;  
+  color:#fff  
+}  
+  
+.full{width:100%}  
+  
+label{  
+  display:block;  
+  font-size:11px;  
+  font-weight:700;  
+  margin:10px 0 5px  
+}  
+  
+input,textarea,select{  
+  width:100%;  
+  padding:12px;  
+  border:1px solid #dce4ee;  
+  border-radius:11px;  
+  outline:none;  
+  background:#fff  
+}  
+  
+textarea{  
+  min-height:95px;  
+  resize:vertical  
+}  
+  
+input:focus,  
+textarea:focus,  
+select:focus{  
+  border-color:#1769ff  
+}  
+  
+.section-title{  
+  display:flex;  
+  align-items:center;  
+  justify-content:space-between;  
+  gap:10px;  
+  margin:5px 0 10px  
+}  
+  
+.section-title h2{  
+  font-size:17px;  
+  margin:0  
+}  
+  
+.product,  
+.order,  
+.ad,  
+.employee,  
+.channel{  
+  display:flex;  
+  gap:11px;  
+  align-items:center  
+}  
+  
+.pic{  
+  width:58px;  
+  height:58px;  
+  border-radius:14px;  
+  background:#eef3fa;  
+  display:grid;  
+  place-items:center;  
+  font-size:25px;  
+  overflow:hidden;  
+  flex:none  
+}  
+  
+.pic img{  
+  width:100%;  
+  height:100%;  
+  object-fit:cover  
+}  
+  
+.grow{  
+  flex:1;  
+  min-width:0  
+}  
+  
+.muted{  
+  color:#8490a0;  
+  font-size:11px  
+}  
+  
+.price{  
+  color:#1769ff;  
+  font-weight:800;  
+  margin-top:3px  
+}  
+  
+.profit{  
+  color:#078453;  
+  font-size:11px  
+}  
+  
+.badge{  
+  display:inline-block;  
+  padding:5px 9px;  
+  border-radius:20px;  
+  font-size:10px;  
+  font-weight:800;  
+  background:#fff4df;  
+  color:#9a6900  
+}  
+  
+.badge.green{  
+  background:#e8fbf2;  
+  color:#087b51  
+}  
+  
+.badge.red{  
+  background:#fff0f0;  
+  color:#d63737  
+}  
+  
+.badge.blue{  
+  background:#eaf1ff;  
+  color:#1769ff  
+}  
+  
+.empty{  
+  text-align:center;  
+  color:#8a95a4;  
+  padding:24px;  
+  font-size:12px  
+}  
+  
+/* UPDATED: 6 NAV ITEMS */  
+  
+.bottom{  
+  position:fixed;  
+  bottom:0;  
+  left:50%;  
+  transform:translateX(-50%);  
+  width:min(820px,100%);  
+  height:70px;  
+  background:#fff;  
+  border-top:1px solid #e5eaf2;  
+  display:grid;  
+  grid-template-columns:repeat(6,1fr);  
+  z-index:20  
+}  
+  
+.nav{  
+  border:0;  
+  background:none;  
+  color:#7d8999;  
+  font-size:9px;  
+  padding:4px 1px  
+}  
+  
+.nav span{  
+  display:block;  
+  font-size:19px;  
+  margin-bottom:2px  
+}  
+  
+.nav.active{  
+  color:#1769ff;  
+  font-weight:800  
+}  
+  
+.modal{  
+  position:fixed;  
+  inset:0;  
+  background:#0008;  
+  z-index:50;  
+  display:none;  
+  align-items:flex-end  
+}  
+  
+.modal.show{display:flex}  
+  
+.sheet{  
+  background:#fff;  
+  width:min(820px,100%);  
+  max-height:94vh;  
+  overflow:auto;  
+  border-radius:24px 24px 0 0;  
+  padding:18px  
+}  
+  
+.close{  
+  float:right;  
+  border:0;  
+  background:#eef2f6;  
+  border-radius:50%;  
+  width:34px;  
+  height:34px  
+}  
+  
+.actions{  
+  display:flex;  
+  gap:8px;  
+  margin-top:12px  
+}  
+  
+.actions>*{flex:1}  
+  
+hr{  
+  border:0;  
+  border-top:1px solid #edf0f5;  
+  margin:13px 0  
+}  
+  
+.notice{  
+  background:#eef5ff;  
+  color:#1769ff;  
+  padding:12px;  
+  border-radius:13px;  
+  font-size:12px;  
+  margin-bottom:12px  
+}  
+  
+.success{  
+  background:#e8fbf2;  
+  color:#087b51;  
+  padding:10px;  
+  border-radius:11px;  
+  font-size:12px  
+}  
+  
+.error{  
+  background:#fff0f0;  
+  color:#c83232;  
+  padding:10px;  
+  border-radius:11px;  
+  font-size:12px  
+}  
+  
+.login-page{  
+  min-height:100vh;  
+  display:grid;  
+  place-items:center;  
+  padding:20px;  
+  background:linear-gradient(135deg,#1769ff,#6758f5)  
+}  
+  
+.login-box{  
+  width:min(420px,100%);  
+  background:#fff;  
+  border-radius:26px;  
+  padding:25px;  
+  box-shadow:0 20px 50px #06163d55  
+}  
+  
+.login-logo{  
+  width:65px;  
+  height:65px;  
+  border-radius:20px;  
+  background:#edf3ff;  
+  display:grid;  
+  place-items:center;  
+  font-size:31px;  
+  margin:auto auto 12px  
+}  
+  
+.login-box h1{  
+  text-align:center;  
+  margin:0;  
+  font-size:23px  
+}  
+  
+.login-box p{  
+  text-align:center;  
+  color:#8490a0;  
+  font-size:12px  
+}  
+  
+#appShell{display:none}  
+  
+.ad-preview{  
+  background:#f6f8fc;  
+  border-radius:16px;  
+  padding:13px;  
+  margin-top:10px  
+}  
+  
+.ad-title{  
+  font-weight:800;  
+  font-size:15px  
+}  
+  
+.ad-text{  
+  font-size:12px;  
+  margin-top:7px;  
+  white-space:pre-wrap  
+}  
+  
+.ad-photo{  
+  width:100%;  
+  max-height:220px;  
+  object-fit:cover;  
+  border-radius:13px;  
+  margin-top:10px  
+}  
+  
+.type-grid{  
+  display:grid;  
+  grid-template-columns:1fr 1fr;  
+  gap:8px;  
+  margin-top:8px  
+}  
+  
+.type{  
+  border:1px solid #e0e6ef;  
+  border-radius:12px;  
+  padding:10px;  
+  background:#fff;  
+  text-align:left;  
+  font-size:12px  
+}  
+  
+.login-message{  
+  margin-top:10px;  
+  font-size:12px;  
+  color:#c83232  
+}  
+  
+/* CHANNEL UI */  
+  
+.channel-card{  
+  border:1px solid #e4eaf3;  
+  border-radius:16px;  
+  padding:12px;  
+  margin-bottom:9px;  
+  background:#fff  
+}  
+  
+.channel-check{  
+  width:20px;  
+  height:20px;  
+  accent-color:#1769ff  
+}  
+  
+.channel-name{  
+  font-weight:800;  
+  font-size:14px  
+}  
+  
+.channel-id{  
+  font-size:11px;  
+  color:#8490a0;  
+  margin-top:3px;  
+  word-break:break-all  
+}  
+  
+.channel-actions{  
+  display:flex;  
+  gap:6px;  
+  margin-top:10px  
+}  
+  
+.channel-actions button{  
+  flex:1  
+}  
+  
+.select-all-box{  
+  display:flex;  
+  align-items:center;  
+  gap:8px;  
+  padding:10px;  
+  background:#f6f8fc;  
+  border-radius:12px;  
+  margin-top:8px  
+}  
+  
+.selected-count{  
+  color:#1769ff;  
+  font-size:11px;  
+  font-weight:700;  
+  margin-left:auto  
+}  
+  
+.connection-box{  
+  margin-top:8px  
+}  
+  
+/* SETTINGS QUICK CARD */  
+  
+.settings-quick{  
+  border:1px solid #dfe8f8;  
+  background:linear-gradient(135deg,#f4f8ff,#ffffff);  
+}  
+  
+@media(min-width:700px){  
+  .content{padding:18px}  
+  .grid{grid-template-columns:repeat(2,1fr)}  
+}  
+</style>  </head>  <body>  <!-- LOGIN -->  <div id="loginPage" class="login-page">    <div class="login-box">  <div class="login-logo">🛍️</div>  
+
+<h1>UNI MARKET</h1>  
+
+<p>Telegram Sales Manager • Master Admin</p>  
+
+<label>Username</label>  
+<input id="loginUsername" autocomplete="username" placeholder="admin">  
+
+<label>Password</label>  
+<input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••">  
+
+<button class="btn primary full" style="margin-top:14px" onclick="login()">  
+  🔐 Login  
+</button>  
+
+<div id="loginMessage" class="login-message"></div>
+
+  </div>  
+</div>  <!-- APP -->  <div id="appShell" class="app">  <header class="hero">    <div class="row">  <div>  
+  <h1>📊 Telegram Sales Manager</h1>  
+  <p id="userLabel">Master Admin • UNI MARKET</p>  
+</div>  
+
+<div class="actions" style="margin:0">  
+  <button class="refresh" onclick="refreshAll()">↻</button>  
+  <button class="logout" onclick="logout()">↪</button>  
+</div>
+
+  </div>    <div class="stats">  <div class="stat">  
+  <b id="productCount">0</b>  
+  <span>📦 ምርቶች</span>  
+</div>  
+
+<div class="stat">  
+  <b id="pendingCount">0</b>  
+  <span>🟠 Pending Orders</span>  
+</div>  
+
+<div class="stat">  
+  <b id="salesTotal">0 ETB</b>  
+  <span>💰 ሽያጭ</span>  
+</div>  
+
+<div class="stat">  
+  <b id="stockTotal">0</b>  
+  <span>📦 Stock</span>  
+</div>
+
+  </div>  </header>  <main class="content">  <!-- HOME -->  <section id="home">    <div class="grid">  <button class="quick" onclick="openProductModal()">  
+  📦  
+  <b>አዲስ ምርት</b>  
+  <small>ስም • ዋጋ • Stock</small>  
+</button>  
+
+<button class="quick" onclick="showSection('orders')">  
+  🛒  
+  <b>Orders</b>  
+  <small>Confirm • Reject</small>  
+</button>  
+
+<button class="quick" onclick="showSection('ads')">  
+  📢  
+  <b>ማስታወቂያ</b>  
+  <small>Save • Publish</small>  
+</button>  
+
+<button class="quick" onclick="showSection('reports')">  
+  📈  
+  <b>Reports</b>  
+  <small>Sales • Profit • Stock</small>  
+</button>  
+
+<button class="quick" onclick="showSection('employees')">  
+  👥  
+  <b>Employees</b>  
+  <small>Users • Permissions</small>  
+</button>  
+
+<button class="quick settings-quick" onclick="showSection('settings')">  
+  ⚙️  
+  <b>Settings</b>  
+  <small>Payment • Telegram • Channels</small>  
+</button>
+
+  </div>    <div class="card">  <div class="section-title">  
+  <h2>📦 የቅርብ ምርቶች</h2>  
+  <button class="btn" onclick="showSection('products')">ሁሉንም</button>  
+</div>  
+
+<div id="homeProducts"></div>
+
+  </div>    <div class="card">  <div class="section-title">  
+  <h2>🛒 Pending Orders</h2>  
+  <button class="btn" onclick="showSection('orders')">Orders</button>  
+</div>  
+
+<div id="homeOrders"></div>
+
+  </div>  </section>  <!-- PRODUCTS -->  <section id="products" style="display:none">    <div class="section-title">  <h2>📦 Products</h2>  
+
+<button class="btn primary" onclick="openProductModal()">  
+  ＋ አዲስ  
+</button>
+
+  </div>    <div id="productsList"></div>  </section>  <!-- ORDERS -->  <section id="orders" style="display:none">    <div class="section-title">  <h2>🛒 Orders</h2>  
+
+<button class="btn" onclick="loadOrders()">↻</button>
+
+  </div>    <div class="notice">  
+    🧾 የደረሰኝ ማረጋገጫ እና Order Confirmation በAdmin በኩል ይደረጋል።  
+  </div>    <div id="ordersList"></div>  </section>  <!-- ADVERTISING -->  <section id="ads" style="display:none">    <div class="section-title">  <h2>📢 Advertising</h2>  
+
+<button class="btn primary" onclick="openAdModal()">  
+  ＋ ማስታወቂያ  
+</button>
+
+  </div>    <div class="notice">  
+    📢 ከታች የሚመረጡትን Channel ይምረጡ፤ ከዚያ Publish ሲደረግ ማስታወቂያው ወደ የተመረጡት Channels ይላካል።  
+  </div>    <div class="card">  <h3 style="margin-top:0">🔥 Advertisement Types</h3>  
+
+<div class="type-grid">  
+
+  <div class="type">🆕 አዲስ ምርት</div>  
+  <div class="type">🔥 ልዩ ቅናሽ</div>  
+  <div class="type">⚡ ውስን Stock</div>  
+  <div class="type">💰 የዋጋ ቅናሽ</div>  
+  <div class="type">⭐ ተመራጭ</div>  
+  <div class="type">📢 መደበኛ</div>  
+
+</div>
+
+  </div>    <div id="adsList"></div>  </section>  <!-- EMPLOYEES -->  <section id="employees" style="display:none">    <div class="section-title">  <h2>👥 Employees</h2>  
+
+<button class="btn primary" onclick="openEmployeeModal()">  
+  ＋ Employee  
+</button>
+
+  </div>    <div id="employeesList"></div>  </section>  <!-- REPORTS -->  <section id="reports" style="display:none">    <div class="section-title">  <h2>📈 Reports</h2>  
+
+<button class="btn" onclick="loadReports()">↻</button>
+
+  </div>    <div class="grid">  <div class="card">  
+  <small>💰 Sales</small>  
+  <h2 id="reportSales">0 ETB</h2>  
+</div>  
+
+<div class="card">  
+  <small>📈 Profit</small>  
+  <h2 id="reportProfit">0 ETB</h2>  
+</div>  
+
+<div class="card">  
+  <small>🛒 Orders</small>  
+  <h2 id="reportOrders">0</h2>  
+</div>  
+
+<div class="card">  
+  <small>📦 Stock</small>  
+  <h2 id="reportStock">0</h2>  
+</div>
+
+  </div>  </section>  <!-- SETTINGS -->  <section id="settings" style="display:none">    <div class="section-title">  <h2>⚙️ Settings</h2>
+
+  </div>    <!-- PAYMENT -->    <div class="card">  <h3>💳 Payment Settings</h3>  
+
+<label>Payment Information</label>  
+
+<textarea  
+  id="paymentInfo"  
+  placeholder="የክፍያ መረጃ..."></textarea>  
+
+<button  
+  class="btn primary full"  
+  style="margin-top:10px"  
+  onclick="savePaymentSettings()">  
+
+  💾 Save Payment Settings  
+
+</button>
+
+  </div>    <!-- TELEGRAM CHANNELS -->    <div class="card">  <div class="section-title">  
+
+  <div>  
+    <h3 style="margin:0">📢 Telegram Channels</h3>  
+
+    <div class="muted">  
+      ብዙ Channel ማገናኘት ይችላሉ።  
+    </div>  
+  </div>  
+
+  <button  
+    class="btn primary"  
+    onclick="openChannelModal()">  
+
+    ＋ Channel  
+
+  </button>  
+
+</div>  
+
+<div class="notice">  
+  💡 Channel ላይ Bot-ውን Admin አድርገው  
+  <b>Post Messages</b> permission ይስጡ።  
+</div>  
+
+<div id="channelsList"></div>  
+
+<div  
+  id="channelsEmpty"  
+  class="empty"  
+  style="display:none">  
+
+  እስካሁን Telegram Channel አልተጨመረም።  
+
+</div>
+
+  </div>    <!-- BOT -->    <div class="card">  <h3>🤖 Telegram Bot</h3>  
+
+<label>Bot Username</label>  
+
+<input  
+  id="telegramBotUsername"  
+  value="uni_market_shop_bot"  
+  placeholder="uni_market_shop_bot">  
+
+<button  
+  class="btn primary full"  
+  style="margin-top:10px"  
+  onclick="saveTelegramBotSettings()">  
+
+  💾 Save Bot Settings  
+
+</button>
+
+  </div>  </section>  </main>  <!-- UPDATED BOTTOM NAV -->  <nav class="bottom">  <button class="nav active"  
+data-section="home"  
+onclick="showSection('home')">
+
+<span>⌂</span>  
+ዋና
+
+  </button>  <button class="nav"  
+data-section="products"  
+onclick="showSection('products')">
+
+<span>📦</span>  
+Products
+
+  </button>  <button class="nav"  
+data-section="orders"  
+onclick="showSection('orders')">
+
+<span>🛒</span>  
+Orders
+
+  </button>  <button class="nav"  
+data-section="ads"  
+onclick="showSection('ads')">
+
+<span>📢</span>  
+Ads
+
+  </button>  <button class="nav"  
+data-section="reports"  
+onclick="showSection('reports')">
+
+<span>📊</span>  
+Reports
+
+  </button>  <button class="nav"  
+data-section="settings"  
+onclick="showSection('settings')">
+
+<span>⚙️</span>  
+Settings
+
+  </button>  </nav>  </div>  <!-- PRODUCT MODAL -->  <div id="productModal" class="modal">    <div class="sheet">  <button  
+  class="close"  
+  onclick="closeModal('productModal')">  
+  ×  
+</button>  
+
+<h2>📦 አዲስ ምርት</h2>  
+
+<form id="productForm">  
+
+  <label>የምርት ስም</label>  
+
+  <input  
+    id="pName"  
+    required  
+    placeholder="ምሳሌ፦ የሴቶች ልብስ">  
+
+  <label>Category</label>  
+
+  <select id="pCategory">  
+
+    <option value="clothes">👕 አልባሳት</option>  
+    <option value="electronics">📱 ኤሌክትሮኒክስ</option>  
+    <option value="children">🧒 የህፃናት</option>  
+    <option value="women">👩 የሴቶች</option>  
+    <option value="furniture">🛋️ የቤት እቃዎች</option>  
+    <option value="others">📦 ሌሎች</option>  
+
+  </select>  
+
+  <label>የግዢ ዋጋ</label>  
+
+  <input  
+    id="pBuy"  
+    type="number"  
+    min="0"  
+    step="0.01"  
+    required>  
+
+  <label>የሽያጭ ዋጋ</label>  
+
+  <input  
+    id="pSell"  
+    type="number"  
+    min="0"  
+    step="0.01"  
+    required>  
+
+  <label>Stock</label>  
+
+  <input  
+    id="pStock"  
+    type="number"  
+    min="0"  
+    step="1"  
+    required>  
+
+  <label>Product Photo URL</label>  
+
+  <input  
+    id="pPhoto"  
+    placeholder="https://...">  
+
+  <label>Description</label>  
+
+  <textarea  
+    id="pDescription"  
+    placeholder="የምርቱ ማብራሪያ..."></textarea>  
+
+  <div id="productMessage"></div>  
+
+  <button  
+    class="btn primary full"  
+    style="margin-top:12px"  
+    id="saveProductBtn">  
+
+    💾 Save Product  
+
+  </button>  
+
+</form>
+
+  </div>  </div>  <!-- AD MODAL -->  <div id="adModal" class="modal">    <div class="sheet">  <button  
+  class="close"  
+  onclick="closeModal('adModal')">  
+  ×  
+</button>  
+
+<h2>📢 አዲስ ማስታወቂያ</h2>  
+
+<form id="adForm">  
+
+  <label>Advertisement Type</label>  
+
+  <select id="adType">  
+
+    <option value="new_product">🆕 አዲስ ምርት</option>  
+    <option value="special_offer">🔥 ልዩ ቅናሽ</option>  
+    <option value="limited_stock">⚡ ውስን Stock</option>  
+    <option value="discount">💰 የዋጋ ቅናሽ</option>  
+    <option value="featured">⭐ ተመራጭ</option>  
+    <option value="normal">📢 መደበኛ ማስታወቂያ</option>  
+
+  </select>  
+
+  <label>Product</label>  
+
+  <select id="adProduct">  
+    <option value="">-- Product ምረጥ --</option>  
+  </select>  
+
+  <label>Title</label>  
+
+  <input  
+    id="adTitle"  
+    required  
+    placeholder="ምሳሌ፦ 🔥 ልዩ ቅናሽ">  
+
+  <label>Advertisement Text</label>  
+
+  <textarea  
+    id="adText"  
+    required  
+    placeholder="የማስታወቂያውን ጽሁፍ እዚህ ጻፍ..."></textarea>  
+
+  <label>Button Text</label>  
+
+  <input  
+    id="adButtonText"  
+    value="🛒 Order Now">  
+
+  <label>📢 Publish To Channels</label>  
+
+  <div class="select-all-box">  
+
+    <input  
+      id="selectAllChannels"  
+      class="channel-check"  
+      type="checkbox"  
+      onchange="toggleAllChannels(this.checked)">  
+
+    <span>ሁሉንም Channels ምረጥ</span>  
+
+    <span  
+      id="selectedChannelCount"  
+      class="selected-count">  
+      0 selected  
+    </span>  
+
+  </div>  
+
+  <div  
+    id="adChannelsList"  
+    style="margin-top:8px">  
+  </div>  
+
+  <label>Photo URL</label>  
+
+  <input  
+    id="adPhoto"  
+    placeholder="https://...">  
+
+  <div id="adMessage"></div>  
+
+  <button  
+    class="btn primary full"  
+    style="margin-top:12px"  
+    id="saveAdBtn">  
+
+    💾 Save Advertisement  
+
+  </button>  
+
+</form>
+
+  </div>  </div>  <!-- CHANNEL MODAL -->  <div id="channelModal" class="modal">    <div class="sheet">  <button  
+  class="close"  
+  onclick="closeModal('channelModal')">  
+  ×  
+</button>  
+
+<h2 id="channelModalTitle">  
+  📢 Add Telegram Channel  
+</h2>  
+
+<form id="channelForm">  
+
+  <input  
+    type="hidden"  
+    id="channelId">  
+
+  <label>Channel Name</label>  
+
+  <input  
+    id="channelName"  
+    required  
+    placeholder="ምሳሌ፦ UNI MARKET">  
+
+  <label>Channel Chat ID</label>  
+
+  <input  
+    id="channelChatId"  
+    required  
+    placeholder="-100xxxxxxxxxx">  
+
+  <label>Channel Username</label>  
+
+  <input  
+    id="channelUsername"  
+    placeholder="@uni_market_channel">  
+
+  <div  
+    id="channelConnectionMessage"  
+    class="connection-box">  
+  </div>  
+
+  <button  
+    type="button"  
+    class="btn full"  
+    style="margin-top:10px"  
+    onclick="checkChannelConnection()">  
+
+    🔎 Check Connection  
+
+  </button>  
+
+  <button  
+    type="submit"  
+    class="btn primary full"  
+    style="margin-top:10px">  
+
+    💾 Save Channel  
+
+  </button>  
+
+</form>
+
+  </div>  </div>  <!-- ORDER MODAL -->  <div id="orderModal" class="modal">    <div class="sheet" id="orderBody"></div>  </div>  <!-- EMPLOYEE MODAL -->  <div id="employeeModal" class="modal">    <div class="sheet">  <button  
+  class="close"  
+  onclick="closeModal('employeeModal')">  
+  ×  
+</button>  
+
+<h2>👤 አዲስ Employee</h2>  
+
+<form id="employeeForm">  
+
+  <label>Employee Name</label>  
+  <input id="eName" required>  
+
+  <label>Username</label>  
+  <input id="eUsername" required>  
+
+  <label>Password</label>  
+  <input id="ePassword" type="password" required>  
+
+  <label>Role</label>  
+
+  <select id="eRole">  
+    <option value="EMPLOYEE">Employee</option>  
+    <option value="MANAGER">Manager</option>  
+  </select>  
+
+  <button  
+    class="btn primary full"  
+    style="margin-top:14px">  
+
+    👤 Create Employee  
+
+  </button>  
+
+</form>
+
+  </div>  </div>  <script>  
+  
+const API={  
+  auth:"/api/auth",  
+  products:"/api/products",  
+  orders:"/api/orders",  
+  ads:"/api/advertisements",  
+  employees:"/api/employees",  
+  reports:"/api/reports",  
+  payment:"/api/payment-settings",  
+  telegram:"/api/telegram-settings",  
+  
+  channels:"/api/telegram-channels",  
+  telegramCheck:"/api/telegram/check-chat"  
+};  
+  
+  
+let token=  
+  localStorage.getItem("tsm_token")||"";  
+  
+let currentUser=null;  
+  
+let products=[];  
+let orders=[];  
+let advertisements=[];  
+let employees=[];  
+let channels=[];  
+  
+  
+const $=  
+  id=>document.getElementById(id);  
+  
+  
+const money=n=>  
+  (Number(n)||0)  
+  .toLocaleString("en-US",{  
+    maximumFractionDigits:2  
+  })+" ETB";  
+  
+  
+const esc=s=>  
+  String(s??"")  
+  .replace(/[&<>"']/g,c=>({  
+    "&":"&amp;",  
+    "<":"&lt;",  
+    ">":"&gt;",  
+    '"':"&quot;",  
+    "'":"&#39;"  
+  }[c]));  
+  
+  
+function authHeaders(extra={}){  
+  
+  return {  
+    ...extra,  
+    ...(token  
+      ?{Authorization:"Bearer "+token}  
+      :{})  
+  };  
+  
+}  
+  
+  
+async function api(url,options={}){  
+  
+  const opts={  
+    ...options  
+  };  
+  
+  opts.headers=  
+    authHeaders({  
+      ...(options.headers||{})  
+    });  
+  
+  const response=  
+    await fetch(url,opts);  
+  
+  const text=  
+    await response.text();  
+  
+  let data={};  
+  
+  try{  
+  
+    data=text  
+      ?JSON.parse(text)  
+      :{};  
+  
+  }catch{  
+  
+    data={};  
+  
+  }  
+  
+  if(response.status===401){  
+  
+    logout();  
+  
+    throw new Error(  
+      "Session expired"  
+    );  
+  
+  }  
+  
+  if(!response.ok){  
+  
+    throw new Error(  
+      data.error||  
+      data.message||  
+      "Request failed"  
+    );  
+  
+  }  
+  
+  return data;  
+  
+}  
+  
+  
+function showSection(id){  
+  
+  [  
+    "home",  
+    "products",  
+    "orders",  
+    "ads",  
+    "employees",  
+    "reports",  
+    "settings"  
+  ].forEach(section=>{  
+  
+    const el=$(section);  
+  
+    if(el){  
+  
+      el.style.display=  
+        section===id  
+        ?"block"  
+        :"none";  
+  
+    }  
+  
+  });  
+  
+  
+  document  
+    .querySelectorAll(".nav")  
+    .forEach(button=>{  
+  
+      button.classList.toggle(  
+        "active",  
+        button.dataset.section===id  
+      );  
+  
+    });  
+  
+  
+  if(id==="ads")  
+    loadAdvertisements();  
+  
+  if(id==="employees")  
+    loadEmployees();  
+  
+  if(id==="settings")  
+    loadSettings();  
+  
+  if(id==="reports")  
+    loadReports();  
+  
+}  
+  
+  
+function openModal(id){  
+  
+  $(id).classList.add("show");  
+  
+}  
+  
+  
+function closeModal(id){  
+  
+  $(id).classList.remove("show");  
+  
+}  
+  
+  
+function setMessage(id,text,type){  
+  
+  const el=$(id);  
+  
+  el.textContent=text;  
+  
+  el.className=  
+    type==="ok"  
+      ?"success"  
+      :"error";  
+  
+}  
+  
+  
+/* LOGIN */  
+  
+async function login(){  
+  
+  const username=  
+    $("loginUsername")  
+    .value  
+    .trim();  
+  
+  const password=  
+    $("loginPassword")  
+    .value;  
+  
+  $("loginMessage")  
+    .textContent="";  
+  
+  if(!username||!password){  
+  
+    $("loginMessage")  
+      .textContent=  
+      "Username እና Password ያስገቡ።";  
+  
+    return;  
+  
+  }  
+  
+  
+  try{  
+  
+    const data=  
+      await api(  
+        API.auth+"/login",  
+        {  
+          method:"POST",  
+          headers:{  
+            "Content-Type":  
+              "application/json"  
+          },  
+          body:JSON.stringify({  
+            username,  
+            password  
+          })  
+        }  
+      );  
+  
+  
+    token=data.token;  
+  
+    localStorage.setItem(  
+      "tsm_token",  
+      token  
+    );  
+  
+    currentUser=  
+      data.user||null;  
+  
+    await enterApp();  
+  
+  }catch(error){  
+  
+    $("loginMessage")  
+      .textContent=  
+      "❌ "+error.message;  
+  
+  }  
+  
+}  
+  
+  
+async function enterApp(){  
+  
+  $("loginPage")  
+    .style.display="none";  
+  
+  $("appShell")  
+    .style.display="block";  
+  
+  $("userLabel")  
+    .textContent=  
+      currentUser?.name||  
+      "Master Admin";  
+  
+  await refreshAll();  
+  
+}  
+  
+  
+function logout(){  
+  
+  token="";  
+  
+  currentUser=null;  
+  
+  localStorage.removeItem(  
+    "tsm_token"  
+  );  
+  
+  location.reload();  
+  
+}  
+  
+  
+async function checkLogin(){  
+  
+  if(!token)return;  
+  
+  try{  
+  
+    const data=  
+      await api(  
+        API.auth+"/me"  
+      );  
+  
+    currentUser=  
+      data.user||null;  
+  
+    await enterApp();  
+  
+  }catch{  
+  
+    localStorage.removeItem(  
+      "tsm_token"  
+    );  
+  
+    token="";  
+  
+  }  
+  
+}  
+  
+  
+/* PRODUCTS */  
+  
+function mapProduct(p){  
+  
+  return {  
+  
+    id:p.id,  
+  
+    name:p.name||"",  
+  
+    category:  
+      p.category||  
+      "others",  
+  
+    buy:Number(  
+      p.buy_price??  
+      p.buyPrice??  
+      0  
+    ),  
+  
+    sell:Number(  
+      p.sell_price??  
+      p.sellPrice??  
+      0  
+    ),  
+  
+    stock:Number(  
+      p.stock??0  
+    ),  
+  
+    photo:  
+      p.photo_url||  
+      p.photoUrl||  
+      "",  
+  
+    description:  
+      p.description||  
+      ""  
+  
+  };  
+  
+}  
+  
+  
+async function loadProducts(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.products);  
+  
+    const raw=  
+      Array.isArray(data)  
+        ?data  
+        :(data.products||[]);  
+  
+    products=  
+      raw.map(mapProduct);  
+  
+    renderProducts();  
+  
+    fillAdProducts();  
+  
+  }catch(error){  
+  
+    console.error(error);  
+  
+  }  
+  
+}  
+  
+  
+function productCard(p){  
+  
+  return `  
+  
+  <div class="card">  
+  
+    <div class="product">  
+  
+      <div class="pic">  
+  
+        ${  
+          p.photo  
+          ?`<img src="${esc(p.photo)}">`  
+          :"📦"  
+        }  
+  
+      </div>  
+  
+      <div class="grow">  
+  
+        <b>${esc(p.name)}</b>  
+  
+        <div class="muted">  
+          Category:  
+          ${esc(p.category)}  
+        </div>  
+  
+        <div class="muted">  
+          Stock:  
+          ${p.stock}  
+        </div>  
+  
+        <div class="price">  
+          የሽያጭ ዋጋ:  
+          ${money(p.sell)}  
+        </div>  
+  
+        <div class="muted">  
+          የግዢ ዋጋ:  
+          ${money(p.buy)}  
+          •  
+          <span class="profit">  
+            Profit:  
+            ${money(p.sell-p.buy)}  
+          </span>  
+        </div>  
+  
+      </div>  
+  
+    </div>  
+  
+  </div>`;  
+  
+}  
+  
+  
+function renderProducts(){  
+  
+  $("productCount")  
+    .textContent=  
+    products.length;  
+  
+  const stock=  
+    products.reduce(  
+      (sum,p)=>sum+p.stock,  
+      0  
+    );  
+  
+  $("stockTotal")  
+    .textContent=stock;  
+  
+  $("reportStock")  
+    .textContent=stock;  
+  
+  
+  $("productsList")  
+    .innerHTML=  
+    products.length  
+    ?products  
+      .slice()  
+      .reverse()  
+      .map(productCard)  
+      .join("")  
+    :`  
+      <div class="empty">  
+        ምርት የለም።  
+      </div>  
+    `;  
+  
+  
+  $("homeProducts")  
+    .innerHTML=  
+    products.length  
+    ?products  
+      .slice(0,3)  
+      .map(productCard)  
+      .join("")  
+    :`  
+      <div class="empty">  
+        ምርት የለም።  
+      </div>  
+    `;  
+  
+}  
+  
+  
+/* ORDERS */  
+  
+function mapOrder(o){  
+  
+  return {  
+  
+    id:o.id,  
+  
+    productName:  
+      o.product_name||  
+      o.productName||  
+      "—",  
+  
+    customerName:  
+      o.customer_name||  
+      o.customerName||  
+      "—",  
+  
+    phone:  
+      o.phone||  
+      "—",  
+  
+    username:  
+      o.telegram_username||  
+      o.username||  
+      "",  
+  
+    address:  
+      o.address||  
+      "",  
+  
+    quantity:  
+      Number(o.quantity||1),  
+  
+    total:  
+      Number(o.total||0),  
+  
+    status:  
+      String(  
+        o.status||"NEW"  
+      ).toUpperCase(),  
+  
+    paymentStatus:  
+      String(  
+        o.payment_status||  
+        "PENDING"  
+      ).toUpperCase(),  
+  
+    receipt:  
+      o.receipt_url||  
+      o.receipt_photo_url||  
+      o.payment_receipt_url||  
+      "",  
+  
+    createdAt:  
+      o.created_at||  
+      o.createdAt||  
+      ""  
+  
+  };  
+  
+}  
+  
+  
+async function loadOrders(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.orders);  
+  
+    const raw=  
+      Array.isArray(data)  
+        ?data  
+        :(data.orders||[]);  
+  
+    orders=  
+      raw.map(mapOrder);  
+  
+    renderOrders();  
+  
+  }catch(error){  
+  
+    console.error(error);  
+  
+  }  
+  
+}  
+  
+  
+function orderCard(o){  
+  
+  const pending=[  
+    "NEW",  
+    "PENDING",  
+    "RECEIPT_PENDING",  
+    "VERIFYING"  
+  ].includes(o.status);  
+  
+  const cls=  
+    o.status==="CONFIRMED"  
+      ?"green"  
+      :o.status==="REJECTED"  
+        ?"red"  
+        :"";  
+  
+  
+  return `  
+  
+  <div class="card">  
+  
+    <div class="order">  
+  
+      <div class="grow">  
+  
+        <b>  
+          ${esc(o.productName)}  
+        </b>  
+  
+        <div class="muted">  
+          👤  
+          ${esc(o.customerName)}  
+          • ×${o.quantity}  
+        </div>  
+  
+        <div class="muted">  
+          📞 ${esc(o.phone)}  
+        </div>  
+  
+        ${  
+          o.username  
+          ?`  
+          <div class="muted">  
+            Telegram:  
+            ${esc(o.username)}  
+          </div>  
+          `  
+          :""  
+        }  
+  
+      </div>  
+  
+      <div style="text-align:right">  
+  
+        <b>${money(o.total)}</b>  
+  
+        <br>  
+  
+        <span class="badge ${cls}">  
+          ${esc(o.status)}  
+        </span>  
+  
+      </div>  
+  
+    </div>  
+  
+    <div class="actions">  
+  
+      ${  
+        pending  
+        ?`  
+  
+        <button  
+          class="btn green"  
+          onclick="changeOrderStatus(  
+            '${esc(o.id)}',  
+            'CONFIRMED'  
+          )">  
+  
+          ✅ Confirm  
+  
+        </button>  
+  
+        <button  
+          class="btn red"  
+          onclick="changeOrderStatus(  
+            '${esc(o.id)}',  
+            'REJECTED'  
+          )">  
+  
+          ❌ Reject  
+  
+        </button>  
+  
+        `  
+        :""  
+      }  
+  
+  
+      <button  
+        class="btn"  
+        onclick="openOrder('${esc(o.id)}')">  
+  
+        👁️ View  
+  
+      </button>  
+  
+    </div>  
+  
+  </div>`;  
+  
+}  
+  
+  
+function renderOrders(){  
+  
+  const pending=  
+    orders.filter(o=>  
+      [  
+        "NEW",  
+        "PENDING",  
+        "RECEIPT_PENDING",  
+        "VERIFYING"  
+      ].includes(o.status)  
+    );  
+  
+  
+  $("pendingCount")  
+    .textContent=  
+    pending.length;  
+  
+  
+  $("ordersList")  
+    .innerHTML=  
+    orders.length  
+    ?orders  
+      .slice()  
+      .reverse()  
+      .map(orderCard)  
+      .join("")  
+    :`  
+      <div class="empty">  
+        አሁን Order የለም።  
+      </div>  
+    `;  
+  
+  
+  $("homeOrders")  
+    .innerHTML=  
+    pending.length  
+    ?pending  
+      .slice(0,3)  
+      .map(orderCard)  
+      .join("")  
+    :`  
+      <div class="empty">  
+        Pending Order የለም።  
+      </div>  
+    `;  
+  
+}  
+  
+  
+function openOrder(id){  
+  
+  const o=  
+    orders.find(  
+      x=>String(x.id)===String(id)  
+    );  
+  
+  if(!o)return;  
+  
+  
+  $("orderBody").innerHTML=`  
+  
+    <button  
+      class="close"  
+      onclick="closeModal('orderModal')">  
+      ×  
+    </button>  
+  
+    <h2>🛒 Order Details</h2>  
+  
+    <div class="card">  
+  
+      <div class="row">  
+        <span>Order ID</span>  
+        <b>${esc(o.id)}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>ደንበኛ</span>  
+        <b>${esc(o.customerName)}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>📞 ስልክ</span>  
+        <b>${esc(o.phone)}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>📦 ምርት</span>  
+        <b>${esc(o.productName)}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>ብዛት</span>  
+        <b>${o.quantity}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>💰 Total</span>  
+        <b>${money(o.total)}</b>  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+        <span>Payment</span>  
+  
+        <span class="badge blue">  
+          ${esc(o.paymentStatus)}  
+        </span>  
+  
+      </div>  
+  
+      <hr>  
+  
+      <div class="row">  
+  
+        <span>Status</span>  
+  
+        <span class="badge">  
+          ${esc(o.status)}  
+        </span>  
+  
+      </div>  
+  
+      ${  
+        o.address  
+        ?`  
+        <hr>  
+  
+        <div>  
+          <div class="muted">  
+            📍 Delivery Address  
+          </div>  
+  
+          <b>  
+            ${esc(o.address)}  
+          </b>  
+  
+        </div>  
+        `  
+        :""  
+      }  
+  
+    </div>  
+  
+  
+    ${  
+      o.receipt  
+      ?`  
+      <div class="card">  
+  
+        <h3>🧾 Receipt</h3>  
+  
+        <a  
+          class="btn primary"  
+          target="_blank"  
+          href="${esc(o.receipt)}">  
+  
+          👁️ View Receipt  
+  
+        </a>  
+  
+      </div>  
+      `  
+      :""  
+    }  
+  
+  
+    ${  
+      [  
+        "NEW",  
+        "PENDING",  
+        "RECEIPT_PENDING",  
+        "VERIFYING"  
+      ].includes(o.status)  
+      ?`  
+      <div class="actions">  
+  
+        <button  
+          class="btn green"  
+          onclick="changeOrderStatus(  
+            '${esc(o.id)}',  
+            'CONFIRMED'  
+          )">  
+  
+          ✅ Confirm Order  
+  
+        </button>  
+  
+        <button  
+          class="btn red"  
+          onclick="changeOrderStatus(  
+            '${esc(o.id)}',  
+            'REJECTED'  
+          )">  
+  
+          ❌ Reject Order  
+  
+        </button>  
+  
+      </div>  
+      `  
+      :""  
+    }  
+  
+  `;  
+  
+  
+  openModal("orderModal");  
+  
+}  
+  
+  
+async function changeOrderStatus(id,status){  
+  
+  const question=  
+    status==="CONFIRMED"  
+      ?"Order እንዲ Confirm ይደረግ?"  
+      :"Order እንዲ Reject ይደረግ?";  
+  
+  
+  if(!confirm(question))  
+    return;  
+  
+  
+  try{  
+  
+    await api(  
+      API.orders+  
+      "/"+  
+      encodeURIComponent(id)+  
+      "/status",  
+      {  
+        method:"PATCH",  
+        headers:{  
+          "Content-Type":  
+            "application/json"  
+        },  
+        body:JSON.stringify({  
+          status  
+        })  
+      }  
+    );  
+  
+  
+    closeModal("orderModal");  
+  
+    await refreshAll();  
+  
+  
+    alert(  
+      status==="CONFIRMED"  
+      ?"✅ Order Confirmed"  
+      :"❌ Order Rejected"  
+    );  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+/* PRODUCT */  
+  
+function openProductModal(){  
+  
+  $("productMessage")  
+    .textContent="";  
+  
+  $("productForm").reset();  
+  
+  openModal(  
+    "productModal"  
+  );  
+  
+}  
+  
+  
+$("productForm")  
+.addEventListener(  
+  "submit",  
+  async event=>{  
+  
+    event.preventDefault();  
+  
+    const button=  
+      $("saveProductBtn");  
+  
+    button.disabled=true;  
+  
+    button.textContent=  
+      "⏳ Saving...";  
+  
+  
+    try{  
+  
+      const body={  
+  
+        name:  
+          $("pName")  
+          .value  
+          .trim(),  
+  
+        category:  
+          $("pCategory")  
+          .value,  
+  
+        buyPrice:  
+          Number(  
+            $("pBuy").value  
+          ),  
+  
+        sellPrice:  
+          Number(  
+            $("pSell").value  
+          ),  
+  
+        stock:  
+          Number(  
+            $("pStock").value  
+          ),  
+  
+        photoUrl:  
+          $("pPhoto")  
+          .value  
+          .trim(),  
+  
+        description:  
+          $("pDescription")  
+          .value  
+          .trim()  
+  
+      };  
+  
+  
+      if(!body.name){  
+  
+        throw new Error(  
+          "የምርት ስም ያስገቡ።"  
+        );  
+  
+      }  
+  
+  
+      await api(  
+        API.products,  
+        {  
+          method:"POST",  
+          headers:{  
+            "Content-Type":  
+              "application/json"  
+          },  
+          body:JSON.stringify(body)  
+        }  
+      );  
+  
+  
+      setMessage(  
+        "productMessage",  
+        "✅ ምርቱ ተመዝግቧል።",  
+        "ok"  
+      );  
+  
+  
+      await loadProducts();  
+  
+  
+      setTimeout(  
+        ()=>closeModal(  
+          "productModal"  
+        ),  
+        600  
+      );  
+  
+  
+    }catch(error){  
+  
+      setMessage(  
+        "productMessage",  
+        "❌ "+error.message,  
+        "error"  
+      );  
+  
+    }finally{  
+  
+      button.disabled=false;  
+  
+      button.textContent=  
+        "💾 Save Product";  
+  
+    }  
+  
+  }  
+);  
+  
+  
+/* ADS */  
+  
+function fillAdProducts(){  
+  
+  $("adProduct").innerHTML=  
+    `<option value="">  
+      -- Product ምረጥ --  
+    </option>`+  
+  
+    products.map(  
+      p=>`  
+      <option value="${esc(p.id)}">  
+        ${esc(p.name)}  
+      </option>  
+      `  
+    ).join("");  
+  
+}  
+  
+  
+function openAdModal(){  
+  
+  $("adForm").reset();  
+  
+  $("adButtonText").value=  
+    "🛒 Order Now";  
+  
+  $("adMessage")  
+    .textContent="";  
+  
+  fillAdProducts();  
+  
+  renderAdChannels();  
+  
+  openModal(  
+    "adModal"  
+  );  
+  
+}  
+  
+  
+$("adForm")  
+.addEventListener(  
+  "submit",  
+  async event=>{  
+  
+    event.preventDefault();  
+  
+    const button=  
+      $("saveAdBtn");  
+  
+    button.disabled=true;  
+  
+    button.textContent=  
+      "⏳ Saving...";  
+  
+  
+    try{  
+  
+      const selected=  
+        getSelectedChannelIds();  
+  
+  
+      if(!selected.length){  
+  
+        throw new Error(  
+          "ቢያንስ አንድ Telegram Channel ይምረጡ።"  
+        );  
+  
+      }  
+  
+  
+      const body={  
+  
+        ad_type:  
+          $("adType").value,  
+  
+        product_id:  
+          $("adProduct").value||  
+          null,  
+  
+        title:  
+          $("adTitle")  
+          .value  
+          .trim(),  
+  
+        text:  
+          $("adText")  
+          .value  
+          .trim(),  
+  
+        button_text:  
+          $("adButtonText")  
+          .value  
+          .trim(),  
+  
+        photo_url:  
+          $("adPhoto")  
+          .value  
+          .trim(),  
+  
+        channel_ids:  
+          selected  
+  
+      };  
+  
+  
+      await api(  
+        API.ads,  
+        {  
+          method:"POST",  
+          headers:{  
+            "Content-Type":  
+              "application/json"  
+          },  
+          body:JSON.stringify(body)  
+        }  
+      );  
+  
+  
+      setMessage(  
+        "adMessage",  
+        "✅ ማስታወቂያው ተቀምጧል።",  
+        "ok"  
+      );  
+  
+  
+      await loadAdvertisements();  
+  
+  
+      setTimeout(  
+        ()=>closeModal("adModal"),  
+        800  
+      );  
+  
+  
+    }catch(error){  
+  
+      setMessage(  
+        "adMessage",  
+        "❌ "+error.message,  
+        "error"  
+      );  
+  
+    }finally{  
+  
+      button.disabled=false;  
+  
+      button.textContent=  
+        "💾 Save Advertisement";  
+  
+    }  
+  
+  }  
+);  
+  
+  
+function adTypeName(type){  
+  
+  const names={  
+  
+    new_product:  
+      "🆕 አዲስ ምርት",  
+  
+    special_offer:  
+      "🔥 ልዩ ቅናሽ",  
+  
+    limited_stock:  
+      "⚡ ውስን Stock",  
+  
+    discount:  
+      "💰 የዋጋ ቅናሽ",  
+  
+    featured:  
+      "⭐ ተመራጭ",  
+  
+    normal:  
+      "📢 መደበኛ"  
+  
+  };  
+  
+  return names[type]||  
+    "📢 ማስታወቂያ";  
+  
+}  
+  
+  
+async function loadAdvertisements(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.ads);  
+  
+    advertisements=  
+      Array.isArray(data)  
+      ?data  
+      :(data.advertisements||[]);  
+  
+    renderAdvertisements();  
+  
+  }catch(error){  
+  
+    console.error(error);  
+  
+  }  
+  
+}  
+  
+  
+function renderAdvertisements(){  
+  
+  if(!advertisements.length){  
+  
+    $("adsList").innerHTML=  
+      `  
+      <div class="empty">  
+        ማስታወቂያ የለም።  
+      </div>  
+      `;  
+  
+    return;  
+  
+  }  
+  
+  
+  $("adsList").innerHTML=  
+    advertisements  
+    .map(ad=>{  
+  
+      const status=  
+        String(  
+          ad.status||"DRAFT"  
+        ).toUpperCase();  
+  
+      const published=  
+        status==="PUBLISHED";  
+  
+  
+      return `  
+  
+      <div class="card">  
+  
+        <div class="row">  
+  
+          <div>  
+  
+            <div class="ad-title">  
+              ${esc(  
+                ad.title||  
+                "ማስታወቂያ"  
+              )}  
+            </div>  
+  
+            <div class="muted">  
+              ${adTypeName(  
+                ad.ad_type||  
+                ad.type  
+              )}  
+            </div>  
+  
+          </div>  
+  
+          <span class="badge ${  
+            published  
+            ?"green"  
+            :""  
+          }">  
+  
+            ${  
+              published  
+              ?"✅ PUBLISHED"  
+              :"📝 "+esc(status)  
+            }  
+  
+          </span>  
+  
+        </div>  
+  
+  
+        ${  
+          ad.photo_url  
+          ?`  
+          <img  
+            class="ad-photo"  
+            src="${esc(ad.photo_url)}">  
+          `  
+          :""  
+        }  
+  
+  
+        <div class="ad-preview">  
+  
+          <div class="ad-text">  
+            ${esc(ad.text||"")}  
+          </div>  
+  
+        </div>  
+  
+  
+        ${  
+          Array.isArray(ad.channel_ids)  
+          ?`  
+          <div class="muted" style="margin-top:8px">  
+            📢 Channels:  
+            ${ad.channel_ids.length}  
+          </div>  
+          `  
+          :""  
+        }  
+  
+  
+        <div class="actions">  
+  
+          ${  
+            !published  
+            ?`  
+            <button  
+              class="btn primary"  
+              onclick="publishAdvertisement(  
+                '${esc(ad.id)}'  
+              )">  
+  
+              📢 Publish  
+  
+            </button>  
+            `  
+            :`  
+            <button  
+              class="btn green"  
+              disabled>  
+  
+              ✅ Published  
+  
+            </button>  
+            `  
+          }  
+  
+  
+          <button  
+            class="btn red"  
+            onclick="deleteAdvertisement(  
+              '${esc(ad.id)}'  
+            )">  
+  
+            🗑️ Delete  
+  
+          </button>  
+  
+        </div>  
+  
+      </div>  
+  
+      `;  
+  
+    }).join("");  
+  
+}  
+  
+  
+async function publishAdvertisement(id){  
+  
+  if(!confirm(  
+    "ማስታወቂያውን የተመረጡት Telegram Channels ላይ ልክ?"  
+  ))return;  
+  
+  
+  try{  
+  
+    await api(  
+      API.ads+  
+      "/"+  
+      encodeURIComponent(id)+  
+      "/publish",  
+      {  
+        method:"POST",  
+        headers:{  
+          "Content-Type":  
+            "application/json"  
+        },  
+        body:JSON.stringify({})  
+      }  
+    );  
+  
+  
+    alert(  
+      "✅ ማስታወቂያው ወደ የተመረጡት Channels ተልኳል።"  
+    );  
+  
+  
+    await loadAdvertisements();  
+  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ Publish አልተሳካም፦\n"+  
+      error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+async function deleteAdvertisement(id){  
+  
+  if(!confirm(  
+    "ይህን ማስታወቂያ ይሰርዙ?"  
+  ))return;  
+  
+  
+  try{  
+  
+    await api(  
+      API.ads+  
+      "/"+  
+      encodeURIComponent(id),  
+      {  
+        method:"DELETE"  
+      }  
+    );  
+  
+  
+    await loadAdvertisements();  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+/* CHANNELS */  
+  
+async function loadChannels(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.channels);  
+  
+    channels=  
+      Array.isArray(data)  
+      ?data  
+      :(data.channels||[]);  
+  
+  
+    renderChannels();  
+  
+    renderAdChannels();  
+  
+  }catch(error){  
+  
+    console.error(  
+      "Channel loading error:",  
+      error  
+    );  
+  
+    channels=[];  
+  
+    renderChannels();  
+  
+    renderAdChannels();  
+  
+  }  
+  
+}  
+  
+  
+function renderChannels(){  
+  
+  const list=  
+    $("channelsList");  
+  
+  const empty=  
+    $("channelsEmpty");  
+  
+  
+  if(!channels.length){  
+  
+    list.innerHTML="";  
+  
+    empty.style.display=  
+      "block";  
+  
+    return;  
+  
+  }  
+  
+  
+  empty.style.display=  
+    "none";  
+  
+  
+  list.innerHTML=  
+    channels.map(channel=>{  
+  
+      const id=  
+        channel.id||  
+        channel.channel_id||  
+        channel.chat_id;  
+  
+      const name=  
+        channel.name||  
+        channel.channel_name||  
+        "Telegram Channel";  
+  
+      const chatId=  
+        channel.chat_id||  
+        channel.telegram_chat_id||  
+        channel.channel_id||  
+        "";  
+  
+      const username=  
+        channel.username||  
+        channel.channel_username||  
+        "";  
+  
+  
+      return `  
+  
+      <div class="channel-card">  
+  
+        <div class="channel">  
+  
+          <div class="pic">  
+            📢  
+          </div>  
+  
+          <div class="grow">  
+  
+            <div class="channel-name">  
+              ${esc(name)}  
+            </div>  
+  
+            <div class="channel-id">  
+              🆔 ${esc(chatId)}  
+            </div>  
+  
+            ${  
+              username  
+              ?`  
+              <div class="muted">  
+                🔗 ${esc(username)}  
+              </div>  
+              `  
+              :""  
+            }  
+  
+          </div>  
+  
+          <span class="badge green">  
+            🟢 Saved  
+          </span>  
+  
+        </div>  
+  
+  
+        <div class="channel-actions">  
+  
+          <button  
+            class="btn"  
+            onclick="editChannel(  
+              '${esc(id)}'  
+            )">  
+  
+            ✏️ Edit  
+  
+          </button>  
+  
+  
+          <button  
+            class="btn"  
+            onclick="checkSavedChannel(  
+              '${esc(chatId)}'  
+            )">  
+  
+            🔎 Check  
+  
+          </button>  
+  
+  
+          <button  
+            class="btn red"  
+            onclick="deleteChannel(  
+              '${esc(id)}'  
+            )">  
+  
+            🗑️ Delete  
+  
+          </button>  
+  
+        </div>  
+  
+      </div>  
+  
+      `;  
+  
+    }).join("");  
+  
+}  
+  
+  
+function renderAdChannels(){  
+  
+  const box=  
+    $("adChannelsList");  
+  
+  if(!box)return;  
+  
+  
+  if(!channels.length){  
+  
+    box.innerHTML=  
+      `  
+      <div class="empty">  
+        Settings ውስጥ Channel ያክሉ።  
+      </div>  
+      `;  
+  
+    $("selectedChannelCount")  
+      .textContent=  
+      "0 selected";  
+  
+    return;  
+  
+  }  
+  
+  
+  box.innerHTML=  
+    channels.map(channel=>{  
+  
+      const id=  
+        channel.id||  
+        channel.channel_id||  
+        channel.chat_id;  
+  
+      const name=  
+        channel.name||  
+        channel.channel_name||  
+        "Telegram Channel";  
+  
+      const chatId=  
+        channel.chat_id||  
+        channel.telegram_chat_id||  
+        channel.channel_id||  
+        "";  
+  
+  
+      return `  
+  
+      <label  
+        style="  
+          display:flex;  
+          align-items:center;  
+          gap:10px;  
+          padding:10px;  
+          margin:5px 0;  
+          border:1px solid #e4eaf3;  
+          border-radius:12px;  
+          background:#fff;  
+        ">  
+  
+        <input  
+          class="channel-check ad-channel-checkbox"  
+          type="checkbox"  
+          value="${esc(id)}"  
+          onchange="updateSelectedChannelCount()">  
+  
+        <span style="font-size:20px">  
+          📢  
+        </span>  
+  
+        <span class="grow">  
+  
+          <b>  
+            ${esc(name)}  
+          </b>  
+  
+          <small  
+            class="muted"  
+            style="display:block">  
+            ${esc(chatId)}  
+          </small>  
+  
+        </span>  
+  
+      </label>  
+  
+      `;  
+  
+    }).join("");  
+  
+  
+  updateSelectedChannelCount();  
+  
+}  
+  
+  
+function getSelectedChannelIds(){  
+  
+  return [  
+    ...document  
+      .querySelectorAll(  
+        ".ad-channel-checkbox:checked"  
+      )  
+  ].map(  
+    input=>input.value  
+  );  
+  
+}  
+  
+  
+function toggleAllChannels(checked){  
+  
+  document  
+    .querySelectorAll(  
+      ".ad-channel-checkbox"  
+    )  
+    .forEach(input=>{  
+      input.checked=checked;  
+    });  
+  
+  
+  updateSelectedChannelCount();  
+  
+}  
+  
+  
+function updateSelectedChannelCount(){  
+  
+  const selected=  
+    getSelectedChannelIds();  
+  
+  
+  $("selectedChannelCount")  
+    .textContent=  
+    `${selected.length} selected`;  
+  
+  
+  const all=  
+    channels.length>0&&  
+    selected.length===  
+    channels.length;  
+  
+  
+  $("selectAllChannels")  
+    .checked=all;  
+  
+}  
+  
+  
+function openChannelModal(){  
+  
+  $("channelForm")  
+    .reset();  
+  
+  $("channelId")  
+    .value="";  
+  
+  $("channelModalTitle")  
+    .textContent=  
+    "📢 Add Telegram Channel";  
+  
+  $("channelConnectionMessage")  
+    .innerHTML="";  
+  
+  openModal(  
+    "channelModal"  
+  );  
+  
+}  
+  
+  
+function editChannel(id){  
+  
+  const channel=  
+    channels.find(c=>  
+      String(  
+        c.id||  
+        c.channel_id||  
+        c.chat_id  
+      )===  
+      String(id)  
+    );  
+  
+  
+  if(!channel)return;  
+  
+  
+  $("channelId")  
+    .value=  
+    channel.id||  
+    channel.channel_id||  
+    channel.chat_id||  
+    "";  
+  
+  
+  $("channelName")  
+    .value=  
+    channel.name||  
+    channel.channel_name||  
+    "";  
+  
+  
+  $("channelChatId")  
+    .value=  
+    channel.chat_id||  
+    channel.telegram_chat_id||  
+    channel.channel_id||  
+    "";  
+  
+  
+  $("channelUsername")  
+    .value=  
+    channel.username||  
+    channel.channel_username||  
+    "";  
+  
+  
+  $("channelModalTitle")  
+    .textContent=  
+    "✏️ Edit Telegram Channel";  
+  
+  
+  $("channelConnectionMessage")  
+    .innerHTML="";  
+  
+  
+  openModal(  
+    "channelModal"  
+  );  
+  
+}  
+  
+  
+async function checkChannelConnection(){  
+  
+  const chatId=  
+    $("channelChatId")  
+    .value  
+    .trim();  
+  
+  
+  if(!chatId){  
+  
+    $("channelConnectionMessage")  
+      .innerHTML=  
+      `  
+      <div class="error">  
+        Channel Chat ID ያስገቡ።  
+      </div>  
+      `;  
+  
+    return;  
+  
+  }  
+  
+  
+  $("channelConnectionMessage")  
+    .innerHTML=  
+    `  
+    <div class="notice">  
+      ⏳ Checking...  
+    </div>  
+    `;  
+  
+  
+  try{  
+  
+    const data=  
+      await api(  
+        API.telegramCheck+  
+        "?chat_id="+  
+        encodeURIComponent(chatId)  
+      );  
+  
+  
+    const chat=  
+      data.chat||  
+      {};  
+  
+  
+    $("channelConnectionMessage")  
+      .innerHTML=  
+      `  
+      <div class="success">  
+  
+        ✅ Telegram Channel ተገኝቷል።  
+  
+        <br>  
+  
+        <b>  
+          ${esc(  
+            chat.title||  
+            chat.username||  
+            "Channel"  
+          )}  
+        </b>  
+  
+      </div>  
+      `;  
+  
+  }catch(error){  
+  
+    $("channelConnectionMessage")  
+      .innerHTML=  
+      `  
+      <div class="error">  
+        ❌ ${esc(error.message)}  
+      </div>  
+      `;  
+  
+  }  
+  
+}  
+  
+  
+async function checkSavedChannel(chatId){  
+  
+  try{  
+  
+    const data=  
+      await api(  
+        API.telegramCheck+  
+        "?chat_id="+  
+        encodeURIComponent(chatId)  
+      );  
+  
+  
+    alert(  
+      "✅ Channel ተገኝቷል፦ "+  
+      (  
+        data.chat?.title||  
+        data.chat?.username||  
+        chatId  
+      )  
+    );  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ Channel አልተገኘም፦\n"+  
+      error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+$("channelForm")  
+.addEventListener(  
+  "submit",  
+  async event=>{  
+  
+    event.preventDefault();  
+  
+  
+    const id=  
+      $("channelId")  
+      .value  
+      .trim();  
+  
+  
+    const body={  
+  
+      name:  
+        $("channelName")  
+        .value  
+        .trim(),  
+  
+      chat_id:  
+        $("channelChatId")  
+        .value  
+        .trim(),  
+  
+      username:  
+        $("channelUsername")  
+        .value  
+        .trim()  
+  
+    };  
+  
+  
+    if(!body.name||  
+       !body.chat_id){  
+  
+      alert(  
+        "Channel Name እና Chat ID ያስገቡ።"  
+      );  
+  
+      return;  
+  
+    }  
+  
+  
+    try{  
+  
+      if(id){  
+  
+        await api(  
+          API.channels+  
+          "/"+  
+          encodeURIComponent(id),  
+          {  
+            method:"PATCH",  
+            headers:{  
+              "Content-Type":  
+                "application/json"  
+            },  
+            body:JSON.stringify(body)  
+          }  
+        );  
+  
+      }else{  
+  
+        await api(  
+          API.channels,  
+          {  
+            method:"POST",  
+            headers:{  
+              "Content-Type":  
+                "application/json"  
+            },  
+            body:JSON.stringify(body)  
+          }  
+        );  
+  
+      }  
+  
+  
+      closeModal(  
+        "channelModal"  
+      );  
+  
+  
+      await loadChannels();  
+  
+  
+      alert(  
+        "✅ Channel ተቀምጧል።"  
+      );  
+  
+    }catch(error){  
+  
+      alert(  
+        "❌ "+error.message  
+      );  
+  
+    }  
+  
+  }  
+);  
+  
+  
+async function deleteChannel(id){  
+  
+  if(!confirm(  
+    "ይህን Channel ማጥፋት ይፈልጋሉ?"  
+  ))return;  
+  
+  
+  try{  
+  
+    await api(  
+      API.channels+  
+      "/"+  
+      encodeURIComponent(id),  
+      {  
+        method:"DELETE"  
+      }  
+    );  
+  
+  
+    await loadChannels();  
+  
+  
+    alert(  
+      "✅ Channel ተሰርዟል።"  
+    );  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+/* EMPLOYEES */  
+  
+function openEmployeeModal(){  
+  
+  $("employeeForm")  
+    .reset();  
+  
+  openModal(  
+    "employeeModal"  
+  );  
+  
+}  
+  
+  
+async function loadEmployees(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.employees);  
+  
+    employees=  
+      Array.isArray(data)  
+      ?data  
+      :(data.employees||[]);  
+  
+    renderEmployees();  
+  
+  }catch(error){  
+  
+    console.error(error);  
+  
+  }  
+  
+}  
+  
+  
+function renderEmployees(){  
+  
+  if(!employees.length){  
+  
+    $("employeesList")  
+      .innerHTML=  
+      `  
+      <div class="empty">  
+        Employee የለም።  
+      </div>  
+      `;  
+  
+    return;  
+  
+  }  
+  
+  
+  $("employeesList")  
+    .innerHTML=  
+    employees  
+    .map(e=>`  
+  
+    <div class="card">  
+  
+      <div class="employee">  
+  
+        <div class="pic">  
+          👤  
+        </div>  
+  
+        <div class="grow">  
+  
+          <b>  
+            ${esc(  
+              e.name||  
+              "Employee"  
+            )}  
+          </b>  
+  
+          <div class="muted">  
+            @${esc(  
+              e.username||  
+              ""  
+            )}  
+          </div>  
+  
+          <div class="muted">  
+            ${esc(  
+              e.role||  
+              "EMPLOYEE"  
+            )}  
+          </div>  
+  
+        </div>  
+  
+        <button  
+          class="btn red"  
+          onclick="deleteEmployee(  
+            '${esc(e.id)}'  
+          )">  
+  
+          🗑️  
+  
+        </button>  
+  
+      </div>  
+  
+    </div>  
+  
+    `).join("");  
+  
+}  
+  
+  
+$("employeeForm")  
+.addEventListener(  
+  "submit",  
+  async event=>{  
+  
+    event.preventDefault();  
+  
+  
+    try{  
+  
+      await api(  
+        API.employees,  
+        {  
+          method:"POST",  
+          headers:{  
+            "Content-Type":  
+              "application/json"  
+          },  
+          body:JSON.stringify({  
+  
+            name:  
+              $("eName")  
+              .value  
+              .trim(),  
+  
+            username:  
+              $("eUsername")  
+              .value  
+              .trim(),  
+  
+            password:  
+              $("ePassword")  
+              .value,  
+  
+            role:  
+              $("eRole")  
+              .value  
+  
+          })  
+        }  
+      );  
+  
+  
+      closeModal(  
+        "employeeModal"  
+      );  
+  
+  
+      await loadEmployees();  
+  
+  
+      alert(  
+        "✅ Employee ተፈጥሯል።"  
+      );  
+  
+    }catch(error){  
+  
+      alert(  
+        "❌ "+error.message  
+      );  
+  
+    }  
+  
+  }  
+);  
+  
+  
+async function deleteEmployee(id){  
+  
+  if(!confirm(  
+    "ይህን Employee ይሰርዙ?"  
+  ))return;  
+  
+  
+  try{  
+  
+    await api(  
+      API.employees+  
+      "/"+  
+      encodeURIComponent(id),  
+      {  
+        method:"DELETE"  
+      }  
+    );  
+  
+  
+    await loadEmployees();  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+/* REPORTS */  
+  
+async function loadReports(){  
+  
+  try{  
+  
+    const data=  
+      await api(API.reports);  
+  
+    const summary=  
+      data.summary||  
+      data;  
+  
+  
+    $("reportSales")  
+      .textContent=  
+      money(  
+        summary.totalSales||  
+        summary.sales||  
+        0  
+      );  
+  
+  
+    $("reportProfit")  
+      .textContent=  
+      money(  
+        summary.totalProfit||  
+        summary.profit||  
+        0  
+      );  
+  
+  
+    $("reportOrders")  
+      .textContent=  
+      summary.totalOrders||  
+      summary.orders||  
+      0;  
+  
+  
+    $("reportStock")  
+      .textContent=  
+      products.reduce(  
+        (sum,p)=>sum+p.stock,  
+        0  
+      );  
+  
+  
+    $("salesTotal")  
+      .textContent=  
+      money(  
+        summary.totalSales||  
+        summary.sales||  
+        0  
+      );  
+  
+  }catch(error){  
+  
+    console.error(error);  
+  
+  }  
+  
+}  
+  
+  
+/* SETTINGS */  
+  
+async function loadSettings(){  
+  
+  try{  
+  
+    const payment=  
+      await api(API.payment);  
+  
+    $("paymentInfo")  
+      .value=  
+      payment.payment_info||  
+      payment.paymentInfo||  
+      payment.info||  
+      "";  
+  
+  }catch{}  
+  
+  
+  try{  
+  
+    const telegram=  
+      await api(API.telegram);  
+  
+  
+    $("telegramBotUsername")  
+      .value=  
+      telegram.bot_username||  
+      "uni_market_shop_bot";  
+  
+  }catch{}  
+  
+  
+  await loadChannels();  
+  
+}  
+  
+  
+async function savePaymentSettings(){  
+  
+  try{  
+  
+    await api(  
+      API.payment,  
+      {  
+        method:"POST",  
+        headers:{  
+          "Content-Type":  
+            "application/json"  
+        },  
+        body:JSON.stringify({  
+  
+          payment_info:  
+            $("paymentInfo")  
+            .value  
+            .trim()  
+  
+        })  
+      }  
+    );  
+  
+  
+    alert(  
+      "✅ Payment Settings ተቀምጧል።"  
+    );  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+async function saveTelegramBotSettings(){  
+  
+  try{  
+  
+    await api(  
+      API.telegram,  
+      {  
+        method:"POST",  
+        headers:{  
+          "Content-Type":  
+            "application/json"  
+        },  
+        body:JSON.stringify({  
+  
+          bot_username:  
+            $("telegramBotUsername")  
+            .value  
+            .trim()  
+  
+        })  
+      }  
+    );  
+  
+  
+    alert(  
+      "✅ Telegram Bot Settings ተቀምጧል።"  
+    );  
+  
+  }catch(error){  
+  
+    alert(  
+      "❌ "+error.message  
+    );  
+  
+  }  
+  
+}  
+  
+  
+/* REFRESH */  
+  
+async function refreshAll(){  
+  
+  await Promise.all([  
+  
+    loadProducts(),  
+  
+    loadOrders(),  
+  
+    loadAdvertisements(),  
+  
+    loadReports(),  
+  
+    loadChannels()  
+  
+  ]);  
+  
+}  
+  
+  
+checkLogin();  
+  
+</script>  </body>  
+</html>
