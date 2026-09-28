@@ -469,6 +469,161 @@ async function sendMessage(
 /* =========================================================
    TELEGRAM BOT POLLING
    FIX:
+   /* =========================================================
+   PRODUCT CATEGORIES
+========================================================= */
+
+const PRODUCT_CATEGORIES = [
+  { id: "clothing",    name: "👕 አልባሳት" },
+  { id: "electronics", name: "📱 ኤሌክትሮኒክስ" },
+  { id: "kids",        name: "🧒 የህፃናት" },
+  { id: "women",       name: "👩 የሴቶች" },
+  { id: "home",        name: "🏠 የቤት እቃዎች" },
+  { id: "other",       name: "🛍️ ሌሎች" }
+];
+
+function productCategoriesKeyboard() {
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: "👕 አልባሳት",
+          callback_data: "category_clothing"
+        },
+        {
+          text: "📱 ኤሌክትሮኒክስ",
+          callback_data: "category_electronics"
+        }
+      ],
+      [
+        {
+          text: "🧒 የህፃናት",
+          callback_data: "category_kids"
+        },
+        {
+          text: "👩 የሴቶች",
+          callback_data: "category_women"
+        }
+      ],
+      [
+        {
+          text: "🏠 የቤት እቃዎች",
+          callback_data: "category_home"
+        },
+        {
+          text: "🛍️ ሌሎች",
+          callback_data: "category_other"
+        }
+      ]
+    ]
+  };
+}
+
+/*
+  Admin HTML ውስጥ ያሉትን category values
+  እና Bot category values እንዲገናኙ ያደርጋል።
+*/
+function categoryAliases(category) {
+  const value = safeString(category).toLowerCase();
+
+  const map = {
+    clothing: ["clothing", "clothes"],
+    clothes: ["clothing", "clothes"],
+
+    electronics: ["electronics"],
+
+    kids: ["kids", "children"],
+    children: ["kids", "children"],
+
+    women: ["women"],
+
+    home: ["home", "furniture"],
+    furniture: ["home", "furniture"],
+
+    other: ["other", "others"],
+    others: ["other", "others"]
+  };
+
+  return map[value] || [value];
+}
+
+async function getBotProducts(category = null) {
+  if (!supabase) {
+    return [];
+  }
+
+  let query = supabase
+    .from("products")
+    .select("*")
+    .order("created_at", {
+      ascending: false
+    });
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(
+      "Bot products error:",
+      error
+    );
+
+    return [];
+  }
+
+  let products = Array.isArray(data)
+    ? data
+    : [];
+
+  products = products.filter(
+    (product) =>
+      numberValue(product.stock, 0) > 0
+  );
+
+  if (!category) {
+    return products;
+  }
+
+  const aliases =
+    categoryAliases(category);
+
+  return products.filter(
+    (product) =>
+      aliases.includes(
+        safeString(product.category).toLowerCase()
+      )
+  );
+}
+
+function productListKeyboard(products) {
+  const rows = [];
+
+  for (const product of products) {
+    rows.push([
+      {
+        text:
+          `🛍️ ${
+            safeString(product.name) || "ምርት"
+          } — ${
+            numberValue(product.sell_price, 0)
+          } ብር`,
+
+        callback_data:
+          `product_${product.id}`
+      }
+    ]);
+  }
+
+  rows.push([
+    {
+      text: "⬅️ ወደ ምድቦች",
+      callback_data: "product_categories"
+    }
+  ]);
+
+  return {
+    inline_keyboard: rows
+  };
+}
    The previous server had Telegram API helpers but no
    getUpdates listener. Therefore /start did nothing.
 
