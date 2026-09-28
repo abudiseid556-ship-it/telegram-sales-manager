@@ -2120,6 +2120,7 @@ app.post(
   }
 );
 
+
 app.post(
   "/api/advertisements/:id/publish",
   async (req, res) => {
@@ -2130,35 +2131,115 @@ app.post(
         );
       }
 
-      let ad = null;
+      /* =========================
+         LOAD ADVERTISEMENT
+      ========================= */
 
-      try {
-        const {
-          data
-        } =
-          await supabase
-            .from(
-              "advertisements"
-            )
-            .select("*")
-            .eq(
-              "id",
-              req.params.id
-            )
-            .maybeSingle();
+      const {
+        data: ad,
+        error: adError
+      } = await supabase
+        .from("advertisements")
+        .select("*")
+        .eq("id", req.params.id)
+        .maybeSingle();
 
-        ad = data;
-      } catch {}
+      if (adError) {
+        throw adError;
+      }
 
-      const settings =
-        await getTelegramSettings();
-
-      const chatId =
-        firstDefined(
-          ad?.telegram_chat_id,
-          settings.admin_chat_id,
-          ADMIN_CHAT_ID
+      if (!ad) {
+        throw new Error(
+          "Advertisement not found"
         );
+      }
+
+      /* =========================
+         RESOLVE TELEGRAM CHAT ID
+      ========================= */
+
+      let chatId = safeString(
+        firstDefined(
+          ad.telegram_chat_id,
+          ad.telegramChatId,
+          ad.target_chat_id,
+          ad.targetChatId
+        )
+      );
+
+      /*
+        IMPORTANT:
+
+        If telegram_chat_id contains
+        a Supabase UUID instead of the
+        real Telegram Chat ID, find the
+        channel row and use its chat_id.
+      */
+
+      if (
+        chatId &&
+        !chatId.startsWith("-100") &&
+        !/^-?\d+$/.test(chatId)
+      ) {
+        const {
+          data: channel,
+          error: channelError
+        } = await supabase
+          .from("telegram_channels")
+          .select(
+            "id, name, chat_id, username, type, is_active"
+          )
+          .eq(
+            "id",
+            chatId
+          )
+          .maybeSingle();
+
+        if (channelError) {
+          throw channelError;
+        }
+
+        if (!channel) {
+          throw new Error(
+            "የተመረጠው Telegram Channel አልተገኘም።"
+          );
+        }
+
+        if (
+          channel.is_active === false
+        ) {
+          throw new Error(
+            `Telegram Channel "${channel.name}" አይሰራም።`
+          );
+        }
+
+        chatId =
+          safeString(
+            channel.chat_id
+          );
+      }
+
+      /*
+        Fallback only if the advertisement
+        does not contain a target.
+      */
+
+      if (!chatId) {
+        const settings =
+          await getTelegramSettings();
+
+        chatId =
+          safeString(
+            firstDefined(
+              settings.telegram_chat_id,
+              settings.ad_chat_id,
+              settings.admin_chat_id,
+              settings.channel_id,
+              settings.group_id,
+              ADMIN_CHAT_ID
+            )
+          );
+      }
 
       if (!chatId) {
         throw new Error(
@@ -2166,16 +2247,38 @@ app.post(
         );
       }
 
+      /* =========================
+         VERIFY REAL TELEGRAM CHAT
+      ========================= */
+
+      const telegramChat =
+        await verifyTelegramChat(
+          chatId
+        );
+
+      /*
+        Use the REAL ID returned by Telegram.
+      */
+
+      chatId =
+        String(
+          telegramChat.id
+        );
+
+      /* =========================
+         MESSAGE
+      ========================= */
+
       const caption =
         `🔥 ${
-          ad?.title ||
+          ad.title ||
           "ማስታወቂያ"
         }\n\n${
-          ad?.text || ""
+          ad.text || ""
         }`;
 
       const buttonText =
-        ad?.button_text ||
+        ad.button_text ||
         "Order Now";
 
       const buttonUrl =
@@ -2195,79 +2298,107 @@ app.post(
         ]
       };
 
-      if (ad?.photo_url) {
-        await telegram(
-          "sendPhoto",
-          {
-            chat_id:
-              chatId,
+      /* =========================
+         SEND PHOTO / TEXT
+      ========================= */
 
-            photo:
-              ad.photo_url,
+      let telegramResult;
 
-            caption,
+      if (ad.photo_url) {
+        telegramResult =
+          await telegram(
+            "sendPhoto",
+            {
+              chat_id:
+                chatId,
 
-            parse_mode:
-              "MARKDOWN",
+              photo:
+                ad.photo_url,
 
-            reply_markup:
-              replyMarkup
-          }
-        );
+              caption,
+
+              reply_markup:
+                replyMarkup
+            }
+          );
       } else {
-        await sendMessage(
-          chatId,
-          caption,
-          {
-            parse_mode:
-              "MARKDOWN",
+        telegramResult =
+          await sendMessage(
+            chatId,
+            caption,
+            {
+              reply_markup:
+                replyMarkup
+            }
+          );
+      }
 
-            reply_markup:
-              replyMarkup
-          }
+      /* =========================
+         UPDATE STATUS
+      ========================= */
+
+      try {
+        await supabase
+          .from("advertisements")
+          .update({
+            status:
+              "PUBLISHED"
+          })
+          .eq(
+            "id",
+            req.params.id
+          );
+      } catch (statusError) {
+        console.error(
+          "Advertisement status update error:",
+          statusError
         );
       }
 
       res.json({
-        ok: true
+        ok: true,
+
+        message:
+          "Advertisement published successfully",
+
+        chat: {
+          id:
+            telegramChat.id,
+
+          type:
+            telegramChat.type ||
+            null,
+
+          title:
+            telegramChat.title ||
+            null,
+
+          username:
+            telegramChat.username
+              ? `@${telegramChat.username}`
+              : null
+        },
+
+        telegram_message_id:
+          telegramResult?.message_id ||
+          null
       });
+
     } catch (error) {
+      console.error(
+        "ADVERTISEMENT PUBLISH ERROR:",
+        error
+      );
+
       res.status(500).json({
         ok: false,
+
         error:
           error.message
       });
     }
   }
 );
-
-app.delete(
-  "/api/advertisements/:id",
-  async (req, res) => {
-    try {
-      if (supabase) {
-        await supabase
-          .from(
-            "advertisements"
-          )
-          .delete()
-          .eq(
-            "id",
-            req.params.id
-          );
-      }
-
-      res.json({
-        ok: true
-      });
-    } catch {
-      res.json({
-        ok: true
-      });
-    }
-  }
-);
-
 /* =========================================================
    EMPLOYEES
 ========================================================= */
