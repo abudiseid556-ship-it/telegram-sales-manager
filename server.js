@@ -60,6 +60,25 @@ const SUPABASE_SERVICE_ROLE_KEY =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
       ""
   ).trim();
+function getSupabaseKeyRole(key) {
+  try {
+    const parts = String(key).split('.');
+    if (parts.length !== 3) return 'NOT_JWT';
+
+    const payload = JSON.parse(
+      Buffer.from(parts[1], 'base64url').toString('utf8')
+    );
+
+    return payload.role || 'NO_ROLE';
+  } catch {
+    return 'INVALID_KEY';
+  }
+}
+
+console.log(
+  '🔐 Supabase key role:',
+  getSupabaseKeyRole(SUPABASE_SERVICE_ROLE_KEY)
+);
 
 const BOT_TOKEN = String(
   process.env.TELEGRAM_BOT_TOKEN || ""
