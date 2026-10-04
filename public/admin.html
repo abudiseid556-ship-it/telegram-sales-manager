@@ -1,1452 +1,3905 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="am">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Sales Manager — Master Admin | UNI MARKET</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #059669;
-            --danger: #dc2626;
-            --warning: #d97706;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-        }
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background: var(--bg-color);
-            color: var(--text-main);
-            font-family: Arial, "Noto Sans Ethiopic", sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+<title>Telegram Sales Manager — Master Admin</title>
 
-        button, input, textarea, select { font: inherit; }
-        button { cursor: pointer; border: none; background: none; }
+<style>
+*{box-sizing:border-box}
 
-        .app {
-            max-width: 820px;
-            margin: 0 auto;
-            min-height: 100vh;
-            padding-bottom: 90px;
-        }
+html,body{
+  margin:0;
+  padding:0;
+  background:#f4f7fb;
+  color:#172033;
+  font-family:Arial,"Noto Sans Ethiopic",sans-serif;
+}
 
-        /* Hero Header */
-        .hero {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-            color: #fff;
-            padding: 24px 20px 20px;
-            border-radius: 0 0 32px 32px;
-            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
-        }
+button,input,select,textarea{
+  font:inherit;
+}
 
-        .row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
+button{
+  cursor:pointer;
+}
 
-        .hero h1 { font-size: 22px; font-weight: 700; }
-        .hero p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+.hidden{
+  display:none!important;
+}
 
-        .refresh, .logout {
-            border-radius: var(--radius-sm);
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-        .refresh:hover, .logout:hover { background: rgba(255, 255, 255, 0.25); }
+/* =========================
+   LOGIN
+========================= */
 
-        /* Stats Grid */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 20px;
-        }
+#loginPage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#dfeaff 0,#f4f7fb 38%,#eef3fa 100%);
+}
 
-        .stat {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            backdrop-filter: blur(8px);
-        }
+.login-box{
+  width:min(430px,100%);
+  background:#fff;
+  border:1px solid #e3eaf3;
+  border-radius:28px;
+  padding:28px 22px;
+  box-shadow:0 20px 60px rgba(27,49,80,.12);
+}
 
-        .stat b { display: block; font-size: 20px; font-weight: 700; }
-        .stat span { font-size: 12px; opacity: 0.85; }
+.login-logo{
+  width:72px;
+  height:72px;
+  margin:0 auto 16px;
+  border-radius:21px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#1769ff,#6758f5);
+  color:#fff;
+  font-size:32px;
+  box-shadow:0 12px 28px rgba(23,105,255,.25);
+}
 
-        /* Content Layout */
-        .content { padding: 18px; }
+.login-box h1{
+  text-align:center;
+  margin:0;
+  font-size:23px;
+}
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
-        }
+.login-box p{
+  text-align:center;
+  color:#7b8798;
+  font-size:12px;
+  margin:7px 0 22px;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
+.login-box label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin:11px 0 6px;
+}
 
-        .quick {
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            text-align: left;
-            min-height: 110px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .quick:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .quick b { display: block; margin-top: 8px; font-size: 15px; }
-        .quick small { color: var(--text-muted); font-size: 12px; }
+.login-box input{
+  width:100%;
+  padding:13px;
+  border:1px solid #dce4ee;
+  border-radius:13px;
+  outline:none;
+  background:#fff;
+}
 
-        /* Buttons & Badges */
-        .btn {
-            border-radius: var(--radius-sm);
-            padding: 10px 14px;
-            font-weight: 600;
-            font-size: 13px;
-            background: #eff6ff;
-            color: var(--primary);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: filter 0.2s;
-        }
-        .btn:hover { filter: brightness(0.95); }
+.login-box input:focus{
+  border-color:#1769ff;
+  box-shadow:0 0 0 3px #1769ff12;
+}
 
-        .primary { background: var(--primary); color: #fff; }
-        .green { background: #ecfdf5; color: var(--success); }
-        .red { background: #fef2f2; color: var(--danger); }
-        .orange { background: #fffbeb; color: var(--warning); }
-        .dark { background: #0f172a; color: #fff; }
-        .full { width: 100%; }
+.login-button{
+  width:100%;
+  margin-top:18px;
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  background:linear-gradient(135deg,#1769ff,#6758f5);
+  color:#fff;
+  font-weight:800;
+}
 
-        /* Form Controls */
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            margin: 12px 0 6px;
-            color: var(--text-main);
-        }
+.login-message{
+  margin-top:12px;
+  padding:10px;
+  border-radius:11px;
+  font-size:12px;
+  display:none;
+}
 
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            outline: none;
-            background: #fff;
-            color: var(--text-main);
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
+.login-message.show{
+  display:block;
+}
 
-        textarea { min-height: 100px; resize: vertical; }
-        input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.login-message.error{
+  background:#fff0f0;
+  color:#c83232;
+}
 
-        .section-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 10px 0 14px;
-        }
-        .section-title h2 { font-size: 18px; font-weight: 700; }
+.login-message.success{
+  background:#e9fbf2;
+  color:#087b51;
+}
 
-        .product, .order, .ad, .employee, .channel {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-        }
 
-        .pic {
-            width: 70px;
-            height: 70px;
-            border-radius: var(--radius-sm);
-            background: #f1f5f9;
-            display: grid;
-            place-items: center;
-            font-size: 24px;
-            overflow: hidden;
-            flex: none;
-            border: 1px solid var(--border-color);
-        }
-        .pic img { width: 100%; height: 100%; object-fit: cover; }
+/* =========================
+   APP
+========================= */
 
-        .grow { flex: 1; min-width: 0; }
-        .muted { color: var(--text-muted); font-size: 12px; }
-        .price { color: var(--primary); font-weight: 700; margin-top: 4px; font-size: 14px; }
-        .profit { color: var(--success); font-size: 12px; font-weight: 600; }
+#appShell{
+  display:none;
+}
 
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            background: #fef3c7;
-            color: var(--warning);
-        }
-        .badge.green { background: #ecfdf5; color: var(--success); }
-        .badge.red { background: #fef2f2; color: var(--danger); }
-        .badge.blue { background: #eff6ff; color: var(--primary); }
+.app{
+  width:min(900px,100%);
+  margin:auto;
+  min-height:100vh;
+  padding-bottom:90px;
+}
 
-        .empty {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 30px;
-            font-size: 13px;
-            background: #fff;
-            border-radius: var(--radius-md);
-            border: 1px dashed var(--border-color);
-        }
+.hero{
+  background:linear-gradient(135deg,#1769ff,#6758f5);
+  color:#fff;
+  padding:20px 16px 18px;
+  border-radius:0 0 28px 28px;
+}
 
-        /* Bottom Navigation Bar */
-        .bottom {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: min(820px, 100%);
-            height: 75px;
-            background: #fff;
-            border-top: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            z-index: 20;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-        }
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
 
-        .nav {
-            border: none;
-            background: none;
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 500;
-            padding: 6px 2px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .nav span { font-size: 20px; margin-bottom: 2px; }
-        .nav.active { color: var(--primary); font-weight: 700; }
+.hero h1{
+  margin:0;
+  font-size:22px;
+}
 
-        /* Modals / Sheets */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 50;
-            display: none;
-            align-items: flex-end;
-        }
-        .modal.show { display: flex; }
+.hero p{
+  margin:5px 0 0;
+  font-size:12px;
+  opacity:.86;
+}
 
-        .sheet {
-            background: #fff;
-            width: min(820px, 100%);
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: 24px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
-            animation: slideUp 0.3s ease;
-        }
+.user-chip{
+  background:#ffffff20;
+  border:1px solid #ffffff35;
+  border-radius:14px;
+  padding:8px 10px;
+  font-size:10px;
+  text-align:right;
+}
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
+.logout-btn{
+  margin-top:7px;
+  border:0;
+  border-radius:9px;
+  padding:5px 8px;
+  background:#ffffff22;
+  color:#fff;
+  font-size:10px;
+}
 
-        .close {
-            float: right;
-            border: none;
-            background: #f1f5f9;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:16px;
+}
 
-        .actions { display: flex; gap: 8px; margin-top: 14px; }
-        .actions > * { flex: 1; }
+.stat{
+  background:#ffffff18;
+  border:1px solid #ffffff35;
+  border-radius:16px;
+  padding:12px;
+}
 
-        hr { border: none; border-top: 1px solid var(--border-color); margin: 14px 0; }
+.stat b{
+  display:block;
+  font-size:20px;
+}
 
-        .notice { background: #eff6ff; color: var(--primary); padding: 12px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; }
-        .success { background: #ecfdf5; color: var(--success); padding: 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; }
-        .error { background: #fef2f2; color: var(--danger); padding: 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; }
+.stat span{
+  font-size:11px;
+  opacity:.82;
+}
 
-        /* Login Screen */
-        .login-page {
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-        }
+.content{
+  padding:14px;
+}
 
-        .login-box {
-            width: min(400px, 100%);
-            background: #fff;
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
+.card{
+  background:#fff;
+  border:1px solid #e5eaf2;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:11px;
+  box-shadow:0 5px 18px #1b31500a;
+}
 
-        .login-logo {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: #eff6ff;
-            display: grid;
-            place-items: center;
-            font-size: 32px;
-            margin: 0 auto 16px;
-        }
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:5px 0 12px;
+}
 
-        .login-box h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
-        .login-box p { text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
-        .login-message { margin-top: 12px; font-size: 13px; color: var(--danger); text-align: center; font-weight: 600; }
+.section-title h2{
+  margin:0;
+  font-size:17px;
+}
 
-        #appShell { display: none; }
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
-        .ad-preview { background: #f8fafc; border-radius: var(--radius-sm); padding: 14px; margin-top: 12px; border: 1px solid var(--border-color); }
-        .ad-title { font-weight: 700; font-size: 15px; }
-        .ad-text { font-size: 13px; margin-top: 6px; white-space: pre-wrap; color: #334155; }
-        .ad-photo { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); margin-top: 10px; }
+.quick{
+  border:1px solid #e4eaf3;
+  background:#fff;
+  border-radius:17px;
+  padding:15px;
+  text-align:left;
+  min-height:105px;
+  box-shadow:0 5px 18px #1b31500a;
+}
 
-        .channel-card { border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; background: #fff; box-shadow: var(--shadow); }
-        .channel-name { font-weight: 700; font-size: 14px; }
-        .channel-id { font-size: 12px; color: var(--text-muted); margin-top: 2px; word-break: break-all; }
-        .channel-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .channel-actions button { flex: 1; }
+.quick span{
+  font-size:24px;
+}
 
-        /* Image Preview Box inside Form */
-        .image-preview-container {
-            width: 100%;
-            height: 120px;
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-sm);
-            display: grid;
-            place-items: center;
-            margin-top: 6px;
-            overflow: hidden;
-            background: #f8fafc;
-        }
-        .image-preview-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+.quick b{
+  display:block;
+  margin-top:9px;
+}
 
-        @media (min-width: 700px) {
-            .content { padding: 24px; }
-            .grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+.quick small{
+  color:#8490a0;
+}
+
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:10px 13px;
+  font-weight:700;
+  background:#edf3ff;
+  color:#1664e8;
+}
+
+.btn.primary{
+  background:#1769ff;
+  color:#fff;
+}
+
+.btn.green{
+  background:#e8fbf2;
+  color:#087b51;
+}
+
+.btn.red{
+  background:#fff0f0;
+  color:#d63737;
+}
+
+.btn.orange{
+  background:#fff5df;
+  color:#9a6900;
+}
+
+.btn.gray{
+  background:#eef2f6;
+  color:#5d6878;
+}
+
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+label{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  margin:10px 0 5px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #dce4ee;
+  border-radius:11px;
+  outline:none;
+  background:#fff;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#1769ff;
+  box-shadow:0 0 0 3px #1769ff10;
+}
+
+.muted{
+  color:#8490a0;
+  font-size:11px;
+}
+
+.price{
+  color:#1769ff;
+  font-weight:800;
+  margin-top:3px;
+}
+
+.profit{
+  color:#078453;
+  font-size:11px;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:800;
+  background:#fff4df;
+  color:#9a6900;
+}
+
+.badge.green{
+  background:#e8fbf2;
+  color:#087b51;
+}
+
+.badge.red{
+  background:#fff0f0;
+  color:#d63737;
+}
+
+.badge.blue{
+  background:#edf3ff;
+  color:#1769ff;
+}
+
+.empty{
+  text-align:center;
+  color:#8a95a4;
+  padding:25px;
+  font-size:12px;
+}
+
+.product,
+.order,
+.employee,
+.channel,
+.ad{
+  display:flex;
+  gap:11px;
+  align-items:center;
+}
+
+.pic{
+  width:62px;
+  height:62px;
+  border-radius:15px;
+  background:#eef3fa;
+  display:grid;
+  place-items:center;
+  font-size:25px;
+  overflow:hidden;
+  flex:none;
+}
+
+.pic img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.grow{
+  flex:1;
+  min-width:0;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #edf0f5;
+  margin:13px 0;
+}
+
+
+/* =========================
+   PHOTO UPLOAD
+========================= */
+
+.photo-upload{
+  border:2px dashed #1769ff;
+  background:#f7faff;
+  border-radius:17px;
+  padding:12px;
+  margin-top:5px;
+}
+
+.photo-upload input[type=file]{
+  border:0;
+  padding:8px 0;
+  background:transparent;
+  box-shadow:none;
+}
+
+.photo-preview{
+  margin-top:10px;
+  width:100%;
+  min-height:170px;
+  border-radius:15px;
+  background:#edf2f8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  color:#8490a0;
+  text-align:center;
+}
+
+.photo-preview img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  display:block;
+}
+
+.photo-preview-empty{
+  padding:25px;
+}
+
+.upload-status{
+  margin-top:8px;
+  font-size:11px;
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(900px,100%);
+  height:70px;
+  background:#fff;
+  border-top:1px solid #e5eaf2;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  z-index:20;
+}
+
+.nav{
+  border:0;
+  background:none;
+  color:#7d8999;
+  font-size:10px;
+}
+
+.nav span{
+  display:block;
+  font-size:20px;
+  margin-bottom:2px;
+}
+
+.nav.active{
+  color:#1769ff;
+  font-weight:800;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#0008;
+  z-index:50;
+  display:none;
+  align-items:flex-end;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.sheet{
+  background:#fff;
+  width:min(900px,100%);
+  max-height:94vh;
+  overflow:auto;
+  border-radius:25px 25px 0 0;
+  padding:18px;
+}
+
+.close{
+  float:right;
+  border:0;
+  background:#eef2f6;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  font-size:20px;
+}
+
+.modal-title{
+  margin:2px 45px 5px 0;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:13px;
+}
+
+.actions .btn{
+  flex:1;
+}
+
+.message{
+  font-size:12px;
+  padding:10px;
+  border-radius:11px;
+  margin-top:10px;
+  display:none;
+}
+
+.message.show{
+  display:block;
+}
+
+.message.ok{
+  background:#e9fbf2;
+  color:#087b51;
+}
+
+.message.err{
+  background:#fff0f0;
+  color:#c83232;
+}
+
+
+/* =========================
+   TABLE / SETTINGS
+========================= */
+
+.info-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+}
+
+.permission-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.permission{
+  background:#f5f8fc;
+  border:1px solid #e1e7ef;
+  border-radius:10px;
+  padding:9px;
+  font-size:11px;
+}
+
+.permission input{
+  width:auto;
+  margin-right:5px;
+}
+
+@media(max-width:480px){
+  .grid{
+    gap:8px;
+  }
+
+  .quick{
+    padding:13px;
+  }
+
+  .hero h1{
+    font-size:19px;
+  }
+}
+</style>
 </head>
+
 <body>
 
-    <!-- LOGIN SCREEN -->
-    <div id="loginPage" class="login-page">
-        <div class="login-box">
-            <div class="login-logo">🛍️</div>
-            <h1>UNI MARKET</h1>
-            <p>Telegram Sales Manager • Master Admin</p>
-            
-            <label>Username</label>
-            <input type="text" id="loginUsername" placeholder="ዩዘርናሜ ያስገቡ">
-            
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="ፓስዎርድ ያስገቡ">
-            
-            <button class="btn primary full" style="margin-top: 20px; padding: 12px;" onclick="login()">🔐 ግባ (Login)</button>
-            <div id="loginMessage" class="login-message"></div>
-        </div>
+<!-- =========================================================
+     LOGIN PAGE
+========================================================= -->
+
+<div id="loginPage">
+
+  <div class="login-box">
+
+    <div class="login-logo">🛍️</div>
+
+    <h1>UNI MARKET</h1>
+
+    <p>Telegram Sales Manager • Master Admin</p>
+
+    <label>Username</label>
+    <input
+      type="text"
+      id="loginUsername"
+      autocomplete="username"
+      placeholder="ዩዘርናሜ ያስገቡ"
+    >
+
+    <label>Password</label>
+    <input
+      type="password"
+      id="loginPassword"
+      autocomplete="current-password"
+      placeholder="ፓስዎርድ ያስገቡ"
+      onkeydown="if(event.key==='Enter') login()"
+    >
+
+    <button
+      class="login-button"
+      id="loginButton"
+      onclick="login()"
+    >
+      🔐 ግባ
+    </button>
+
+    <div id="loginMessage" class="login-message"></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
+
+<div id="appShell">
+
+<div class="app">
+
+<header class="hero">
+
+  <div class="row">
+
+    <div>
+      <h1>📊 Telegram Sales Manager</h1>
+      <p>Master Admin • Products • Orders • Sales</p>
     </div>
 
-    <!-- MAIN APP SHELL -->
-    <div id="appShell" class="app">
-        <!-- HEADER -->
-        <div class="hero">
-            <div class="row">
-                <div>
-                    <h1 id="userLabel">Master Admin</h1>
-                    <p>UNI MARKET • Telegram Sales Manager</p>
-                </div>
-                <div style="display:flex; gap:8px;">
-                    <button class="refresh" onclick="refreshAll()" title="Refresh">↻ ራፍሬሽ</button>
-                    <button class="logout" onclick="logout()" title="Logout">↪ ውጣ</button>
-                </div>
-            </div>
-            
-            <div class="stats">
-                <div class="stat">
-                    <b id="productCount">0</b>
-                    <span>📦 ምርቶች</span>
-                </div>
-                <div class="stat">
-                    <b id="pendingCount">0</b>
-                    <span>🟠 Pending Orders</span>
-                </div>
-                <div class="stat">
-                    <b id="salesTotal">0 ETB</b>
-                    <span>💰 ጠቅላላ ሽያጭ</span>
-                </div>
-                <div class="stat">
-                    <b id="stockTotal">0</b>
-                    <span>📦 Stock ሐብት</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTENT AREA -->
-        <div class="content">
-
-            <!-- HOME SECTION -->
-            <div id="home" class="section">
-                <div class="grid" style="margin-bottom: 16px;">
-                    <button class="quick" onclick="showSection('products'); openProductModal();">
-                        <span style="font-size: 24px;">📦</span>
-                        <b>አዲስ ምርት መዝግብ</b>
-                        <small>አዲስ እቃ ወደ ሱቁ ያክሉ</small>
-                    </button>
-                    <button class="quick" onclick="showSection('orders')">
-                        <span style="font-size: 24px;">🛒</span>
-                        <b>Orders ማስተዳደር</b>
-                        <small>ትዕዛዞችን አረጋግጥ/ውድቅ አድርግ</small>
-                    </button>
-                    <button class="quick" onclick="showSection('ads'); openAdModal();">
-                        <span style="font-size: 24px;">📢</span>
-                        <b>ማስታወቂያ ጻፍ</b>
-                        <small>ወደ ቴሌግራም ቻናሎች ላክ</small>
-                    </button>
-                    <button class="quick" onclick="showSection('reports')">
-                        <span style="font-size: 24px;">📈</span>
-                        <b>የሽያጭ ሪፖርት</b>
-                        <small>ትርፍ፣ ሽያጭ እና ስቶክ ተመልከት</small>
-                    </button>
-                </div>
-
-                <div class="section-title">
-                    <h2>🛒 Pending Orders</h2>
-                    <button class="btn" onclick="showSection('orders')">ሁሉንም 👁️</button>
-                </div>
-                <div id="homeOrders"></div>
-
-                <div class="section-title" style="margin-top: 24px;">
-                    <h2>📦 የቅርብ ጊዜ ምርቶች</h2>
-                    <button class="btn" onclick="showSection('products')">ሁሉንም 👁️</button>
-                </div>
-                <div id="homeProducts"></div>
-            </div>
-
-            <!-- PRODUCTS SECTION -->
-            <div id="products" class="section" style="display:none;">
-                <div class="section-title">
-                    <h2>📦 የምርት ዝርዝር</h2>
-                    <button class="btn primary" onclick="openProductModal()">＋ አዲስ ምርት</button>
-                </div>
-                <div id="productsList"></div>
-            </div>
-
-            <!-- ORDERS SECTION -->
-            <div id="orders" class="section" style="display:none;">
-                <div class="section-title">
-                    <h2>🛒 የደንበኛ ትዕዛዞች</h2>
-                    <button class="btn" onclick="loadOrders()">↻ ሪፍሬሽ</button>
-                </div>
-                <div class="notice">🧾 የደረሰኝ ማረጋገጫ እና Order Confirmation በአድሚን በኩል ይደረጋል።</div>
-                <div id="ordersList"></div>
-            </div>
-
-            <!-- ADS SECTION -->
-            <div id="ads" class="section" style="display:none;">
-                <div class="section-title">
-                    <h2>📢 የቴሌግራም ማስታወቂያዎች</h2>
-                    <button class="btn primary" onclick="openAdModal()">＋ ማስታወቂያ ጻፍ</button>
-                </div>
-                <div class="notice">📢 ከታች የሚመረጡትን Channel ይምረጡ፤ ከዚያ Publish ሲደረግ ማስታወቂያው ወደ የተመረጡት Channels በቦቱ ይላካል።</div>
-                <div id="adsList"></div>
-            </div>
-
-            <!-- EMPLOYEES SECTION -->
-            <div id="employees" class="section" style="display:none;">
-                <div class="section-title">
-                    <h2>👥 የሰራተኞች አስተዳደር</h2>
-                    <button class="btn primary" onclick="openEmployeeModal()">＋ ሰራተኛ ጨምር</button>
-                </div>
-                <div id="employeesList"></div>
-            </div>
-
-            <!-- REPORTS SECTION -->
-            <div id="reports" class="section" style="display:none;">
-                <div class="section-title">
-                    <h2>📈 የንግድ ሪፖርት ማጠቃለያ</h2>
-                    <button class="btn" onclick="loadReports()">↻ ሪፍሬሽ</button>
-                </div>
-                <div class="grid">
-                    <div class="card"><div class="muted">💰 ጠቅላላ ሽያጭ</div><div class="price" id="reportSales" style="font-size:20px; margin-top:8px;">0 ETB</div></div>
-                    <div class="card"><div class="muted">📈 ጠቅላላ ትርፍ</div><div class="profit" id="reportProfit" style="font-size:20px; margin-top:8px;">0 ETB</div></div>
-                    <div class="card"><div class="muted">🛒 የተጠናቀቁ ትዕዛዞች</div><b id="reportOrders" style="font-size:20px; margin-top:8px; display:block;">0</b></div>
-                    <div class="card"><div class="muted">📦 የቀረው Stock ብዛት</div><b id="reportStock" style="font-size:20px; margin-top:8px; display:block; color:var(--primary);">0</b></div>
-                </div>
-            </div>
-
-            <!-- SETTINGS SECTION -->
-            <div id="settings" class="section" style="display:none;">
-                <div class="section-title"><h2>⚙️ የስርዓት ማስተካከያዎች</h2></div>
-                
-                <div class="card">
-                    <h3>💳 የክፍያ መረጃ (Payment Settings)</h3>
-                    <label>የባንክ/ቴሌብር መረጃ</label>
-                    <textarea id="paymentInfo" placeholder="ለምሳሌ: CBE 1000... (በስም...)"></textarea>
-                    <button class="btn primary" style="margin-top:10px;" onclick="savePaymentSettings()">💾 አስቀምጥ</button>
-                </div>
-
-                <div class="card">
-                    <h3>📢 የቴሌግራም ቻናሎች</h3>
-                    <div class="muted" style="margin-bottom:10px;">ብዙ ቻናሎችን ማገናኘት እና ማስተዳደር ይችላሉ።</div>
-                    <button class="btn primary" onclick="openChannelModal()">＋ ቻናል ጨምር</button>
-                    <div class="notice" style="margin-top:12px;">💡 ቻናሉ ላይ ቦቱን (Bot) አድሚን አድርገው 'Post Messages' ፍቃድ መስጠትዎን አይርሱ።</div>
-                    <div id="channelsEmpty" class="empty" style="margin-top:10px;">እስካሁን Telegram Channel አልተጨመረም።</div>
-                    <div id="channelsList" style="margin-top:10px;"></div>
-                </div>
-
-                <div class="card">
-                    <h3>🤖 የቴሌግራም ቦት (Telegram Bot)</h3>
-                    <label>Bot Username</label>
-                    <input type="text" id="telegramBotUsername" placeholder="@shop_bot">
-                    <button class="btn primary" style="margin-top:10px;" onclick="saveTelegramBotSettings()">💾 ቦት አስተካክል</button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- BOTTOM NAVIGATION -->
-        <div class="bottom">
-            <button class="nav active" data-section="home" onclick="showSection('home')"><span>⌂</span>ዋና</button>
-            <button class="nav" data-section="products" onclick="showSection('products')"><span>📦</span>ምርቶች</button>
-            <button class="nav" data-section="orders" onclick="showSection('orders')"><span>🛒</span>Orders</button>
-            <button class="nav" data-section="ads" onclick="showSection('ads')"><span>📢</span>ማስታወቂያ</button>
-            <button class="nav" data-section="reports" onclick="showSection('reports')"><span>📊</span>ሪፖርት</button>
-            <button class="nav" data-section="settings" onclick="showSection('settings')"><span>⚙️</span>ሴቲንግ</button>
-        </div>
+    <div class="user-chip">
+      <div id="userLabel">Master Admin</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
-    <!-- MODALS -->
-    <!-- Product Modal -->
-    <div id="productModal" class="modal">
-        <div class="sheet">
-            <button class="close" onclick="closeModal('productModal')">✕</button>
-            <h2>📦 አዲስ ምርት መዝግብ</h2>
-            <form id="productForm">
-                <label>የምርት ስም</label>
-                <input type="text" id="pName" required placeholder="የምርቱ ስም">
-                
-                <label>Category (ምድብ)</label>
-                <select id="pCategory">
-                    <option value="clothes">👕 አልባሳት</option>
-                    <option value="electronics">📱 ኤሌክትሮኒክስ</option>
-                    <option value="children">🧒 የህፃናት</option>
-                    <option value="women">👩 የሴቶች</option>
-                    <option value="furniture">🛋️ የቤት እቃዎች</option>
-                    <option value="others">📦 ሌሎች</option>
-                </select>
+  </div>
 
-                <div class="grid">
-                    <div>
-                        <label>የግዢ ዋጋ (ETB)</label>
-                        <input type="number" id="pBuy" required placeholder="0">
-                    </div>
-                    <div>
-                        <label>የሽያጭ ዋጋ (ETB)</label>
-                        <input type="number" id="pSell" required placeholder="0">
-                    </div>
-                </div>
+  <div class="stats">
 
-                <label>Stock (ብዛት)</label>
-                <input type="number" id="pStock" required placeholder="10">
+    <div class="stat">
+      <b id="productCount">0</b>
+      <span>📦 ምርቶች</span>
+    </div>
 
-                <label>Product Photo URL</label>
-                <input type="url" id="pPhoto" placeholder="https://image-link.com/photo.jpg" oninput="previewProductImage(this.value)">
-                
-                <div class="image-preview-container">
-                    <span id="previewPlaceholder" style="color:var(--text-muted); font-size:12px;">የፎቶ ፕሪቪው እዚህ ይታያል</span>
-                    <img id="imagePreviewTag" style="display:none;" alt="Preview">
-                </div>
+    <div class="stat">
+      <b id="pendingCount">0</b>
+      <span>🟠 Pending Orders</span>
+    </div>
 
-                <label>Description (መግለጫ)</label>
-                <textarea id="pDescription" placeholder="ስለ ምርቱ ዝርዝር መረጃ..."></textarea>
+    <div class="stat">
+      <b id="salesTotal">0 ETB</b>
+      <span>💰 ሽያጭ</span>
+    </div>
 
-                <div id="productMessage" style="margin-top:10px;"></div>
-                <button type="submit" id="saveProductBtn" class="btn primary full" style="margin-top:15px; padding:12px;">💾 ምርት አስቀምጥ</button>
-            </form>
+    <div class="stat">
+      <b id="stockTotal">0</b>
+      <span>📦 Stock</span>
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="content">
+
+<!-- =========================================================
+     HOME
+========================================================= -->
+
+<section id="home">
+
+  <div class="grid">
+
+    <button
+      class="quick"
+      onclick="openModal('productModal')"
+    >
+      <span>📦</span>
+      <b>አዲስ ምርት</b>
+      <small>Photo • Price • Stock</small>
+    </button>
+
+    <button
+      class="quick"
+      onclick="showSection('orders')"
+    >
+      <span>🛒</span>
+      <b>Orders</b>
+      <small>Pending • Confirm • Reject</small>
+    </button>
+
+    <button
+      class="quick"
+      onclick="showSection('ads')"
+    >
+      <span>📢</span>
+      <b>Advertising</b>
+      <small>Telegram Ads</small>
+    </button>
+
+    <button
+      class="quick"
+      onclick="showSection('employees')"
+    >
+      <span>👥</span>
+      <b>Employees</b>
+      <small>Permissions</small>
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+      <h2>📦 የቅርብ ምርቶች</h2>
+
+      <button
+        class="btn"
+        onclick="showSection('products')"
+      >
+        ሁሉንም
+      </button>
+    </div>
+
+    <div id="homeProducts">
+      <div class="empty">እየጫነ...</div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+      <h2>🛒 Pending Orders</h2>
+
+      <button
+        class="btn"
+        onclick="showSection('orders')"
+      >
+        Orders
+      </button>
+    </div>
+
+    <div id="homeOrders">
+      <div class="empty">እየጫነ...</div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     PRODUCTS
+========================================================= -->
+
+<section id="products" style="display:none">
+
+  <div class="section-title">
+
+    <h2>📦 Products</h2>
+
+    <button
+      class="btn primary"
+      onclick="openNewProduct()"
+    >
+      ＋ አዲስ
+    </button>
+
+  </div>
+
+  <div id="productsList"></div>
+
+</section>
+
+
+<!-- =========================================================
+     ORDERS
+========================================================= -->
+
+<section id="orders" style="display:none">
+
+  <div class="section-title">
+
+    <h2>🛒 Orders</h2>
+
+    <button
+      class="btn"
+      onclick="loadOrders()"
+    >
+      ↻
+    </button>
+
+  </div>
+
+  <div class="card">
+    🧾 የክፍያ ደረሰኝ ከተላከ በኋላ
+    <b>Admin ያረጋግጣል።</b>
+  </div>
+
+  <div id="ordersList"></div>
+
+</section>
+
+
+<!-- =========================================================
+     ADS
+========================================================= -->
+
+<section id="ads" style="display:none">
+
+  <div class="section-title">
+
+    <h2>📢 Advertising</h2>
+
+    <button
+      class="btn primary"
+      onclick="openModal('adModal')"
+    >
+      ＋ አዲስ
+    </button>
+
+  </div>
+
+  <div id="adsList"></div>
+
+</section>
+
+
+<!-- =========================================================
+     EMPLOYEES
+========================================================= -->
+
+<section id="employees" style="display:none">
+
+  <div class="section-title">
+
+    <h2>👥 Employees</h2>
+
+    <button
+      class="btn primary"
+      onclick="openModal('employeeModal')"
+    >
+      ＋ Employee
+    </button>
+
+  </div>
+
+  <div id="employeesList"></div>
+
+</section>
+
+
+<!-- =========================================================
+     REPORTS
+========================================================= -->
+
+<section id="reports" style="display:none">
+
+  <div class="card">
+
+    <h2 style="margin-top:0">📈 Master Reports</h2>
+
+    <div class="info-row">
+      <span>ምርቶች</span>
+      <b id="rProducts">0</b>
+    </div>
+
+    <hr>
+
+    <div class="info-row">
+      <span>Stock</span>
+      <b id="rStock">0</b>
+    </div>
+
+    <hr>
+
+    <div class="info-row">
+      <span>Pending Orders</span>
+      <b id="rPending">0</b>
+    </div>
+
+    <hr>
+
+    <div class="info-row">
+      <span>Sales</span>
+      <b id="rSales">0 ETB</b>
+    </div>
+
+    <hr>
+
+    <div class="info-row">
+      <span>Profit</span>
+      <b id="rProfit">0 ETB</b>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SETTINGS
+========================================================= -->
+
+<section id="settings" style="display:none">
+
+  <div class="card">
+
+    <h2 style="margin-top:0">💳 Payment Settings</h2>
+
+    <label>Bank Name</label>
+    <input id="bankName" placeholder="Bank">
+
+    <label>Account Name</label>
+    <input id="accountName" placeholder="Account owner">
+
+    <label>Account Number</label>
+    <input id="accountNumber" placeholder="Account number">
+
+    <label>Telebirr</label>
+    <input id="telebirr" placeholder="Telebirr number">
+
+    <label>CBE Birr</label>
+    <input id="cbeBirr" placeholder="CBE Birr">
+
+    <label>Instructions</label>
+    <textarea id="paymentInstructions"
+      placeholder="የክፍያ መመሪያ"></textarea>
+
+    <button
+      class="btn primary"
+      style="width:100%;margin-top:12px"
+      onclick="savePaymentSettings()"
+    >
+      💾 Save Payment Settings
+    </button>
+
+    <div id="paymentMessage" class="message"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2 style="margin-top:0">🤖 Telegram Settings</h2>
+
+    <label>Admin Chat ID</label>
+    <input id="telegramAdminChatId">
+
+    <label>Bot Username</label>
+    <input id="telegramBotUsername">
+
+    <button
+      class="btn primary"
+      style="width:100%;margin-top:12px"
+      onclick="saveTelegramSettings()"
+    >
+      💾 Save Telegram Settings
+    </button>
+
+    <div id="telegramMessage" class="message"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2 style="margin-top:0">📣 Telegram Channels / Groups</h2>
+
+    <label>Name</label>
+    <input id="channelName" placeholder="UNI MARKET Channel">
+
+    <label>Chat ID</label>
+    <input id="channelChatId" placeholder="-100...">
+
+    <button
+      class="btn primary"
+      style="width:100%;margin-top:12px"
+      onclick="addChannel()"
+    >
+      ＋ Add Channel / Group
+    </button>
+
+    <div id="channelsList" style="margin-top:12px"></div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================================================
+     BOTTOM NAV
+========================================================= -->
+
+<nav class="bottom">
+
+  <button
+    class="nav active"
+    data-section="home"
+    onclick="showSection('home')"
+  >
+    <span>⌂</span>
+    ዋና
+  </button>
+
+  <button
+    class="nav"
+    data-section="products"
+    onclick="showSection('products')"
+  >
+    <span>📦</span>
+    Products
+  </button>
+
+  <button
+    class="nav"
+    data-section="orders"
+    onclick="showSection('orders')"
+  >
+    <span>🛒</span>
+    Orders
+  </button>
+
+  <button
+    class="nav"
+    data-section="ads"
+    onclick="showSection('ads')"
+  >
+    <span>📢</span>
+    Ads
+  </button>
+
+  <button
+    class="nav"
+    data-section="settings"
+    onclick="showSection('settings')"
+  >
+    <span>⚙️</span>
+    Settings
+  </button>
+
+</nav>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+     PRODUCT MODAL
+========================================================= -->
+
+<div id="productModal" class="modal">
+
+<div class="sheet">
+
+<button
+  class="close"
+  onclick="closeModal('productModal')"
+>
+×
+</button>
+
+<h2 class="modal-title" id="productModalTitle">
+📦 አዲስ ምርት
+</h2>
+
+<form id="productForm">
+
+<input
+  type="hidden"
+  id="productId"
+>
+
+<label>የምርት ስም</label>
+
+<input
+  id="pName"
+  required
+  placeholder="ምሳሌ፦ ሴቶች ልብስ"
+>
+
+
+<label>Category</label>
+
+<select id="pCategory">
+
+<option value="clothing">👕 አልባሳት</option>
+<option value="electronics">📱 ኤሌክትሮኒክስ</option>
+<option value="kids">🧒 የህፃናት</option>
+<option value="women">👩 የሴቶች</option>
+<option value="home">🏠 የቤት እቃዎች</option>
+<option value="other">🛍️ ሌሎች</option>
+
+</select>
+
+
+<label>የግዢ ዋጋ</label>
+
+<input
+  id="pBuy"
+  type="number"
+  min="0"
+  step="0.01"
+  required
+  placeholder="500"
+>
+
+
+<label>የሽያጭ ዋጋ</label>
+
+<input
+  id="pSell"
+  type="number"
+  min="0"
+  step="0.01"
+  required
+  placeholder="800"
+>
+
+
+<label>Stock</label>
+
+<input
+  id="pStock"
+  type="number"
+  min="0"
+  step="1"
+  required
+  placeholder="10"
+>
+
+
+<label>Product Photo</label>
+
+<div class="photo-upload">
+
+<input
+  type="file"
+  id="productPhotoFile"
+  accept="image/*"
+  capture="environment"
+  onchange="previewProductPhoto(event)"
+>
+
+<div
+  id="productPhotoPreview"
+  class="photo-preview"
+>
+
+<div class="photo-preview-empty">
+📷<br>
+<b>ፎቶ ይምረጡ</b><br>
+<span class="muted">
+Gallery ወይም Camera
+</span>
+</div>
+
+</div>
+
+<div
+  id="uploadStatus"
+  class="upload-status muted"
+></div>
+
+</div>
+
+
+<input
+  type="hidden"
+  id="pPhoto"
+>
+
+
+<label>Description</label>
+
+<textarea
+  id="pDescription"
+  placeholder="የምርቱ ማብራሪያ..."
+></textarea>
+
+
+<div
+  id="productMessage"
+  class="message"
+></div>
+
+
+<div class="actions">
+
+<button
+  type="button"
+  class="btn gray"
+  onclick="closeModal('productModal')"
+>
+Cancel
+</button>
+
+<button
+  type="submit"
+  class="btn primary"
+  id="saveProductBtn"
+>
+💾 Save Product
+</button>
+
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+     ORDER MODAL
+========================================================= -->
+
+<div id="orderModal" class="modal">
+
+<div class="sheet">
+
+<div id="orderBody"></div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     AD MODAL
+========================================================= -->
+
+<div id="adModal" class="modal">
+
+<div class="sheet">
+
+<button
+  class="close"
+  onclick="closeModal('adModal')"
+>
+×
+</button>
+
+<h2 class="modal-title">
+📢 አዲስ Advertisement
+</h2>
+
+<label>Title</label>
+
+<input
+  id="adTitle"
+  placeholder="UNI MARKET Offer"
+>
+
+
+<label>Message</label>
+
+<textarea
+  id="adText"
+  placeholder="የማስታወቂያ ጽሑፍ..."
+></textarea>
+
+
+<label>Photo URL</label>
+
+<input
+  id="adPhoto"
+  placeholder="https://..."
+>
+
+
+<label>Telegram Chat ID</label>
+
+<input
+  id="adChatId"
+  placeholder="-100..."
+>
+
+
+<div id="adMessage" class="message"></div>
+
+
+<div class="actions">
+
+<button
+  class="btn gray"
+  onclick="closeModal('adModal')"
+>
+Cancel
+</button>
+
+<button
+  class="btn primary"
+  onclick="saveAdvertisement()"
+>
+💾 Save Draft
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     EMPLOYEE MODAL
+========================================================= -->
+
+<div id="employeeModal" class="modal">
+
+<div class="sheet">
+
+<button
+  class="close"
+  onclick="closeModal('employeeModal')"
+>
+×
+</button>
+
+<h2 class="modal-title">
+👥 አዲስ Employee
+</h2>
+
+<label>Name</label>
+
+<input
+  id="employeeName"
+  placeholder="Employee name"
+>
+
+
+<label>Username</label>
+
+<input
+  id="employeeUsername"
+  placeholder="username"
+>
+
+
+<label>Password</label>
+
+<input
+  id="employeePassword"
+  type="password"
+  placeholder="password"
+>
+
+
+<label>Role</label>
+
+<select id="employeeRole">
+
+<option value="EMPLOYEE">
+EMPLOYEE
+</option>
+
+<option value="MANAGER">
+MANAGER
+</option>
+
+</select>
+
+
+<label>Permissions</label>
+
+<div class="permission-grid">
+
+<label class="permission">
+<input type="checkbox" value="products">
+Products
+</label>
+
+<label class="permission">
+<input type="checkbox" value="delete_product">
+Delete Product
+</label>
+
+<label class="permission">
+<input type="checkbox" value="view_orders">
+Orders
+</label>
+
+<label class="permission">
+<input type="checkbox" value="verify_payment">
+Verify Payment
+</label>
+
+<label class="permission">
+<input type="checkbox" value="confirm_order">
+Confirm Order
+</label>
+
+<label class="permission">
+<input type="checkbox" value="advertising">
+Advertising
+</label>
+
+<label class="permission">
+<input type="checkbox" value="employees">
+Employees
+</label>
+
+<label class="permission">
+<input type="checkbox" value="reports">
+Reports
+</label>
+
+<label class="permission">
+<input type="checkbox" value="delivery">
+Delivery
+</label>
+
+</div>
+
+
+<div id="employeeMessage" class="message"></div>
+
+
+<div class="actions">
+
+<button
+  class="btn gray"
+  onclick="closeModal('employeeModal')"
+>
+Cancel
+</button>
+
+<button
+  class="btn primary"
+  onclick="saveEmployee()"
+>
+💾 Create Employee
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   API
+========================================================= */
+
+const API = {
+
+  auth: "/api/auth",
+
+  products: "/api/products",
+
+  upload: "/api/upload",
+
+  orders: "/api/orders",
+
+  ads: "/api/advertisements",
+
+  employees: "/api/employees",
+
+  reports: "/api/reports",
+
+  payment: "/api/payment-settings",
+
+  telegram: "/api/telegram-settings",
+
+  channels: "/api/telegram-channels",
+
+  telegramCheck: "/api/telegram/check-chat"
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let token =
+  localStorage.getItem("tsm_token") || "";
+
+let currentUser = null;
+
+let products = [];
+
+let orders = [];
+
+let advertisements = [];
+
+let employees = [];
+
+let channels = [];
+
+let editingProductId = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id =>
+  document.getElementById(id);
+
+
+function esc(value){
+
+  return String(value ?? "")
+    .replace(/[&<>"']/g,c => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c]));
+
+}
+
+
+function money(value){
+
+  return (
+    Number(value || 0)
+      .toLocaleString(
+        "en-US",
+        {maximumFractionDigits:2}
+      )
+    + " ETB"
+  );
+
+}
+
+
+function authHeaders(extra = {}){
+
+  return {
+
+    ...extra,
+
+    ...(token
+      ? {
+          Authorization:
+            "Bearer " + token
+        }
+      : {})
+
+  };
+
+}
+
+
+async function api(url,options = {}){
+
+  const opts = {
+    ...options
+  };
+
+  opts.headers =
+    authHeaders({
+      ...(options.headers || {})
+    });
+
+  const response =
+    await fetch(url,opts);
+
+  const text =
+    await response.text();
+
+  let data = {};
+
+  try{
+
+    data =
+      text
+        ? JSON.parse(text)
+        : {};
+
+  }catch{
+
+    data = {};
+
+  }
+
+  if(response.status === 401){
+
+    logout();
+
+    throw new Error(
+      "Session expired"
+    );
+
+  }
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Request failed"
+    );
+
+  }
+
+  return data;
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+function loginMessage(text,type){
+
+  const box =
+    $("loginMessage");
+
+  box.textContent = text;
+
+  box.className =
+    "login-message show " +
+    type;
+
+}
+
+
+async function login(){
+
+  const username =
+    $("loginUsername")
+      .value
+      .trim();
+
+  const password =
+    $("loginPassword")
+      .value;
+
+  if(!username || !password){
+
+    loginMessage(
+      "Username እና Password ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const button =
+    $("loginButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "⏳ እየገባ...";
+
+  try{
+
+    const data =
+      await api(
+        API.auth + "/login",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            username,
+            password
+          })
+        }
+      );
+
+    token =
+      data.token;
+
+    localStorage.setItem(
+      "tsm_token",
+      token
+    );
+
+    currentUser =
+      data.user || null;
+
+    loginMessage(
+      "✅ Login successful",
+      "success"
+    );
+
+    await enterApp();
+
+  }catch(error){
+
+    loginMessage(
+      "❌ " + error.message,
+      "error"
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "🔐 ግባ";
+
+  }
+
+}
+
+
+async function checkLogin(){
+
+  if(!token){
+
+    $("loginPage")
+      .style
+      .display = "flex";
+
+    $("appShell")
+      .style
+      .display = "none";
+
+    return;
+
+  }
+
+  try{
+
+    const data =
+      await api(
+        API.auth + "/me"
+      );
+
+    currentUser =
+      data.user || null;
+
+    await enterApp();
+
+  }catch{
+
+    localStorage.removeItem(
+      "tsm_token"
+    );
+
+    token = "";
+
+    $("loginPage")
+      .style
+      .display = "flex";
+
+    $("appShell")
+      .style
+      .display = "none";
+
+  }
+
+}
+
+
+async function enterApp(){
+
+  $("loginPage")
+    .style
+    .display = "none";
+
+  $("appShell")
+    .style
+    .display = "block";
+
+  $("userLabel")
+    .textContent =
+      currentUser?.name ||
+      currentUser?.username ||
+      "Master Admin";
+
+  await refreshAll();
+
+}
+
+
+function logout(){
+
+  token = "";
+
+  currentUser = null;
+
+  localStorage.removeItem(
+    "tsm_token"
+  );
+
+  location.reload();
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+const sections = [
+  "home",
+  "products",
+  "orders",
+  "ads",
+  "employees",
+  "reports",
+  "settings"
+];
+
+
+function showSection(id){
+
+  sections.forEach(section => {
+
+    const element =
+      $(section);
+
+    if(element){
+
+      element.style.display =
+        section === id
+          ? "block"
+          : "none";
+
+    }
+
+  });
+
+  document
+    .querySelectorAll(".nav")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.section === id
+      );
+
+    });
+
+  if(id === "products")
+    renderProducts();
+
+  if(id === "orders")
+    loadOrders();
+
+  if(id === "ads")
+    loadAds();
+
+  if(id === "employees")
+    loadEmployees();
+
+  if(id === "settings")
+    loadSettings();
+
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id){
+
+  $(id)
+    .classList
+    .add("show");
+
+}
+
+
+function closeModal(id){
+
+  $(id)
+    .classList
+    .remove("show");
+
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+function mapProduct(p){
+
+  return {
+
+    id:p.id,
+
+    name:p.name || "",
+
+    description:
+      p.description || "",
+
+    category:
+      p.category || "other",
+
+    buy:
+      Number(
+        p.buy_price ??
+        p.buyPrice ??
+        0
+      ),
+
+    sell:
+      Number(
+        p.sell_price ??
+        p.sellPrice ??
+        0
+      ),
+
+    stock:
+      Number(
+        p.stock ?? 0
+      ),
+
+    photo:
+      p.photo_url ??
+      p.photoUrl ??
+      p.photo ??
+      ""
+
+  };
+
+}
+
+
+async function loadProducts(){
+
+  const data =
+    await api(API.products);
+
+  const raw =
+    Array.isArray(data)
+      ? data
+      : (
+          data.products ||
+          []
+        );
+
+  products =
+    raw.map(mapProduct);
+
+  renderProducts();
+
+}
+
+
+function renderProducts(){
+
+  $("productCount")
+    .textContent =
+      products.length;
+
+  const stock =
+    products.reduce(
+      (sum,p) =>
+        sum + p.stock,
+      0
+    );
+
+  $("stockTotal")
+    .textContent =
+      stock;
+
+  $("rProducts")
+    .textContent =
+      products.length;
+
+  $("rStock")
+    .textContent =
+      stock;
+
+  const html =
+    products.length
+
+      ? products
+          .map(productCard)
+          .join("")
+
+      : `
+        <div class="empty">
+          ምርት የለም።
+          ＋ አዲስ ምርት ጨምር።
         </div>
-    </div>
+      `;
 
-    <!-- Order Details Modal -->
-    <div id="orderModal" class="modal">
-        <div class="sheet" id="orderBody"></div>
-    </div>
+  $("productsList")
+    .innerHTML =
+      html;
 
-    <!-- Ad Modal -->
-    <div id="adModal" class="modal">
-        <div class="sheet">
-            <button class="close" onclick="closeModal('adModal')">✕</button>
-            <h2>📢 አዲስ ማስታወቂያ መፍጠር</h2>
-            <form id="adForm">
-                <label>Advertisement Type</label>
-                <select id="adType">
-                    <option value="new_product">🆕 አዲስ ምርት</option>
-                    <option value="special_offer">🔥 ልዩ ቅናሽ</option>
-                    <option value="limited_stock">⚡ ውስን Stock</option>
-                    <option value="discount">💰 የዋጋ ቅናሽ</option>
-                    <option value="featured">⭐ ተመራጭ</option>
-                    <option value="normal">📢 መደበኛ ማስታወቂያ</option>
-                </select>
+  $("homeProducts")
+    .innerHTML =
+      products.length
 
-                <label>Product (አማራጭ)</label>
-                <select id="adProduct" onchange="autofillAdFromProduct(this.value)"><option value="">-- Product ምረጥ --</option></select>
+        ? products
+            .slice(0,3)
+            .map(productCard)
+            .join("")
 
-                <label>ርዕስ (Title)</label>
-                <input type="text" id="adTitle" required placeholder="የማስታወቂያ ርዕስ">
+        : `
+          <div class="empty">
+            ምርት የለም።
+          </div>
+        `;
 
-                <label>ማስታወቂያ ጽሁፍ (Text)</label>
-                <textarea id="adText" required placeholder="የማስታወቂያው ዝርዝር ይዘት..."></textarea>
+}
 
-                <label>የአዝራር ጽሁፍ (Button Text)</label>
-                <input type="text" id="adButtonText" value="🛒 Order Now">
 
-                <label>Photo URL</label>
-                <input type="url" id="adPhoto" placeholder="https://..." oninput="previewAdImage(this.value)">
-                
-                <div class="image-preview-container">
-                    <span id="adPreviewPlaceholder" style="color:var(--text-muted); font-size:12px;">የማስታወቂያ ፎቶ ፕሪቪው</span>
-                    <img id="adImagePreviewTag" style="display:none;" alt="Ad Preview">
-                </div>
+function productCard(p){
 
-                <label style="margin-top:16px;"><b>ማስታወቂያው የሚላክባቸው ቻናሎች፦</b></label>
-                <div class="select-all-box" style="display:flex; align-items:center; gap:10px; padding:10px; background:#f1f5f9; border-radius:10px; margin-top:6px;">
-                    <input id="selectAllChannels" type="checkbox" style="width:20px;height:20px;" onchange="toggleAllChannels(this.checked)">
-                    <span>ሁሉንም ቻናሎች ምረጥ</span>
-                    <span id="selectedChannelCount" style="margin-left:auto; color:var(--primary); font-weight:700;">0 selected</span>
-                </div>
-                <div id="adChannelsList" style="margin-top:10px;"></div>
+  return `
 
-                <div id="adMessage" style="margin-top:10px;"></div>
-                <button type="submit" id="saveAdBtn" class="btn primary full" style="margin-top:15px; padding:12px;">💾 ማስታወቂያ አስቀምጥ</button>
-            </form>
+  <div class="card">
+
+    <div class="product">
+
+      <div class="pic">
+
+        ${
+          p.photo
+
+            ? `
+              <img
+                src="${esc(p.photo)}"
+                alt=""
+                loading="lazy"
+              >
+            `
+
+            : "📦"
+        }
+
+      </div>
+
+      <div class="grow">
+
+        <b>${esc(p.name)}</b>
+
+        <div class="muted">
+          ${esc(p.category)}
+          • Stock: ${p.stock}
         </div>
-    </div>
 
-    <!-- Channel Modal -->
-    <div id="channelModal" class="modal">
-        <div class="sheet">
-            <button class="close" onclick="closeModal('channelModal')">✕</button>
-            <h2 id="channelModalTitle">📢 Add Telegram Channel</h2>
-            <form id="channelForm">
-                <input type="hidden" id="channelId">
-                <label>Channel Name</label>
-                <input type="text" id="channelName" required placeholder="ለምሳሌ: UNI Market ዩኒ ማርኬት">
-
-                <label>Channel Chat ID (-100...)</label>
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="channelChatId" required placeholder="-100123456789">
-                    <button type="button" class="btn" onclick="checkChannelConnection()">🔎 ቼክ አድርግ</button>
-                </div>
-                <div id="channelConnectionMessage" style="margin-top:8px;"></div>
-
-                <label>Channel Username (አማራጭ)</label>
-                <input type="text" id="channelUsername" placeholder="@unimarket_channel">
-
-                <button type="submit" class="btn primary full" style="margin-top:20px; padding:12px;">💾 Channel አስቀምጥ</button>
-            </form>
+        <div class="price">
+          የሽያጭ ዋጋ:
+          ${money(p.sell)}
         </div>
-    </div>
 
-    <!-- Employee Modal -->
-    <div id="employeeModal" class="modal">
-        <div class="sheet">
-            <button class="close" onclick="closeModal('employeeModal')">✕</button>
-            <h2>👤 አዲስ ሰራተኛ መመዝገብ</h2>
-            <form id="employeeForm">
-                <label>Employee Name</label>
-                <input type="text" id="eName" required placeholder="የሰራተኛው ስም">
-                
-                <label>Username</label>
-                <input type="text" id="eUsername" required placeholder="username">
+        <div class="muted">
 
-                <label>Password</label>
-                <input type="password" id="ePassword" required placeholder="******">
+          የግዢ:
+          ${money(p.buy)}
 
-                <label>Role</label>
-                <select id="eRole">
-                    <option value="EmployeeManager">EmployeeManager</option>
-                    <option value="SalesAgent">SalesAgent</option>
-                </select>
+          •
 
-                <button type="submit" class="btn primary full" style="margin-top:20px; padding:12px;">👤 ሰራተኛ ፍጠር</button>
-            </form>
+          <span class="profit">
+            Profit:
+            ${money(p.sell-p.buy)}
+          </span>
+
         </div>
+
+      </div>
+
+      <div>
+
+        <button
+          class="btn"
+          onclick="editProduct('${esc(p.id)}')"
+        >
+          ✏️
+        </button>
+
+        <button
+          class="btn red"
+          onclick="deleteProduct('${esc(p.id)}')"
+        >
+          🗑️
+        </button>
+
+      </div>
+
     </div>
 
-    <!-- APPLICATION SCRIPT -->
-    <script>
-        const API = {
-            auth: "/api/auth",
-            products: "/api/products",
-            orders: "/api/orders",
-            ads: "/api/advertisements",
-            employees: "/api/employees",
-            reports: "/api/reports",
-            payment: "/api/payment-settings",
-            telegram: "/api/telegram-settings",
-            channels: "/api/telegram-channels",
-            telegramCheck: "/api/telegram/check-chat"
+  </div>
+
+  `;
+
+}
+
+
+function openNewProduct(){
+
+  editingProductId =
+    null;
+
+  $("productModalTitle")
+    .textContent =
+      "📦 አዲስ ምርት";
+
+  $("productForm")
+    .reset();
+
+  $("productId")
+    .value = "";
+
+  $("pPhoto")
+    .value = "";
+
+  resetPhotoPreview();
+
+  $("productMessage")
+    .className =
+      "message";
+
+  openModal(
+    "productModal"
+  );
+
+}
+
+
+function editProduct(id){
+
+  const p =
+    products.find(
+      x => String(x.id) === String(id)
+    );
+
+  if(!p)return;
+
+  editingProductId =
+    p.id;
+
+  $("productModalTitle")
+    .textContent =
+      "✏️ ምርት አስተካክል";
+
+  $("productId")
+    .value = p.id;
+
+  $("pName")
+    .value = p.name;
+
+  $("pCategory")
+    .value = p.category;
+
+  $("pBuy")
+    .value = p.buy;
+
+  $("pSell")
+    .value = p.sell;
+
+  $("pStock")
+    .value = p.stock;
+
+  $("pDescription")
+    .value = p.description;
+
+  $("pPhoto")
+    .value = p.photo;
+
+  if(p.photo){
+
+    $("productPhotoPreview")
+      .innerHTML = `
+        <img
+          src="${esc(p.photo)}"
+          alt="Product"
+        >
+      `;
+
+  }else{
+
+    resetPhotoPreview();
+
+  }
+
+  openModal(
+    "productModal"
+  );
+
+}
+
+
+/* =========================================================
+   PHOTO PREVIEW + UPLOAD
+========================================================= */
+
+function resetPhotoPreview(){
+
+  $("productPhotoPreview")
+    .innerHTML = `
+
+      <div class="photo-preview-empty">
+
+        📷<br>
+
+        <b>ፎቶ ይምረጡ</b>
+
+        <br>
+
+        <span class="muted">
+          Gallery ወይም Camera
+        </span>
+
+      </div>
+
+  `;
+
+  $("uploadStatus")
+    .textContent = "";
+
+  $("productPhotoFile")
+    .value = "";
+
+}
+
+
+function previewProductPhoto(event){
+
+  const file =
+    event.target.files?.[0];
+
+  if(!file){
+
+    resetPhotoPreview();
+
+    return;
+
+  }
+
+  if(!file.type.startsWith("image/")){
+
+    alert(
+      "እባክዎ image file ይምረጡ።"
+    );
+
+    event.target.value = "";
+
+    return;
+
+  }
+
+  if(file.size > 8 * 1024 * 1024){
+
+    alert(
+      "ፎቶው ከ 8MB መብለጥ የለበትም።"
+    );
+
+    event.target.value = "";
+
+    return;
+
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    function(e){
+
+      $("productPhotoPreview")
+        .innerHTML = `
+
+          <img
+            src="${e.target.result}"
+            alt="Preview"
+          >
+
+        `;
+
+    };
+
+  reader.readAsDataURL(file);
+
+}
+
+
+async function uploadProductPhoto(){
+
+  const file =
+    $("productPhotoFile")
+      .files?.[0];
+
+  if(!file){
+
+    return $("pPhoto")
+      .value
+      .trim();
+
+  }
+
+  $("uploadStatus")
+    .textContent =
+      "⏳ ፎቶው እየተጫነ ነው...";
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "file",
+    file
+  );
+
+  const response =
+    await fetch(
+      API.upload,
+      {
+        method:"POST",
+        headers:
+          authHeaders(),
+        body:formData
+      }
+    );
+
+  const text =
+    await response.text();
+
+  let data = {};
+
+  try{
+
+    data =
+      text
+        ? JSON.parse(text)
+        : {};
+
+  }catch{
+
+    data = {};
+
+  }
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      "Photo upload failed"
+    );
+
+  }
+
+  const url =
+    data.url ||
+    data.publicUrl ||
+    data.photo_url ||
+    data.path ||
+    "";
+
+  if(!url){
+
+    throw new Error(
+      "Upload ተሳክቷል ግን URL አልተመለሰም።"
+    );
+
+  }
+
+  $("pPhoto")
+    .value = url;
+
+  $("uploadStatus")
+    .textContent =
+      "✅ Photo uploaded";
+
+  return url;
+
+}
+
+
+/* =========================================================
+   SAVE PRODUCT
+========================================================= */
+
+$("productForm")
+  .addEventListener(
+    "submit",
+    async function(event){
+
+      event.preventDefault();
+
+      const button =
+        $("saveProductBtn");
+
+      button.disabled = true;
+
+      button.textContent =
+        "⏳ Saving...";
+
+      try{
+
+        const photoUrl =
+          await uploadProductPhoto();
+
+        const body = {
+
+          name:
+            $("pName")
+              .value
+              .trim(),
+
+          category:
+            $("pCategory")
+              .value,
+
+          buy_price:
+            Number(
+              $("pBuy").value
+            ),
+
+          sell_price:
+            Number(
+              $("pSell").value
+            ),
+
+          stock:
+            Number(
+              $("pStock").value
+            ),
+
+          photo_url:
+            photoUrl,
+
+          description:
+            $("pDescription")
+              .value
+              .trim()
+
         };
 
-        let token = localStorage.getItem("tsm_token") || "";
-        let currentUser = null;
-        let products = [];
-        let orders = [];
-        let advertisements = [];
-        let employees = [];
-        let channels = [];
+        if(!body.name){
 
-        const $ = id => document.getElementById(id);
-        const money = n => (Number(n) || 0).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " ETB";
-        const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+          throw new Error(
+            "የምርት ስም ያስገቡ።"
+          );
 
-        function authHeaders(extra = {}) {
-            return { ...extra, ...(token ? { Authorization: "Bearer " + token } : {}) };
         }
 
-        async function api(url, options = {}) {
-            const opts = { ...options };
-            opts.headers = authHeaders({ ...(options.headers || {}) });
-            const response = await fetch(url, opts);
-            const text = await response.text();
-            let data = {};
-            try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
+        let url =
+          API.products;
 
-            if (response.status === 401) {
-                logout();
-                throw new Error("Session expired");
-            }
-            if (!response.ok) {
-                throw new Error(data.error || data.message || "Request failed");
-            }
-            return data;
+        let method =
+          "POST";
+
+        if(editingProductId){
+
+          url +=
+            "/" +
+            encodeURIComponent(
+              editingProductId
+            );
+
+          method =
+            "PATCH";
+
         }
 
-        function showSection(id) {
-            ["home", "products", "orders", "ads", "employees", "reports", "settings"].forEach(section => {
-                const el = $(section);
-                if (el) el.style.display = (section === id) ? "block" : "none";
-            });
+        await api(
+          url,
+          {
+            method,
 
-            document.querySelectorAll(".nav").forEach(button => {
-                button.classList.toggle("active", button.dataset.section === id);
-            });
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
 
-            if (id === "ads") loadAdvertisements();
-            if (id === "employees") loadEmployees();
-            if (id === "settings") loadSettings();
-            if (id === "reports") loadReports();
-        }
+            body:
+              JSON.stringify(body)
+          }
+        );
 
-        function openModal(id) { $(id).classList.add("show"); }
-        function closeModal(id) { $(id).classList.remove("show"); }
+        showMessage(
+          "productMessage",
+          "✅ ምርቱ ተቀምጧል።",
+          "ok"
+        );
 
-        function setMessage(id, text, type) {
-            const el = $(id);
-            el.textContent = text;
-            el.className = (type === "ok") ? "success" : "error";
-        }
+        await loadProducts();
 
-        /* IMAGE PREVIEW UTILS */
-        function previewProductImage(url) {
-            const tag = $("imagePreviewTag");
-            const placeholder = $("previewPlaceholder");
-            if (url && url.trim().length > 5) {
-                tag.src = url.trim();
-                tag.style.display = "block";
-                placeholder.style.display = "none";
-            } else {
-                tag.style.display = "none";
-                placeholder.style.display = "block";
-            }
-        }
+        setTimeout(
+          () =>
+            closeModal(
+              "productModal"
+            ),
+          600
+        );
 
-        function previewAdImage(url) {
-            const tag = $("adImagePreviewTag");
-            const placeholder = $("adPreviewPlaceholder");
-            if (url && url.trim().length > 5) {
-                tag.src = url.trim();
-                tag.style.display = "block";
-                placeholder.style.display = "none";
-            } else {
-                tag.style.display = "none";
-                placeholder.style.display = "block";
-            }
-        }
+      }catch(error){
 
-        /* LOGIN */
-        async function login() {
-            const username = $("loginUsername").value.trim();
-            const password = $("loginPassword").value;
-            $("loginMessage").textContent = "";
+        showMessage(
+          "productMessage",
+          "❌ " +
+            error.message,
+          "err"
+        );
 
-            if (!username || !password) {
-                $("loginMessage").textContent = "Username እና Password ያስገቡ።";
-                return;
-            }
+      }finally{
 
-            try {
-                const data = await api(API.auth + "/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
-                token = data.token;
-                localStorage.setItem("tsm_token", token);
-                currentUser = data.user || null;
-                await enterApp();
-            } catch (error) {
-                $("loginMessage").textContent = "❌ " + error.message;
-            }
-        }
+        button.disabled = false;
 
-        async function enterApp() {
-            $("loginPage").style.display = "none";
-            $("appShell").style.display = "block";
-            $("userLabel").textContent = currentUser?.name || "Master Admin";
-            await refreshAll();
-        }
+        button.textContent =
+          "💾 Save Product";
 
-        function logout() {
-            token = "";
-            currentUser = null;
-            localStorage.removeItem("tsm_token");
-            location.reload();
-        }
+      }
 
-        async function checkLogin() {
-            if (!token) return;
-            try {
-                const data = await api(API.auth + "/me");
-                currentUser = data.user || null;
-                await enterApp();
-            } catch {
-                localStorage.removeItem("tsm_token");
-                token = "";
-            }
-        }
+    }
+  );
 
-        /* PRODUCTS */
-        function mapProduct(p) {
-            return {
-                id: p.id,
-                name: p.name || "",
-                category: p.category || "others",
-                buy: Number(p.buy_price ?? p.buyPrice ?? 0),
-                sell: Number(p.sell_price ?? p.sellPrice ?? 0),
-                stock: Number(p.stock ?? 0),
-                photo: p.photo_url || p.photoUrl || "",
-                description: p.description || ""
-            };
-        }
 
-        async function loadProducts() {
-            try {
-                const data = await api(API.products);
-                const raw = Array.isArray(data) ? data : (data.products || []);
-                products = raw.map(mapProduct);
-                renderProducts();
-                fillAdProducts();
-            } catch (error) { console.error(error); }
-        }
+async function deleteProduct(id){
 
-        function productCard(p) {
-            return `
-            <div class="card">
-                <div class="product">
-                    <div class="pic">
-                        ${p.photo ? `<img src="${esc(p.photo)}" onerror="this.parentElement.innerHTML='📦'">` : "📦"}
+  if(!confirm(
+    "ይህን ምርት ማጥፋት እርግጠኛ ነዎት?"
+  ))return;
+
+  try{
+
+    await api(
+      API.products +
+      "/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    await loadProducts();
+
+  }catch(error){
+
+    alert(
+      "❌ " +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function mapOrder(o){
+
+  return {
+
+    id:o.id,
+
+    productName:
+      o.product_name ??
+      o.productName ??
+      "—",
+
+    customerName:
+      o.customer_name ??
+      o.customerName ??
+      o.name ??
+      "—",
+
+    phone:
+      o.phone ??
+      "—",
+
+    username:
+      o.username ??
+      "",
+
+    quantity:
+      Number(
+        o.quantity ?? 1
+      ),
+
+    total:
+      Number(
+        o.total ?? 0
+      ),
+
+    status:
+      String(
+        o.status ??
+        "NEW"
+      ).toUpperCase(),
+
+    receipt:
+      o.receipt_url ??
+      o.receiptUrl ??
+      "",
+
+    address:
+      o.address ??
+      o.destination ??
+      "",
+
+    createdAt:
+      o.created_at ??
+      o.createdAt ??
+      ""
+
+  };
+
+}
+
+
+async function loadOrders(){
+
+  try{
+
+    const data =
+      await api(API.orders);
+
+    const raw =
+      Array.isArray(data)
+        ? data
+        : (
+            data.orders ||
+            []
+          );
+
+    orders =
+      raw.map(mapOrder);
+
+    renderOrders();
+
+  }catch(error){
+
+    console.error(
+      "Orders:",
+      error
+    );
+
+    orders = [];
+
+    renderOrders();
+
+  }
+
+}
+
+
+function renderOrders(){
+
+  const pending =
+    orders.filter(
+      o =>
+        ![
+          "CONFIRMED",
+          "REJECTED",
+          "DELIVERED"
+        ].includes(
+          o.status
+        )
+    );
+
+  $("pendingCount")
+    .textContent =
+      pending.length;
+
+  $("rPending")
+    .textContent =
+      pending.length;
+
+  const sales =
+    orders
+      .filter(
+        o =>
+          [
+            "CONFIRMED",
+            "DELIVERED"
+          ].includes(
+            o.status
+          )
+      )
+      .reduce(
+        (sum,o) =>
+          sum + o.total,
+        0
+      );
+
+  $("salesTotal")
+    .textContent =
+      money(sales);
+
+  $("rSales")
+    .textContent =
+      money(sales);
+
+  $("ordersList")
+    .innerHTML =
+      orders.length
+
+        ? orders
+            .map(orderCard)
+            .join("")
+
+        : `
+          <div class="empty">
+            አሁን Order የለም።
+          </div>
+        `;
+
+  $("homeOrders")
+    .innerHTML =
+      pending.length
+
+        ? pending
+            .slice(0,3)
+            .map(orderCard)
+            .join("")
+
+        : `
+          <div class="empty">
+            Pending Order የለም።
+          </div>
+        `;
+
+}
+
+
+function orderCard(o){
+
+  const statusClass =
+    o.status === "CONFIRMED"
+      ? "green"
+      : o.status === "REJECTED"
+        ? "red"
+        : "blue";
+
+  return `
+
+  <div
+    class="card"
+    onclick="openOrder('${esc(o.id)}')"
+  >
+
+    <div class="order">
+
+      <div class="grow">
+
+        <b>
+          ${esc(o.productName)}
+        </b>
+
+        <div class="muted">
+          👤 ${esc(o.customerName)}
+          • ×${o.quantity}
+        </div>
+
+        <div class="muted">
+          📞 ${esc(o.phone)}
+        </div>
+
+      </div>
+
+      <div style="text-align:right">
+
+        <b>
+          ${money(o.total)}
+        </b>
+
+        <br>
+
+        <span
+          class="badge ${statusClass}"
+        >
+          ${esc(o.status)}
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  `;
+
+}
+
+
+function openOrder(id){
+
+  const order =
+    orders.find(
+      o =>
+        String(o.id) ===
+        String(id)
+    );
+
+  if(!order)return;
+
+  $("orderBody")
+    .innerHTML = `
+
+    <button
+      class="close"
+      onclick="closeModal('orderModal')"
+    >
+      ×
+    </button>
+
+    <h2 class="modal-title">
+      🛒 Order Details
+    </h2>
+
+    <div class="card">
+
+      <div class="info-row">
+        <span>ደንበኛ</span>
+        <b>${esc(order.customerName)}</b>
+      </div>
+
+      <hr>
+
+      <div class="info-row">
+        <span>📞 Phone</span>
+        <b>${esc(order.phone)}</b>
+      </div>
+
+      <hr>
+
+      <div class="info-row">
+        <span>📦 Product</span>
+        <b>${esc(order.productName)}</b>
+      </div>
+
+      <hr>
+
+      <div class="info-row">
+        <span>ብዛት</span>
+        <b>${order.quantity}</b>
+      </div>
+
+      <hr>
+
+      <div class="info-row">
+        <span>💰 Total</span>
+        <b>${money(order.total)}</b>
+      </div>
+
+      <hr>
+
+      <div class="info-row">
+        <span>Status</span>
+        <span class="badge">
+          ${esc(order.status)}
+        </span>
+      </div>
+
+      ${
+        order.address
+          ? `
+            <hr>
+            <div>
+              <span class="muted">
+                📍 Delivery Address
+              </span>
+              <br>
+              <b>${esc(order.address)}</b>
+            </div>
+          `
+          : ""
+      }
+
+    </div>
+
+    ${
+      order.receipt
+        ? `
+          <div class="card">
+
+            <h3>
+              🧾 Payment Receipt
+            </h3>
+
+            <a
+              href="${esc(order.receipt)}"
+              target="_blank"
+              class="btn primary"
+            >
+              🖼️ Open Receipt
+            </a>
+
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      ![
+        "CONFIRMED",
+        "REJECTED",
+        "DELIVERED"
+      ].includes(order.status)
+
+        ? `
+
+          <div class="actions">
+
+            <button
+              class="btn green"
+              onclick="
+                changeOrderStatus(
+                  '${esc(order.id)}',
+                  'CONFIRMED'
+                )
+              "
+            >
+              ✅ Confirm
+            </button>
+
+            <button
+              class="btn red"
+              onclick="
+                changeOrderStatus(
+                  '${esc(order.id)}',
+                  'REJECTED'
+                )
+              "
+            >
+              ❌ Reject
+            </button>
+
+          </div>
+
+        `
+
+        : ""
+    }
+
+  `;
+
+  openModal(
+    "orderModal"
+  );
+
+}
+
+
+async function changeOrderStatus(
+  id,
+  status
+){
+
+  try{
+
+    await api(
+      API.orders +
+      "/" +
+      encodeURIComponent(id),
+      {
+        method:"PATCH",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            status
+          })
+      }
+    );
+
+    closeModal(
+      "orderModal"
+    );
+
+    await loadOrders();
+
+  }catch(error){
+
+    alert(
+      "❌ " +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ADS
+========================================================= */
+
+async function loadAds(){
+
+  try{
+
+    const data =
+      await api(API.ads);
+
+    advertisements =
+      Array.isArray(data)
+        ? data
+        : (
+            data.advertisements ||
+            []
+          );
+
+    renderAds();
+
+  }catch(error){
+
+    console.error(
+      "Ads:",
+      error
+    );
+
+  }
+
+}
+
+
+function renderAds(){
+
+  $("adsList")
+    .innerHTML =
+      advertisements.length
+
+        ? advertisements
+            .map(ad => `
+
+              <div class="card">
+
+                <div class="ad">
+
+                  <div class="grow">
+
+                    <b>
+                      ${esc(ad.title)}
+                    </b>
+
+                    <div class="muted">
+                      ${esc(ad.text)}
                     </div>
-                    <div class="grow">
-                        <b>${esc(p.name)}</b>
-                        <div class="muted">Category: ${esc(p.category)} | Stock: ${p.stock}</div>
-                        <div class="price">የሽያጭ ዋጋ: ${money(p.sell)}</div>
-                        <div class="muted">ግዢ: ${money(p.buy)} • <span class="profit">Profit: ${money(p.sell - p.buy)}</span></div>
-                    </div>
+
+                    <br>
+
+                    <span class="badge">
+                      ${esc(ad.status || "DRAFT")}
+                    </span>
+
+                  </div>
+
                 </div>
-            </div>`;
-        }
 
-        function renderProducts() {
-            $("productCount").textContent = products.length;
-            const stock = products.reduce((sum, p) => sum + p.stock, 0);
-            $("stockTotal").textContent = stock;
-            $("reportStock").textContent = stock;
+              </div>
 
-            $("productsList").innerHTML = products.length ? products.slice().reverse().map(productCard).join("") : `<div class="empty">ምርት የለም።</div>`;
-            $("homeProducts").innerHTML = products.length ? products.slice(0, 3).map(productCard).join("") : `<div class="empty">ምርት የለም።</div>`;
-        }
+            `)
+            .join("")
 
-        /* ORDERS */
-        function mapOrder(o) {
-            return {
-                id: o.id,
-                productName: o.product_name || o.productName || "—",
-                customerName: o.customer_name || o.customerName || "—",
-                phone: o.phone || "—",
-                username: o.telegram_username || o.username || "",
-                address: o.address || "",
-                quantity: Number(o.quantity || 1),
-                total: Number(o.total || 0),
-                status: String(o.status || "NEW").toUpperCase(),
-                paymentStatus: String(o.payment_status || "PENDING").toUpperCase(),
-                receipt: o.receipt_url || o.receipt_photo_url || o.payment_receipt_url || "",
-                createdAt: o.created_at || o.createdAt || ""
-            };
-        }
+        : `
+          <div class="empty">
+            Advertisement የለም።
+          </div>
+        `;
 
-        async function loadOrders() {
-            try {
-                const data = await api(API.orders);
-                const raw = Array.isArray(data) ? data : (data.orders || []);
-                orders = raw.map(mapOrder);
-                renderOrders();
-            } catch (error) { console.error(error); }
-        }
+}
 
-        function orderCard(o) {
-            const pending = ["NEW", "PENDING", "RECEIPT_PENDING", "VERIFYING"].includes(o.status);
-            const cls = o.status === "CONFIRMED" ? "green" : o.status === "REJECTED" ? "red" : "";
-            return `
-            <div class="card">
-                <div class="order">
-                    <div class="grow">
-                        <b>${esc(o.productName)}</b>
-                        <div class="muted">👤 ${esc(o.customerName)} • ×${o.quantity}</div>
-                        <div class="muted">📞 ${esc(o.phone)} ${o.username ? `• @${esc(o.username)}` : ""}</div>
+
+async function saveAdvertisement(){
+
+  const body = {
+
+    title:
+      $("adTitle")
+        .value
+        .trim(),
+
+    text:
+      $("adText")
+        .value
+        .trim(),
+
+    photo_url:
+      $("adPhoto")
+        .value
+        .trim(),
+
+    telegram_chat_id:
+      $("adChatId")
+        .value
+        .trim()
+
+  };
+
+  try{
+
+    await api(
+      API.ads,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+      }
+    );
+
+    showMessage(
+      "adMessage",
+      "✅ Advertisement draft saved.",
+      "ok"
+    );
+
+    await loadAds();
+
+    setTimeout(
+      () =>
+        closeModal("adModal"),
+      600
+    );
+
+  }catch(error){
+
+    showMessage(
+      "adMessage",
+      "❌ " +
+        error.message,
+      "err"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   EMPLOYEES
+========================================================= */
+
+async function loadEmployees(){
+
+  try{
+
+    const data =
+      await api(API.employees);
+
+    employees =
+      Array.isArray(data)
+        ? data
+        : (
+            data.employees ||
+            []
+          );
+
+    renderEmployees();
+
+  }catch(error){
+
+    console.error(
+      "Employees:",
+      error
+    );
+
+  }
+
+}
+
+
+function renderEmployees(){
+
+  $("employeesList")
+    .innerHTML =
+      employees.length
+
+        ? employees
+            .map(e => `
+
+              <div class="card">
+
+                <div class="employee">
+
+                  <div class="pic">
+                    👤
+                  </div>
+
+                  <div class="grow">
+
+                    <b>
+                      ${esc(
+                        e.name ||
+                        e.username
+                      )}
+                    </b>
+
+                    <div class="muted">
+                      @${esc(
+                        e.username ||
+                        ""
+                      )}
                     </div>
-                    <div style="text-align:right">
-                        <b>${money(o.total)}</b><br>
-                        <span class="badge ${cls}">${esc(o.status)}</span>
-                    </div>
+
+                    <span class="badge blue">
+                      ${esc(
+                        e.role ||
+                        "EMPLOYEE"
+                      )}
+                    </span>
+
+                  </div>
+
                 </div>
-                <div class="actions">
-                    ${pending ? `
-                        <button class="btn green" onclick="changeOrderStatus('${esc(o.id)}', 'CONFIRMED')">✅ Confirm</button>
-                        <button class="btn red" onclick="changeOrderStatus('${esc(o.id)}', 'REJECTED')">❌ Reject</button>
-                    ` : ""}
-                    <button class="btn" onclick="openOrder('${esc(o.id)}')">👁️ View</button>
+
+              </div>
+
+            `)
+            .join("")
+
+        : `
+          <div class="empty">
+            Employee የለም።
+          </div>
+        `;
+
+}
+
+
+async function saveEmployee(){
+
+  const permissions =
+    Array.from(
+      document.querySelectorAll(
+        "#employeeModal .permission input:checked"
+      )
+    )
+    .map(
+      input =>
+        input.value
+    );
+
+  const body = {
+
+    name:
+      $("employeeName")
+        .value
+        .trim(),
+
+    username:
+      $("employeeUsername")
+        .value
+        .trim(),
+
+    password:
+      $("employeePassword")
+        .value,
+
+    role:
+      $("employeeRole")
+        .value,
+
+    permissions
+
+  };
+
+  try{
+
+    await api(
+      API.employees,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+      }
+    );
+
+    showMessage(
+      "employeeMessage",
+      "✅ Employee created.",
+      "ok"
+    );
+
+    await loadEmployees();
+
+    setTimeout(
+      () =>
+        closeModal(
+          "employeeModal"
+        ),
+      600
+    );
+
+  }catch(error){
+
+    showMessage(
+      "employeeMessage",
+      "❌ " +
+        error.message,
+      "err"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+async function loadReports(){
+
+  try{
+
+    const data =
+      await api(API.reports);
+
+    const summary =
+      data.summary ||
+      data;
+
+    $("rProducts")
+      .textContent =
+        products.length;
+
+    $("rStock")
+      .textContent =
+        products.reduce(
+          (sum,p) =>
+            sum + p.stock,
+          0
+        );
+
+    $("rPending")
+      .textContent =
+        summary.pendingOrders ??
+        0;
+
+    $("rSales")
+      .textContent =
+        money(
+          summary.totalSales
+        );
+
+    $("rProfit")
+      .textContent =
+        money(
+          summary.totalProfit
+        );
+
+  }catch(error){
+
+    console.error(
+      "Reports:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+async function loadSettings(){
+
+  try{
+
+    const payment =
+      await api(
+        API.payment
+      );
+
+    $("bankName")
+      .value =
+        payment.bank_name ||
+        payment.bank ||
+        "";
+
+    $("accountName")
+      .value =
+        payment.account_name ||
+        "";
+
+    $("accountNumber")
+      .value =
+        payment.account_number ||
+        "";
+
+    $("telebirr")
+      .value =
+        payment.telebirr ||
+        payment.telebirr_number ||
+        "";
+
+    $("cbeBirr")
+      .value =
+        payment.cbe_birr ||
+        payment.cbe_birr_number ||
+        "";
+
+    $("paymentInstructions")
+      .value =
+        payment.instructions ||
+        payment.note ||
+        "";
+
+  }catch(error){
+
+    console.error(
+      "Payment settings:",
+      error
+    );
+
+  }
+
+
+  try{
+
+    const telegram =
+      await api(
+        API.telegram
+      );
+
+    $("telegramAdminChatId")
+      .value =
+        telegram.admin_chat_id ||
+        telegram.telegram_admin_chat_id ||
+        telegram.chat_id ||
+        "";
+
+    $("telegramBotUsername")
+      .value =
+        telegram.bot_username ||
+        "";
+
+  }catch(error){
+
+    console.error(
+      "Telegram settings:",
+      error
+    );
+
+  }
+
+  await loadChannels();
+
+}
+
+
+async function savePaymentSettings(){
+
+  const body = {
+
+    bank_name:
+      $("bankName").value.trim(),
+
+    account_name:
+      $("accountName").value.trim(),
+
+    account_number:
+      $("accountNumber").value.trim(),
+
+    telebirr:
+      $("telebirr").value.trim(),
+
+    cbe_birr:
+      $("cbeBirr").value.trim(),
+
+    instructions:
+      $("paymentInstructions")
+        .value
+        .trim()
+
+  };
+
+  try{
+
+    await api(
+      API.payment,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+      }
+    );
+
+    showMessage(
+      "paymentMessage",
+      "✅ Payment settings saved.",
+      "ok"
+    );
+
+  }catch(error){
+
+    showMessage(
+      "paymentMessage",
+      "❌ " +
+        error.message,
+      "err"
+    );
+
+  }
+
+}
+
+
+async function saveTelegramSettings(){
+
+  const body = {
+
+    admin_chat_id:
+      $("telegramAdminChatId")
+        .value
+        .trim(),
+
+    bot_username:
+      $("telegramBotUsername")
+        .value
+        .trim()
+
+  };
+
+  try{
+
+    await api(
+      API.telegram,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+      }
+    );
+
+    showMessage(
+      "telegramMessage",
+      "✅ Telegram settings saved.",
+      "ok"
+    );
+
+  }catch(error){
+
+    showMessage(
+      "telegramMessage",
+      "❌ " +
+        error.message,
+      "err"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CHANNELS
+========================================================= */
+
+async function loadChannels(){
+
+  try{
+
+    const data =
+      await api(
+        API.channels
+      );
+
+    channels =
+      Array.isArray(data)
+        ? data
+        : (
+            data.channels ||
+            []
+          );
+
+    renderChannels();
+
+  }catch(error){
+
+    console.error(
+      "Channels:",
+      error
+    );
+
+  }
+
+}
+
+
+function renderChannels(){
+
+  $("channelsList")
+    .innerHTML =
+      channels.length
+
+        ? channels
+            .map(c => `
+
+              <div class="card">
+
+                <div class="channel">
+
+                  <div class="grow">
+
+                    <b>
+                      ${esc(
+                        c.name ||
+                        c.username ||
+                        c.chat_id
+                      )}
+                    </b>
+
+                    <div class="muted">
+                      ${esc(
+                        c.chat_id ||
+                        ""
+                      )}
+                    </div>
+
+                  </div>
+
+                  <span
+                    class="badge
+                    ${
+                      c.is_active !== false
+                        ? "green"
+                        : "red"
+                    }"
+                  >
+                    ${
+                      c.is_active !== false
+                        ? "ACTIVE"
+                        : "OFF"
+                    }
+                  </span>
+
                 </div>
-            </div>`;
+
+              </div>
+
+            `)
+            .join("")
+
+        : `
+          <div class="empty">
+            Channel / Group የለም።
+          </div>
+        `;
+
+}
+
+
+async function addChannel(){
+
+  const name =
+    $("channelName")
+      .value
+      .trim();
+
+  const chat_id =
+    $("channelChatId")
+      .value
+      .trim();
+
+  if(!chat_id){
+
+    alert(
+      "Chat ID ያስገቡ።"
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      API.channels,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            name,
+            chat_id
+          })
         }
+    );
 
-        function renderOrders() {
-            const pending = orders.filter(o => ["NEW", "PENDING", "RECEIPT_PENDING", "VERIFYING"].includes(o.status));
-            $("pendingCount").textContent = pending.length;
-            $("ordersList").innerHTML = orders.length ? orders.slice().reverse().map(orderCard).join("") : `<div class="empty">አሁን Order የለም።</div>`;
-            $("homeOrders").innerHTML = pending.length ? pending.slice(0, 3).map(orderCard).join("") : `<div class="empty">Pending Order የለም።</div>`;
-        }
+    $("channelName")
+      .value = "";
 
-        function openOrder(id) {
-            const o = orders.find(x => String(x.id) === String(id));
-            if (!o) return;
-            $("orderBody").innerHTML = `
-                <button class="close" onclick="closeModal('orderModal')">✕</button>
-                <h2>🛒 Order Details</h2>
-                <div class="card">
-                    <div class="row"><span>Order ID</span><b>${esc(o.id)}</b></div><hr>
-                    <div class="row"><span>ደንበኛ</span><b>${esc(o.customerName)}</b></div><hr>
-                    <div class="row"><span>📞 ስልክ</span><b>${esc(o.phone)}</b></div><hr>
-                    <div class="row"><span>📦 ምርት</span><b>${esc(o.productName)}</b></div><hr>
-                    <div class="row"><span>ብዛት</span><b>${o.quantity}</b></div><hr>
-                    <div class="row"><span>💰 Total</span><b>${money(o.total)}</b></div><hr>
-                    <div class="row"><span>Payment</span><span class="badge blue">${esc(o.paymentStatus)}</span></div><hr>
-                    <div class="row"><span>Status</span><span class="badge">${esc(o.status)}</span></div>
-                    ${o.address ? `<hr><div><div class="muted">📍 Delivery Address</div><b>${esc(o.address)}</b></div>` : ""}
-                </div>
-                ${o.receipt ? `<div class="card"><h3>🧾 Receipt</h3><a class="btn primary full" target="_blank" href="${esc(o.receipt)}">👁️️ View Receipt Image</a></div>` : ""}
-                ${["NEW", "PENDING", "RECEIPT_PENDING", "VERIFYING"].includes(o.status) ? `
-                    <div class="actions">
-                        <button class="btn green" onclick="changeOrderStatus('${esc(o.id)}', 'CONFIRMED')">✅ Confirm Order</button>
-                        <button class="btn red" onclick="changeOrderStatus('${esc(o.id)}', 'REJECTED')">❌ Reject Order</button>
-                    </div>` : ""}
-            `;
-            openModal("orderModal");
-        }
+    $("channelChatId")
+      .value = "";
 
-        async function changeOrderStatus(id, status) {
-            if (!confirm(status === "CONFIRMED" ? "Order እንዲ Confirm ይደረግ?" : "Order እንዲ Reject ይደረግ?")) return;
-            try {
-                await api(API.orders + "/" + encodeURIComponent(id) + "/status", {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status })
-                });
-                closeModal("orderModal");
-                await refreshAll();
-                alert(status === "CONFIRMED" ? "✅ Order Confirmed" : "❌ Order Rejected");
-            } catch (error) { alert("❌ " + error.message); }
-        }
+    await loadChannels();
 
-        /* PRODUCT FORM */
-        function openProductModal() {
-            $("productMessage").textContent = "";
-            $("productForm").reset();
-            previewProductImage("");
-            openModal("productModal");
-        }
+  }catch(error){
 
-        $("productForm").addEventListener("submit", async event => {
-            event.preventDefault();
-            const btn = $("saveProductBtn");
-            btn.disabled = true; btn.textContent = "⏳ Saving...";
-            try {
-                const body = {
-                    name: $("pName").value.trim(),
-                    category: $("pCategory").value,
-                    buyPrice: Number($("pBuy").value),
-                    sellPrice: Number($("pSell").value),
-                    stock: Number($("pStock").value),
-                    photoUrl: $("pPhoto").value.trim(),
-                    description: $("pDescription").value.trim()
-                };
-                if (!body.name) throw new Error("የምርት ስም ያስገቡ።");
-                await api(API.products, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body)
-                });
-                setMessage("productMessage", "✅ ምርቱ ተመዝግቧል።", "ok");
-                await loadProducts();
-                setTimeout(() => closeModal("productModal"), 600);
-            } catch (error) {
-                setMessage("productMessage", "❌ " + error.message, "error");
-            } finally {
-                btn.disabled = false; btn.textContent = "💾 ምርት አስቀምጥ";
-            }
-        });
+    alert(
+      "❌ " +
+      error.message
+    );
 
-        /* ADS */
-        function fillAdProducts() {
-            $("adProduct").innerHTML = `<option value="">-- Product ምረጥ --</option>` + products.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
-        }
+  }
 
-        function autofillAdFromProduct(productId) {
-            if (!productId) return;
-            const p = products.find(x => String(x.id) === String(productId));
-            if (!p) return;
-            $("adTitle").value = p.name;
-            $("adText").value = `🔥 አዲስ ምርት ገብቷል!\n\n📦 ${p.name}\n💰 ዋጋ: ${money(p.sell)}\n\n${p.description || "ይዘዙን!"}`;
-            if (p.photo) {
-                $("adPhoto").value = p.photo;
-                previewAdImage(p.photo);
-            }
-        }
+}
 
-        function openAdModal() {
-            $("adForm").reset();
-            $("adButtonText").value = "🛒 Order Now";
-            $("adMessage").textContent = "";
-            previewAdImage("");
-            fillAdProducts();
-            renderAdChannels();
-            openModal("adModal");
-        }
 
-        $("adForm").addEventListener("submit", async event => {
-            event.preventDefault();
-            const btn = $("saveAdBtn");
-            btn.disabled = true; btn.textContent = "⏳ Saving...";
-            try {
-                const selected = getSelectedChannelIds();
-                if (!selected.length) throw new Error("ቢያንስ አንድ Telegram Channel ይምረጡ።");
-                const body = {
-                    ad_type: $("adType").value,
-                    product_id: $("adProduct").value || null,
-                    title: $("adTitle").value.trim(),
-                    text: $("adText").value.trim(),
-                    button_text: $("adButtonText").value.trim(),
-                    photo_url: $("adPhoto").value.trim(),
-                    channel_ids: selected
-                };
-                await api(API.ads, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body)
-                });
-                setMessage("adMessage", "✅ ማስታወቂያው ተቀምጧል።", "ok");
-                await loadAdvertisements();
-                setTimeout(() => closeModal("adModal"), 800);
-            } catch (error) {
-                setMessage("adMessage", "❌ " + error.message, "error");
-            } finally {
-                btn.disabled = false; btn.textContent = "💾 ማስታወቂያ አስቀምጥ";
-            }
-        });
+/* =========================================================
+   UI MESSAGE
+========================================================= */
 
-        function adTypeName(type) {
-            return {
-                new_product: "🆕 አዲስ ምርት",
-                special_offer: "🔥 ልዩ ቅናሽ",
-                limited_stock: "⚡ ውስን Stock",
-                discount: "💰 የዋጋ ቅናሽ",
-                featured: "⭐ ተመራጭ",
-                normal: "📢 መደበኛ"
-            }[type] || "📢 ማስታወቂያ";
-        }
+function showMessage(
+  id,
+  text,
+  type
+){
 
-        async function loadAdvertisements() {
-            try {
-                const data = await api(API.ads);
-                advertisements = Array.isArray(data) ? data : (data.advertisements || []);
-                renderAdvertisements();
-            } catch (error) { console.error(error); }
-        }
+  const element =
+    $(id);
 
-        function renderAdvertisements() {
-            if (!advertisements.length) {
-                $("adsList").innerHTML = `<div class="empty">ማስታወቂያ የለም።</div>`;
-                return;
-            }
-            $("adsList").innerHTML = advertisements.map(ad => {
-                const status = String(ad.status || "DRAFT").toUpperCase();
-                const published = status === "PUBLISHED";
-                return `
-                <div class="card">
-                    <div class="row">
-                        <div>
-                            <div class="ad-title">${esc(ad.title || "ማስታወቂያ")}</div>
-                            <div class="muted">${adTypeName(ad.ad_type || ad.type)}</div>
-                        </div>
-                        <span class="badge ${published ? "green" : ""}">${published ? "✅ PUBLISHED" : "📝 " + esc(status)}</span>
-                    </div>
-                    ${ad.photo_url ? `<img class="ad-photo" src="${esc(ad.photo_url)}" onerror="this.style.display='none'">` : ""}
-                    <div class="ad-preview"><div class="ad-text">${esc(ad.text || "")}</div></div>
-                    ${Array.isArray(ad.channel_ids) ? `<div class="muted" style="margin-top:8px">📢 Channels: ${ad.channel_ids.length}</div>` : ""}
-                    <div class="actions">
-                        ${!published ? `<button class="btn primary" onclick="publishAdvertisement('${esc(ad.id)}')">📢 Publish</button>` : `<button class="btn green" disabled>✅ Published</button>`}
-                        <button class="btn red" onclick="deleteAdvertisement('${esc(ad.id)}')">🗑️ Delete</button>
-                    </div>
-                </div>`;
-            }).join("");
-        }
+  element.textContent =
+    text;
 
-        async function publishAdvertisement(id) {
-            if (!confirm("ማስታወቂያውን የተመረጡት Telegram Channels ላይ ይላክ?")) return;
-            try {
-                await api(API.ads + "/" + encodeURIComponent(id) + "/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
-                alert("✅ ማስታወቂያው ወደ ቻናሎቹ ተልኳል።");
-                await loadAdvertisements();
-            } catch (error) { alert("❌ Publish አልተሳካም፦\n" + error.message); }
-        }
+  element.className =
+    "message show " +
+    type;
 
-        async function deleteAdvertisement(id) {
-            if (!confirm("ይህን ማስታወቂያ ይሰርዙ?")) return;
-            try {
-                await api(API.ads + "/" + encodeURIComponent(id), { method: "DELETE" });
-                await loadAdvertisements();
-            } catch (error) { alert("❌ " + error.message); }
-        }
+}
 
-        /* CHANNELS */
-        async function loadChannels() {
-            try {
-                const data = await api(API.channels);
-                channels = Array.isArray(data) ? data : (data.channels || []);
-                renderChannels();
-                renderAdChannels();
-            } catch {
-                channels = [];
-                renderChannels();
-                renderAdChannels();
-            }
-        }
 
-        function renderChannels() {
-            const list = $("channelsList"), empty = $("channelsEmpty");
-            if (!channels.length) { list.innerHTML = ""; empty.style.display = "block"; return; }
-            empty.style.display = "none";
-            list.innerHTML = channels.map(channel => {
-                const id = channel.id || channel.channel_id || channel.chat_id;
-                const name = channel.name || channel.channel_name || "Telegram Channel";
-                const chatId = channel.chat_id || channel.telegram_chat_id || channel.channel_id || "";
-                const username = channel.username || channel.channel_username || "";
-                return `
-                <div class="channel-card">
-                    <div class="channel">
-                        <div class="pic">📢</div>
-                        <div class="grow">
-                            <div class="channel-name">${esc(name)}</div>
-                            <div class="channel-id">🆔 ${esc(chatId)}</div>
-                            ${username ? `<div class="muted">🔗 ${esc(username)}</div>` : ""}
-                        </div>
-                        <span class="badge green">🟢 Saved</span>
-                    </div>
-                    <div class="channel-actions">
-                        <button class="btn" onclick="editChannel('${esc(id)}')">✏️ Edit</button>
-                        <button class="btn" onclick="checkSavedChannel('${esc(chatId)}')">🔎 Check</button>
-                        <button class="btn red" onclick="deleteChannel('${esc(id)}')">🗑️ Delete</button>
-                    </div>
-                </div>`;
-            }).join("");
-        }
+/* =========================================================
+   REFRESH
+========================================================= */
 
-        function renderAdChannels() {
-            const box = $("adChannelsList");
-            if (!box) return;
-            if (!channels.length) {
-                box.innerHTML = `<div class="empty">Settings ውስጥ Channel ያክሉ።</div>`;
-                $("selectedChannelCount").textContent = "0 selected";
-                return;
-            }
-            box.innerHTML = channels.map(channel => {
-                const id = channel.id || channel.channel_id || channel.chat_id;
-                const name = channel.name || channel.channel_name || "Telegram Channel";
-                const chatId = channel.chat_id || channel.telegram_chat_id || channel.channel_id || "";
-                return `
-                <label style="display:flex; align-items:center; gap:10px; padding:10px; margin:6px 0; border:1px solid var(--border-color); border-radius:10px; background:#fff; cursor:pointer;">
-                    <input class="channel-check ad-channel-checkbox" type="checkbox" value="${esc(id)}" style="width:18px;height:18px;" onchange="updateSelectedChannelCount()">
-                    <span style="font-size:18px">📢</span>
-                    <span class="grow"><b>${esc(name)}</b><small class="muted" style="display:block">${esc(chatId)}</small></span>
-                </label>`;
-            }).join("");
-            updateSelectedChannelCount();
-        }
+async function refreshAll(){
 
-        function getSelectedChannelIds() {
-            return [...document.querySelectorAll(".ad-channel-checkbox:checked")].map(input => input.value);
-        }
+  try{
 
-        function toggleAllChannels(checked) {
-            document.querySelectorAll(".ad-channel-checkbox").forEach(input => { input.checked = checked; });
-            updateSelectedChannelCount();
-        }
+    await Promise.all([
+      loadProducts(),
+      loadOrders(),
+      loadAds(),
+      loadEmployees(),
+      loadReports()
+    ]);
 
-        function updateSelectedChannelCount() {
-            const selected = getSelectedChannelIds();
-            $("selectedChannelCount").textContent = `${selected.length} selected`;
-            $("selectAllChannels").checked = channels.length > 0 && selected.length === channels.length;
-        }
+  }catch(error){
 
-        function openChannelModal() {
-            $("channelForm").reset();
-            $("channelId").value = "";
-            $("channelModalTitle").textContent = "📢 Add Telegram Channel";
-            $("channelConnectionMessage").innerHTML = "";
-            openModal("channelModal");
-        }
+    console.error(
+      "Refresh:",
+      error
+    );
 
-        function editChannel(id) {
-            const channel = channels.find(c => String(c.id || c.channel_id || c.chat_id) === String(id));
-            if (!channel) return;
-            $("channelId").value = channel.id || channel.channel_id || channel.chat_id || "";
-            $("channelName").value = channel.name || channel.channel_name || "";
-            $("channelChatId").value = channel.chat_id || channel.telegram_chat_id || channel.channel_id || "";
-            $("channelUsername").value = channel.username || channel.channel_username || "";
-            $("channelModalTitle").textContent = "✏️ Edit Telegram Channel";
-            $("channelConnectionMessage").innerHTML = "";
-            openModal("channelModal");
-        }
+  }
 
-        async function checkChannelConnection() {
-            const chatId = $("channelChatId").value.trim();
-            if (!chatId) { $("channelConnectionMessage").innerHTML = `<div class="error">Channel Chat ID ያስገቡ።</div>`; return; }
-            $("channelConnectionMessage").innerHTML = `<div class="notice">⏳ Checking connection...</div>`;
-            try {
-                const data = await api(API.telegramCheck + "?chat_id=" + encodeURIComponent(chatId));
-                const chat = data.chat || {};
-                $("channelConnectionMessage").innerHTML = `<div class="success">✅ Channel ተገኝቷል፦ <br><b>${esc(chat.title || chat.username || "Channel")}</b></div>`;
-            } catch (error) {
-                $("channelConnectionMessage").innerHTML = `<div class="error">❌ ${esc(error.message)}</div>`;
-            }
-        }
+}
 
-        async function checkSavedChannel(chatId) {
-            try {
-                const data = await api(API.telegramCheck + "?chat_id=" + encodeURIComponent(chatId));
-                alert("✅ Channel ተገኝቷል፦ " + (data.chat?.title || data.chat?.username || chatId));
-            } catch (error) { alert("❌ Channel አልተገኘም፦\n" + error.message); }
-        }
 
-        $("channelForm").addEventListener("submit", async event => {
-            event.preventDefault();
-            const id = $("channelId").value.trim();
-            const body = {
-                name: $("channelName").value.trim(),
-                chat_id: $("channelChatId").value.trim(),
-                username: $("channelUsername").value.trim()
-            };
-            if (!body.name || !body.chat_id) { alert("Channel Name እና Chat ID ያስገቡ።"); return; }
-            try {
-                if (id) {
-                    await api(API.channels + "/" + encodeURIComponent(id), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-                } else {
-                    await api(API.channels, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-                }
-                closeModal("channelModal");
-                await loadChannels();
-                alert("✅ Channel ተቀምጧል።");
-            } catch (error) { alert("❌ " + error.message); }
-        });
+/* =========================================================
+   START
+========================================================= */
 
-        async function deleteChannel(id) {
-            if (!confirm("ይህን Channel ማጥፋት ይፈልጋሉ?")) return;
-            try {
-                await api(API.channels + "/" + encodeURIComponent(id), { method: "DELETE" });
-                await loadChannels();
-                alert("✅ Channel ተሰርዟል።");
-            } catch (error) { alert("❌ " + error.message); }
-        }
+checkLogin();
 
-        /* EMPLOYEES */
-        function openEmployeeModal() { $("employeeForm").reset(); openModal("employeeModal"); }
 
-        async function loadEmployees() {
-            try {
-                const data = await api(API.employees);
-                employees = Array.isArray(data) ? data : (data.employees || []);
-                renderEmployees();
-            } catch (error) { console.error(error); }
-        }
+/*
+  Orders refresh.
+  Login is still required because
+  api() sends the Bearer token and
+  401 automatically returns to Login.
+*/
 
-        function renderEmployees() {
-            if (!employees.length) { $("employeesList").innerHTML = `<div class="empty">Employee የለም።</div>`; return; }
-            $("employeesList").innerHTML = employees.map(e => `
-                <div class="card">
-                    <div class="employee">
-                        <div class="pic">👤</div>
-                        <div class="grow">
-                            <b>${esc(e.name || "Employee")}</b>
-                            <div class="muted">@${esc(e.username || "")}</div>
-                            <div class="muted">${esc(e.role || "EMPLOYEE")}</div>
-                        </div>
-                        <button class="btn red" onclick="deleteEmployee('${esc(e.id)}')">🗑️</button>
-                    </div>
-                </div>`).join("");
-        }
+setInterval(
+  async () => {
 
-        $("employeeForm").addEventListener("submit", async event => {
-            event.preventDefault();
-            try {
-                await api(API.employees, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: $("eName").value.trim(),
-                        username: $("eUsername").value.trim(),
-                        password: $("ePassword").value,
-                        role: $("eRole").value
-                    })
-                });
-                closeModal("employeeModal");
-                await loadEmployees();
-                alert("✅ Employee ተፈጥሯል።");
-            } catch (error) { alert("❌ " + error.message); }
-        });
+    if(token){
 
-        async function deleteEmployee(id) {
-            if (!confirm("ይህን Employee ይሰርዙ?")) return;
-            try {
-                await api(API.employees + "/" + encodeURIComponent(id), { method: "DELETE" });
-                await loadEmployees();
-            } catch (error) { alert("❌ " + error.message); }
-        }
+      try{
 
-        /* REPORTS */
-        async function loadReports() {
-            try {
-                const data = await api(API.reports);
-                const summary = data.summary || data;
-                $("reportSales").textContent = money(summary.totalSales || summary.sales || 0);
-                $("reportProfit").textContent = money(summary.totalProfit || summary.profit || 0);
-                $("reportOrders").textContent = summary.totalOrders || summary.orders || 0;
-                $("reportStock").textContent = products.reduce((sum, p) => sum + p.stock, 0);
-                $("salesTotal").textContent = money(summary.totalSales || summary.sales || 0);
-            } catch (error) { console.error(error); }
-        }
+        await loadOrders();
 
-        /* SETTINGS */
-        async function loadSettings() {
-            try {
-                const payment = await api(API.payment);
-                $("paymentInfo").value = payment.payment_info || payment.paymentInfo || payment.info || "";
-            } catch {}
-            try {
-                const telegram = await api(API.telegram);
-                $("telegramBotUsername").value = telegram.bot_username || "uni_market_shop_bot";
-            } catch {}
-            await loadChannels();
-        }
+      }catch(error){
 
-        async function savePaymentSettings() {
-            try {
-                await api(API.payment, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ payment_info: $("paymentInfo").value.trim() })
-                });
-                alert("✅ Payment Settings ተቀምጧል።");
-            } catch (error) { alert("❌ " + error.message); }
-        }
+        console.error(error);
 
-        async function saveTelegramBotSettings() {
-            try {
-                await api(API.telegram, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ bot_username: $("telegramBotUsername").value.trim() })
-                });
-                alert("✅ Telegram Bot Settings ተቀምጧል።");
-            } catch (error) { alert("❌ " + error.message); }
-        }
+      }
 
-        /* REFRESH */
-        async function refreshAll() {
-            await Promise.all([loadProducts(), loadOrders(), loadAdvertisements(), loadReports(), loadChannels()]);
-        }
+    }
 
-        checkLogin();
-    </script>
+  },
+  15000
+);
+
+</script>
+
 </body>
 </html>
