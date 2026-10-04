@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
+
+<title>Telegram Sales Manager — Master Admin</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --primary:#1477ff;
+  --primary2:#655cff;
+  --bg:#f4f7fb;
+  --card:#fff;
+  --text:#182230;
+  --muted:#718096;
+  --border:#e5eaf1;
+  --green:#10b981;
+  --red:#ef4444;
+  --orange:#f59e0b;
+  --shadow:0 10px 30px rgba(20,50,90,.08);
+}
+
+body{
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans Ethiopic",
+    "Segoe UI",
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* ================= LOGIN ================= */
+
+#loginPage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,#1477ff 0,#1477ff 18%,transparent 45%),
+    radial-gradient(circle at bottom right,#655cff 0,#655cff 15%,transparent 42%),
+    #f4f7fb;
+}
+
+.login-card{
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  border-radius:28px;
+  padding:32px 24px;
+  box-shadow:0 25px 70px rgba(30,50,100,.18);
+}
+
+.logo-box{
+  width:76px;
+  height:76px;
+  border-radius:24px;
+  margin:0 auto 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:32px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  box-shadow:0 14px 30px rgba(20,119,255,.28);
+}
+
+.login-card h1{
+  text-align:center;
+  font-size:23px;
+  margin-bottom:7px;
+}
+
+.login-card .subtitle{
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:26px;
+}
+
+.form-group{
+  margin-bottom:16px;
+}
+
+.form-group label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.input{
+  width:100%;
+  height:50px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:0 15px;
+  outline:none;
+  background:#fafbfd;
+  transition:.2s;
+}
+
+.input:focus{
+  border-color:var(--primary);
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(20,119,255,.08);
+}
+
+.login-btn{
+  width:100%;
+  height:52px;
+  border-radius:15px;
+  color:#fff;
+  font-weight:800;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  box-shadow:0 12px 25px rgba(20,119,255,.22);
+}
+
+.login-btn:disabled{
+  opacity:.65;
+}
+
+.login-error{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  color:#b91c1c;
+  background:#fef2f2;
+  font-size:13px;
+  display:none;
+}
+
+/* ================= APP ================= */
+
+#app{
+  min-height:100vh;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  color:#fff;
+  padding:18px 18px 22px;
+  background:linear-gradient(135deg,#1477ff,#655cff);
+  border-radius:0 0 26px 26px;
+  box-shadow:0 10px 30px rgba(20,80,180,.18);
+}
+
+.topbar-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-icon{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.18);
+  font-size:22px;
+}
+
+.brand h2{
+  font-size:17px;
+}
+
+.brand small{
+  opacity:.8;
+  font-size:11px;
+}
+
+.logout-btn{
+  padding:9px 13px;
+  border-radius:11px;
+  color:#fff;
+  background:rgba(255,255,255,.15);
+  font-size:12px;
+  font-weight:700;
+}
+
+.container{
+  max-width:1180px;
+  margin:auto;
+  padding:18px 16px 100px;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:-10px;
+  position:relative;
+  z-index:5;
+}
+
+.stat-card{
+  background:#fff;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--shadow);
+  min-width:0;
+}
+
+.stat-icon{
+  font-size:21px;
+  margin-bottom:9px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:4px;
+}
+
+.stat-value{
+  font-size:21px;
+  font-weight:900;
+}
+
+/* ================= QUICK ACTIONS ================= */
+
+.section{
+  margin-top:22px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.section-head h3{
+  font-size:17px;
+}
+
+.section-head button{
+  color:var(--primary);
+  background:transparent;
+  font-size:12px;
+  font-weight:800;
+}
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.quick-card{
+  background:#fff;
+  border-radius:18px;
+  padding:17px 14px;
+  box-shadow:var(--shadow);
+  text-align:left;
+  transition:.15s;
+}
+
+.quick-card:active{
+  transform:scale(.98);
+}
+
+.quick-icon{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:10px;
+  font-size:20px;
+  background:#eef5ff;
+}
+
+.quick-card strong{
+  display:block;
+  font-size:13px;
+  margin-bottom:3px;
+}
+
+.quick-card span{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* ================= TABS ================= */
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:3px;
+  scrollbar-width:none;
+}
+
+.tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.tab{
+  white-space:nowrap;
+  padding:10px 14px;
+  border-radius:12px;
+  background:#fff;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  box-shadow:var(--shadow);
+}
+
+.tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+}
+
+/* ================= PANELS ================= */
+
+.panel{
+  background:#fff;
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:16px;
+  margin-top:14px;
+}
+
+.panel-title{
+  font-size:15px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.empty{
+  padding:35px 15px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* ================= PRODUCT ================= */
+
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:13px;
+}
+
+.product-card{
+  overflow:hidden;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+}
+
+.product-image{
+  width:100%;
+  height:155px;
+  object-fit:cover;
+  background:#f0f3f7;
+}
+
+.product-info{
+  padding:12px;
+}
+
+.product-name{
+  font-weight:800;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.product-category{
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:9px;
+}
+
+.price-row{
+  display:flex;
+  justify-content:space-between;
+  gap:7px;
+  margin-bottom:9px;
+}
+
+.price{
+  font-size:13px;
+  font-weight:800;
+}
+
+.stock{
+  color:var(--green);
+  font-size:11px;
+  font-weight:700;
+}
+
+.product-actions{
+  display:flex;
+  gap:7px;
+}
+
+.small-btn{
+  flex:1;
+  height:35px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.edit-btn{
+  background:#eef5ff;
+  color:var(--primary);
+}
+
+.delete-btn{
+  background:#fff0f0;
+  color:var(--red);
+}
+
+/* ================= ORDER ================= */
+
+.order-card{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.order-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.order-id{
+  font-size:13px;
+  font-weight:900;
+}
+
+.status{
+  display:inline-flex;
+  padding:5px 8px;
+  border-radius:8px;
+  font-size:10px;
+  font-weight:800;
+  background:#eef5ff;
+  color:var(--primary);
+}
+
+.order-meta{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+
+.meta-item{
+  background:#f8fafc;
+  border-radius:10px;
+  padding:9px;
+}
+
+.meta-item small{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:2px;
+}
+
+.meta-item strong{
+  font-size:12px;
+}
+
+.order-actions{
+  display:flex;
+  gap:8px;
+  margin-top:11px;
+}
+
+.order-actions button{
+  flex:1;
+  height:38px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:800;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,
+td{
+  text-align:left;
+  padding:12px 10px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+
+th{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(15,23,42,.55);
+  padding:0;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-card{
+  width:100%;
+  max-width:650px;
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:25px 25px 0 0;
+  padding:20px;
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:17px;
+}
+
+.modal-head h3{
+  font-size:18px;
+}
+
+.close{
+  width:36px;
+  height:36px;
+  border-radius:11px;
+  background:#f1f4f8;
+  font-size:20px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+textarea.input{
+  height:100px;
+  padding:13px;
+  resize:vertical;
+}
+
+.save-btn{
+  width:100%;
+  height:48px;
+  border-radius:13px;
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  font-weight:800;
+  margin-top:5px;
+}
+
+/* ================= BOTTOM NAV ================= */
+
+.bottom-nav{
+  position:fixed;
+  z-index:60;
+  left:50%;
+  bottom:12px;
+  transform:translateX(-50%);
+  width:calc(100% - 24px);
+  max-width:560px;
+  display:flex;
+  justify-content:space-around;
+  padding:9px;
+  border-radius:20px;
+  background:rgba(255,255,255,.95);
+  box-shadow:0 15px 45px rgba(20,40,80,.18);
+  backdrop-filter:blur(15px);
+}
+
+.nav-btn{
+  flex:1;
+  background:transparent;
+  color:#8a96a8;
+  padding:7px 4px;
+  border-radius:12px;
+  font-size:10px;
+  font-weight:700;
+}
+
+.nav-btn .nav-icon{
+  display:block;
+  font-size:19px;
+  margin-bottom:2px;
+}
+
+.nav-btn.active{
+  color:var(--primary);
+  background:#eef5ff;
+}
+
+/* ================= TOAST ================= */
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:88px;
+  transform:translateX(-50%) translateY(20px);
+  z-index:300;
+  max-width:90%;
+  padding:12px 16px;
+  border-radius:13px;
+  color:#fff;
+  background:#182230;
+  font-size:12px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+#toast.error{
+  background:#dc2626;
+}
+
+#toast.success{
+  background:#059669;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:800px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .products-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:560px){
+  .quick-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:auto;
+  }
+
+  .products-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .product-image{
+    height:125px;
+  }
+}
+
+@media(max-width:390px){
+  .products-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     LOGIN
+========================================================= -->
+
+<section id="loginPage">
+
+  <div class="login-card">
+
+    <div class="logo-box">
+      U
+    </div>
+
+    <h1>Telegram Sales Manager</h1>
+
+    <div class="subtitle">
+      Master Admin Login
+    </div>
+
+    <form id="loginForm">
+
+      <div class="form-group">
+        <label>Username</label>
+        <input
+          id="loginUsername"
+          class="input"
+          type="text"
+          autocomplete="username"
+          placeholder="Username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          class="input"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Password"
+          required
+        >
+      </div>
+
+      <button
+        id="loginBtn"
+        class="login-btn"
+        type="submit">
+        Login
+      </button>
+
+      <div id="loginError" class="login-error"></div>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     APP
+========================================================= -->
+
+<section id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="topbar-row">
+
+      <div class="brand">
+
+        <div class="brand-icon">
+          🛍️
+        </div>
+
+        <div>
+          <h2>UNI MARKET</h2>
+          <small>Telegram Sales Manager</small>
+        </div>
+
+      </div>
+
+      <button
+        id="logoutBtn"
+        class="logout-btn">
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Products</div>
+        <div id="statProducts" class="stat-value">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-label">Orders</div>
+        <div id="statOrders" class="stat-value">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Sales ETB</div>
+        <div id="statSales" class="stat-value">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Stock</div>
+        <div id="statStock" class="stat-value">0</div>
+      </div>
+
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+
+    <section class="section">
+
+      <div class="section-head">
+        <h3>Quick Actions</h3>
+      </div>
+
+      <div class="quick-grid">
+
+        <button class="quick-card" onclick="openProductModal()">
+          <div class="quick-icon">➕</div>
+          <strong>New Product</strong>
+          <span>Add product</span>
+        </button>
+
+        <button class="quick-card" onclick="showSection('orders')">
+          <div class="quick-icon">🛒</div>
+          <strong>Orders</strong>
+          <span>Manage orders</span>
+        </button>
+
+        <button class="quick-card" onclick="openAdModal()">
+          <div class="quick-icon">📢</div>
+          <strong>Advertising</strong>
+          <span>Create advertisement</span>
+        </button>
+
+        <button class="quick-card" onclick="showSection('reports')">
+          <div class="quick-icon">📈</div>
+          <strong>Reports</strong>
+          <span>Sales & profit</span>
+        </button>
+
+        <button class="quick-card" onclick="showSection('employees')">
+          <div class="quick-icon">👥</div>
+          <strong>Employees</strong>
+          <span>Manage employees</span>
+        </button>
+
+        <button class="quick-card" onclick="showSection('settings')">
+          <div class="quick-icon">⚙️</div>
+          <strong>Settings</strong>
+          <span>System settings</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- TABS -->
+
+    <section class="section">
+
+      <div class="tabs">
+
+        <button
+          class="tab active"
+          data-section="dashboard"
+          onclick="showSection('dashboard')">
+          Dashboard
+        </button>
+
+        <button
+          class="tab"
+          data-section="products"
+          onclick="showSection('products')">
+          Products
+        </button>
+
+        <button
+          class="tab"
+          data-section="orders"
+          onclick="showSection('orders')">
+          Orders
+        </button>
+
+        <button
+          class="tab"
+          data-section="ads"
+          onclick="showSection('ads')">
+          Advertising
+        </button>
+
+        <button
+          class="tab"
+          data-section="employees"
+          onclick="showSection('employees')">
+          Employees
+        </button>
+
+        <button
+          class="tab"
+          data-section="reports"
+          onclick="showSection('reports')">
+          Reports
+        </button>
+
+        <button
+          class="tab"
+          data-section="settings"
+          onclick="showSection('settings')">
+          Settings
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- DASHBOARD -->
+
+    <section
+      id="section-dashboard"
+      class="app-section">
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Welcome to UNI MARKET
+        </div>
+
+        <div class="empty">
+          Products, orders, payments and Telegram sales
+          are managed from this dashboard.
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PRODUCTS -->
+
+    <section
+      id="section-products"
+      class="app-section hidden">
+
+      <div class="section-head">
+        <h3>Products</h3>
+
+        <button onclick="openProductModal()">
+          + New Product
+        </button>
+      </div>
+
+      <div class="panel">
+
+        <div id="productsList" class="products-grid">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+      id="section-orders"
+      class="app-section hidden">
+
+      <div class="section-head">
+        <h3>Orders</h3>
+
+        <button onclick="loadOrders()">
+          Refresh
+        </button>
+      </div>
+
+      <div class="panel">
+
+        <div id="ordersList">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ADS -->
+
+    <section
+      id="section-ads"
+      class="app-section hidden">
+
+      <div class="section-head">
+        <h3>Advertising</h3>
+
+        <button onclick="openAdModal()">
+          + New Advertisement
+        </button>
+      </div>
+
+      <div class="panel">
+
+        <div id="adsList">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- EMPLOYEES -->
+
+    <section
+      id="section-employees"
+      class="app-section hidden">
+
+      <div class="section-head">
+        <h3>Employees</h3>
+
+        <button onclick="openEmployeeModal()">
+          + New Employee
+        </button>
+      </div>
+
+      <div class="panel">
+
+        <div id="employeesList">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- REPORTS -->
+
+    <section
+      id="section-reports"
+      class="app-section hidden">
+
+      <div class="section-head">
+        <h3>Reports</h3>
+
+        <button onclick="loadReports()">
+          Refresh
+        </button>
+      </div>
+
+      <div class="panel">
+
+        <div id="reportsContent">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+
+    <section
+      id="section-settings"
+      class="app-section hidden">
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Payment Settings
+        </div>
+
+        <form id="paymentForm">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Payment Method</label>
+              <input
+                id="paymentMethod"
+                class="input"
+                placeholder="Telebirr / Bank"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Account / Number</label>
+              <input
+                id="paymentAccount"
+                class="input"
+                placeholder="Account or phone"
+              >
+            </div>
+
+            <div class="form-group full">
+              <label>Payment Instructions</label>
+              <textarea
+                id="paymentInstructions"
+                class="input"
+                placeholder="Payment information..."></textarea>
+            </div>
+
+          </div>
+
+          <button
+            class="save-btn"
+            type="submit">
+            Save Payment Settings
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Telegram Settings
+        </div>
+
+        <form id="telegramForm">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Admin Chat ID</label>
+              <input
+                id="telegramChatId"
+                class="input"
+                placeholder="Chat ID"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Bot Username</label>
+              <input
+                id="telegramBotUsername"
+                class="input"
+                placeholder="uni_market_shop_bot"
+              >
+            </div>
+
+          </div>
+
+          <button
+            class="save-btn"
+            type="submit">
+            Save Telegram Settings
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-title">
+          Telegram Channels
+        </div>
+
+        <button
+          class="save-btn"
+          onclick="openChannelModal()">
+          + Add Telegram Channel
+        </button>
+
+        <div
+          id="channelsList"
+          style="margin-top:14px">
+          <div class="empty">Loading...</div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-btn active"
+      data-nav="dashboard"
+      onclick="showSection('dashboard')">
+      <span class="nav-icon">⌂</span>
+      Home
+    </button>
+
+    <button
+      class="nav-btn"
+      data-nav="products"
+      onclick="showSection('products')">
+      <span class="nav-icon">📦</span>
+      Products
+    </button>
+
+    <button
+      class="nav-btn"
+      data-nav="orders"
+      onclick="showSection('orders')">
+      <span class="nav-icon">🛒</span>
+      Orders
+    </button>
+
+    <button
+      class="nav-btn"
+      data-nav="ads"
+      onclick="showSection('ads')">
+      <span class="nav-icon">📢</span>
+      Ads
+    </button>
+
+    <button
+      class="nav-btn"
+      data-nav="settings"
+      onclick="showSection('settings')">
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </button>
+
+  </nav>
+
+</section>
+
+
+<!-- =========================================================
+     PRODUCT MODAL
+========================================================= -->
+
+<div id="productModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3 id="productModalTitle">
+        New Product
+      </h3>
+
+      <button
+        class="close"
+        onclick="closeProductModal()">
+        ×
+      </button>
+
+    </div>
+
+    <form id="productForm">
+
+      <input
+        type="hidden"
+        id="productId">
+
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Product Name</label>
+          <input
+            id="pName"
+            class="input"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+
+          <select
+            id="pCategory"
+            class="input"
+            required>
+
+            <option value="clothing">አልባሳት</option>
+            <option value="electronics">ኤሌክትሮኒክስ</option>
+            <option value="kids">የህፃናት</option>
+            <option value="women">የሴቶች</option>
+            <option value="home">የቤት እቃዎች</option>
+            <option value="other">ሌሎች</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+          <label>Stock</label>
+          <input
+            id="pStock"
+            class="input"
+            type="number"
+            min="0"
+            value="0">
+        </div>
+
+        <div class="form-group">
+          <label>Buy Price</label>
+          <input
+            id="pBuy"
+            class="input"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0">
+        </div>
+
+        <div class="form-group">
+          <label>Sell Price</label>
+          <input
+            id="pSell"
+            class="input"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0">
+        </div>
+
+        <div class="form-group full">
+          <label>Photo URL</label>
+          <input
+            id="pPhoto"
+            class="input"
+            placeholder="https://...">
+        </div>
+
+        <div class="form-group full">
+          <label>Description</label>
+
+          <textarea
+            id="pDescription"
+            class="input"
+            placeholder="Product description..."></textarea>
+
+        </div>
+
+      </div>
+
+      <button
+        class="save-btn"
+        type="submit">
+        Save Product
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     AD MODAL
+========================================================= -->
+
+<div id="adModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>Advertisement</h3>
+
+      <button
+        class="close"
+        onclick="closeAdModal()">
+        ×
+      </button>
+
+    </div>
+
+    <form id="adForm">
+
+      <input
+        type="hidden"
+        id="adId">
+
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Title</label>
+          <input
+            id="adTitle"
+            class="input"
+            required>
+        </div>
+
+        <div class="form-group full">
+          <label>Message</label>
+          <textarea
+            id="adMessage"
+            class="input"
+            required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Image URL</label>
+          <input
+            id="adImage"
+            class="input"
+            placeholder="https://...">
+        </div>
+
+        <div class="form-group full">
+          <label>Button URL</label>
+          <input
+            id="adUrl"
+            class="input"
+            placeholder="https://...">
+        </div>
+
+      </div>
+
+      <button
+        class="save-btn"
+        type="submit">
+        Save Advertisement
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     EMPLOYEE MODAL
+========================================================= -->
+
+<div id="employeeModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>New Employee</h3>
+
+      <button
+        class="close"
+        onclick="closeEmployeeModal()">
+        ×
+      </button>
+
+    </div>
+
+    <form id="employeeForm">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            id="eUsername"
+            class="input"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Name</label>
+          <input
+            id="eName"
+            class="input"
+            required>
+        </div>
+
+        <div class="form-group full">
+          <label>Password</label>
+          <input
+            id="ePassword"
+            class="input"
+            type="password"
+            required>
+        </div>
+
+        <div class="form-group full">
+
+          <label>Permissions</label>
+
+          <div
+            style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:8px;
+            margin-top:8px;
+            ">
+
+            <label>
+              <input type="checkbox" value="products" class="perm">
+              Products
+            </label>
+
+            <label>
+              <input type="checkbox" value="view_orders" class="perm">
+              Orders
+            </label>
+
+            <label>
+              <input type="checkbox" value="verify_payment" class="perm">
+              Verify Payment
+            </label>
+
+            <label>
+              <input type="checkbox" value="confirm_order" class="perm">
+              Confirm Order
+            </label>
+
+            <label>
+              <input type="checkbox" value="advertising" class="perm">
+              Advertising
+            </label>
+
+            <label>
+              <input type="checkbox" value="reports" class="perm">
+              Reports
+            </label>
+
+            <label>
+              <input type="checkbox" value="delivery" class="perm">
+              Delivery
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <button
+        class="save-btn"
+        type="submit">
+        Create Employee
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHANNEL MODAL
+========================================================= -->
+
+<div id="channelModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <h3>Telegram Channel</h3>
+
+      <button
+        class="close"
+        onclick="closeChannelModal()">
+        ×
+      </button>
+
+    </div>
+
+    <form id="channelForm">
+
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Channel Name</label>
+          <input
+            id="cName"
+            class="input"
+            required>
+        </div>
+
+        <div class="form-group full">
+          <label>Chat ID / Username</label>
+          <input
+            id="cChatId"
+            class="input"
+            placeholder="@channelusername"
+            required>
+        </div>
+
+      </div>
+
+      <button
+        class="save-btn"
+        type="submit">
+        Save Channel
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   API
+========================================================= */
+
+const API = {
+  auth: "/api/auth",
+  products: "/api/products",
+  orders: "/api/orders",
+  ads: "/api/advertisements",
+  employees: "/api/employees",
+  reports: "/api/reports",
+  payment: "/api/payment-settings",
+  telegram: "/api/telegram-settings",
+  channels: "/api/telegram-channels",
+  telegramCheck: "/api/telegram/check-chat",
+  upload: "/api/upload"
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let token = localStorage.getItem("tsm_token") || "";
+let currentUser = null;
+let products = [];
+let orders = [];
+let advertisements = [];
+let employees = [];
+let channels = [];
+let editingProductId = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function money(value){
+  return Number(value || 0).toLocaleString("en-US",{
+    maximumFractionDigits:2
+  });
+}
+
+function authHeaders(extra={}){
+  const headers = {
+    ...extra
+  };
+
+  if(token){
+    headers.Authorization = "Bearer " + token;
+  }
+
+  return headers;
+}
+
+async function api(url, options={}){
+
+  const opts = {
+    ...options
+  };
+
+  opts.headers = authHeaders(options.headers || {});
+
+  let response;
+
+  try{
+    response = await fetch(url,opts);
+  }catch(error){
+
+    throw new Error(
+      "Server ጋር መገናኘት አልተቻለም።"
+    );
+  }
+
+  const text = await response.text();
+
+  let data = {};
+
+  try{
+    data = text ? JSON.parse(text) : {};
+  }catch{
+    data = {
+      error:text || "Invalid server response"
+    };
+  }
+
+  if(response.status === 401){
+
+    if(url !== API.auth + "/login"){
+      logout(false);
+    }
+
+    throw new Error(
+      data.error || "Unauthorized"
+    );
+  }
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Request failed"
+    );
+  }
+
+  return data;
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+function toast(message,type=""){
+  const el = $("toast");
+
+  el.textContent = message;
+  el.className = "";
+
+  el.id = "toast";
+
+  if(type){
+    el.classList.add(type);
+  }
+
+  requestAnimationFrame(()=>{
+    el.classList.add("show");
+  });
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(()=>{
+    el.classList.remove("show");
+  },3000);
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(username,password){
+
+  /*
+    IMPORTANT:
+    Existing backend route:
+    POST /api/auth/login
+
+    Body:
+    {
+      username,
+      password
+    }
+  */
+
+  const data = await api(API.auth + "/login",{
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
+    },
+
+    body:JSON.stringify({
+      username,
+      password
+    })
+  });
+
+  if(!data.token){
+    throw new Error(
+      data.error || "Login failed"
+    );
+  }
+
+  token = data.token;
+
+  localStorage.setItem(
+    "tsm_token",
+    token
+  );
+
+  currentUser = data.user || null;
+
+  await enterApp();
+}
+
+
+async function checkSession(){
+
+  if(!token){
+    showLogin();
+    return;
+  }
+
+  try{
+
+    const data = await api(
+      API.auth + "/me"
+    );
+
+    currentUser = data.user || data.auth || null;
+
+    await enterApp();
+
+  }catch(error){
+
+    localStorage.removeItem("tsm_token");
+    token = "";
+
+    showLogin();
+  }
+}
+
+
+function showLogin(){
+
+  $("loginPage").classList.remove("hidden");
+  $("app").classList.add("hidden");
+
+}
+
+
+async function enterApp(){
+
+  $("loginPage").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  updateUserUI();
+
+  await loadAll();
+}
+
+
+function updateUserUI(){
+
+  const name =
+    currentUser?.name ||
+    currentUser?.username ||
+    "Admin";
+
+  const brandSmall =
+    document.querySelector(".brand small");
+
+  if(brandSmall){
+    brandSmall.textContent =
+      "Admin • " + name;
+  }
+}
+
+
+function logout(show=true){
+
+  token = "";
+
+  currentUser = null;
+
+  localStorage.removeItem(
+    "tsm_token"
+  );
+
+  $("app").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+
+  $("loginPassword").value = "";
+
+  if(show){
+    toast("Logged out");
+  }
+}
+
+
+$("loginForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const username =
+      $("loginUsername").value.trim();
+
+    const password =
+      $("loginPassword").value;
+
+    const errorBox =
+      $("loginError");
+
+    const button =
+      $("loginBtn");
+
+    errorBox.style.display = "none";
+
+    if(!username || !password){
+
+      errorBox.textContent =
+        "Username እና Password ያስፈልጋሉ።";
+
+      errorBox.style.display = "block";
+
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    try{
+
+      await login(
+        username,
+        password
+      );
+
+    }catch(error){
+
+      errorBox.textContent =
+        error.message ||
+        "Login failed";
+
+      errorBox.style.display =
+        "block";
+
+    }finally{
+
+      button.disabled = false;
+      button.textContent = "Login";
+
+    }
+
+  }
+);
+
+
+$("logoutBtn").addEventListener(
+  "click",
+  ()=>logout()
+);
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showSection(section){
+
+  document
+    .querySelectorAll(".app-section")
+    .forEach(el=>{
+      el.classList.add("hidden");
+    });
+
+  const target =
+    $("section-" + section);
+
+  if(target){
+    target.classList.remove("hidden");
+  }
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(el=>{
+      el.classList.toggle(
+        "active",
+        el.dataset.section === section
+      );
+    });
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(el=>{
+      el.classList.toggle(
+        "active",
+        el.dataset.nav === section
+      );
+    });
+
+  if(section === "products"){
+    loadProducts();
+  }
+
+  if(section === "orders"){
+    loadOrders();
+  }
+
+  if(section === "ads"){
+    loadAds();
+  }
+
+  if(section === "employees"){
+    loadEmployees();
+  }
+
+  if(section === "reports"){
+    loadReports();
+  }
+
+  if(section === "settings"){
+    loadSettings();
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+/* =========================================================
+   LOAD ALL
+========================================================= */
+
+async function loadAll(){
+
+  await Promise.allSettled([
+    loadProducts(),
+    loadOrders(),
+    loadAds(),
+    loadEmployees(),
+    loadReports(),
+    loadSettings()
+  ]);
+
+  updateStats();
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+function normalizeProduct(p){
+
+  return {
+    ...p,
+
+    id:p.id,
+
+    name:p.name || "",
+
+    category:p.category || "other",
+
+    buy:Number(
+      p.buy_price ??
+      p.buyPrice ??
+      0
+    ),
+
+    sell:Number(
+      p.sell_price ??
+      p.sellPrice ??
+      0
+    ),
+
+    stock:Number(
+      p.stock ??
+      0
+    ),
+
+    photo:
+      p.photo_url ||
+      p.photoUrl ||
+      "",
+
+    description:
+      p.description || ""
+  };
+}
+
+
+async function loadProducts(){
+
+  try{
+
+    const data =
+      await api(API.products);
+
+    products =
+      Array.isArray(data)
+        ? data
+        : (
+            data.products ||
+            data.data ||
+            []
+          );
+
+    products =
+      products.map(normalizeProduct);
+
+    renderProducts();
+    updateStats();
+
+  }catch(error){
+
+    $("productsList").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+}
+
+
+function renderProducts(){
+
+  if(!products.length){
+
+    $("productsList").innerHTML =
+      `<div class="empty">
+        No products found.
+      </div>`;
+
+    return;
+  }
+
+  $("productsList").innerHTML =
+    products.map(p=>{
+
+      const image =
+        p.photo ||
+        "https://via.placeholder.com/500x350?text=UNI+MARKET";
+
+      return `
+        <article class="product-card">
+
+          <img
+            class="product-image"
+            src="${escapeHtml(image)}"
+            onerror="this.src='https://via.placeholder.com/500x350?text=UNI+MARKET'"
+          >
+
+          <div class="product-info">
+
+            <div class="product-name">
+              ${escapeHtml(p.name)}
+            </div>
+
+            <div class="product-category">
+              ${escapeHtml(p.category)}
+            </div>
+
+            <div class="price-row">
+
+              <span class="price">
+                ${money(p.sell)} ETB
+              </span>
+
+              <span class="stock">
+                Stock: ${p.stock}
+              </span>
+
+            </div>
+
+            <div class="product-actions">
+
+              <button
+                class="small-btn edit-btn"
+                onclick="editProduct('${escapeHtml(p.id)}')">
+                Edit
+              </button>
+
+              <button
+                class="small-btn delete-btn"
+                onclick="deleteProduct('${escapeHtml(p.id)}')">
+                Delete
+              </button>
+
+            </div>
+
+          </div>
+
+        </article>
+      `;
+
+    }).join("");
+}
+
+
+function openProductModal(product=null){
+
+  editingProductId =
+    product?.id || null;
+
+  $("productModalTitle").textContent =
+    product
+      ? "Edit Product"
+      : "New Product";
+
+  $("productId").value =
+    product?.id || "";
+
+  $("pName").value =
+    product?.name || "";
+
+  $("pCategory").value =
+    product?.category || "clothing";
+
+  $("pBuy").value =
+    product?.buy ?? 0;
+
+  $("pSell").value =
+    product?.sell ?? 0;
+
+  $("pStock").value =
+    product?.stock ?? 0;
+
+  $("pPhoto").value =
+    product?.photo || "";
+
+  $("pDescription").value =
+    product?.description || "";
+
+  $("productModal")
+    .classList.add("show");
+}
+
+
+function closeProductModal(){
+
+  $("productModal")
+    .classList.remove("show");
+
+}
+
+
+function editProduct(id){
+
+  const product =
+    products.find(
+      p => String(p.id) === String(id)
+    );
+
+  if(!product){
+    toast("Product not found","error");
+    return;
+  }
+
+  openProductModal(product);
+}
+
+
+$("productForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const id =
+      $("productId").value.trim();
+
+    const body = {
+
+      name:
+        $("pName").value.trim(),
+
+      category:
+        $("pCategory").value,
+
+      buyPrice:
+        Number($("pBuy").value || 0),
+
+      sellPrice:
+        Number($("pSell").value || 0),
+
+      stock:
+        Number($("pStock").value || 0),
+
+      photoUrl:
+        $("pPhoto").value.trim(),
+
+      description:
+        $("pDescription").value.trim()
+    };
+
+    try{
+
+      if(id){
+
+        await api(
+          API.products + "/" +
+          encodeURIComponent(id),
+          {
+            method:"PUT",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(body)
+          }
+        );
+
+        toast(
+          "Product updated",
+          "success"
+        );
+
+      }else{
+
+        await api(
+          API.products,
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(body)
+          }
+        );
+
+        toast(
+          "Product added",
+          "success"
+        );
+      }
+
+      closeProductModal();
+
+      await loadProducts();
+
+      updateStats();
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+
+  }
+);
+
+
+async function deleteProduct(id){
+
+  if(!confirm(
+    "ይህን Product ማጥፋት ይፈልጋሉ?"
+  )){
+    return;
+  }
+
+  try{
+
+    await api(
+      API.products + "/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    toast(
+      "Product deleted",
+      "success"
+    );
+
+    await loadProducts();
+
+    updateStats();
+
+  }catch(error){
+
+    toast(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+async function loadOrders(){
+
+  try{
+
+    const data =
+      await api(API.orders);
+
+    orders =
+      Array.isArray(data)
+        ? data
+        : (
+            data.orders ||
+            data.data ||
+            []
+          );
+
+    renderOrders();
+
+    updateStats();
+
+  }catch(error){
+
+    $("ordersList").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+}
+
+
+function renderOrders(){
+
+  if(!orders.length){
+
+    $("ordersList").innerHTML =
+      `<div class="empty">
+        No orders found.
+      </div>`;
+
+    return;
+  }
+
+  $("ordersList").innerHTML =
+    orders.map(order=>{
+
+      const id =
+        order.id ||
+        order.order_id ||
+        "-";
+
+      const customer =
+        order.customer_name ||
+        order.customerName ||
+        order.name ||
+        "-";
+
+      const phone =
+        order.phone ||
+        order.customer_phone ||
+        "-";
+
+      const status =
+        order.status ||
+        "PENDING";
+
+      const payment =
+        order.payment_status ||
+        order.paymentStatus ||
+        "PENDING";
+
+      const total =
+        Number(
+          order.total ||
+          order.total_amount ||
+          0
+        );
+
+      return `
+        <div class="order-card">
+
+          <div class="order-head">
+
+            <div>
+              <div class="order-id">
+                Order #${escapeHtml(id)}
+              </div>
+
+              <div
+                style="
+                color:#718096;
+                font-size:11px;
+                margin-top:3px;">
+                ${escapeHtml(customer)}
+              </div>
+            </div>
+
+            <span class="status">
+              ${escapeHtml(status)}
+            </span>
+
+          </div>
+
+          <div class="order-meta">
+
+            <div class="meta-item">
+              <small>Phone</small>
+              <strong>
+                ${escapeHtml(phone)}
+              </strong>
+            </div>
+
+            <div class="meta-item">
+              <small>Total</small>
+              <strong>
+                ${money(total)} ETB
+              </strong>
+            </div>
+
+            <div class="meta-item">
+              <small>Payment</small>
+              <strong>
+                ${escapeHtml(payment)}
+              </strong>
+            </div>
+
+            <div class="meta-item">
+              <small>Quantity</small>
+              <strong>
+                ${Number(order.quantity || 0)}
+              </strong>
+            </div>
+
+          </div>
+
+          <div class="order-actions">
+
+            <button
+              style="background:#ecfdf5;color:#047857"
+              onclick="updateOrderStatus('${escapeHtml(id)}','CONFIRMED')">
+              Confirm
+            </button>
+
+            <button
+              style="background:#fff7ed;color:#c2410c"
+              onclick="updateOrderStatus('${escapeHtml(id)}','DELIVERY_PENDING')">
+              Delivery
+            </button>
+
+            <button
+              style="background:#fef2f2;color:#b91c1c"
+              onclick="updateOrderStatus('${escapeHtml(id)}','REJECTED')">
+              Reject
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+async function updateOrderStatus(id,status){
+
+  try{
+
+    await api(
+      API.orders + "/" +
+      encodeURIComponent(id) +
+      "/status",
+      {
+        method:"PATCH",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+          status
+        })
+      }
+    );
+
+    toast(
+      "Order updated",
+      "success"
+    );
+
+    await loadOrders();
+
+  }catch(error){
+
+    toast(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================================================
+   ADVERTISEMENTS
+========================================================= */
+
+async function loadAds(){
+
+  try{
+
+    const data =
+      await api(API.ads);
+
+    advertisements =
+      Array.isArray(data)
+        ? data
+        : (
+            data.advertisements ||
+            data.ads ||
+            data.data ||
+            []
+          );
+
+    renderAds();
+
+  }catch(error){
+
+    $("adsList").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+  }
+}
+
+
+function renderAds(){
+
+  if(!advertisements.length){
+
+    $("adsList").innerHTML =
+      `<div class="empty">
+        No advertisements found.
+      </div>`;
+
+    return;
+  }
+
+  $("adsList").innerHTML =
+    advertisements.map(ad=>{
+
+      return `
+        <div class="order-card">
+
+          <div class="order-head">
+
+            <div>
+              <div class="order-id">
+                ${escapeHtml(
+                  ad.title || "Advertisement"
+                )}
+              </div>
+
+              <div
+                style="
+                margin-top:6px;
+                color:#718096;
+                font-size:12px;">
+                ${escapeHtml(
+                  ad.message || ""
+                )}
+              </div>
+            </div>
+
+            <span class="status">
+              ${escapeHtml(
+                ad.status || "DRAFT"
+              )}
+            </span>
+
+          </div>
+
+          <div class="order-actions">
+
+            <button
+              style="background:#eef5ff;color:#1477ff"
+              onclick="publishAd('${escapeHtml(ad.id || "")}')">
+              Publish
+            </button>
+
+            <button
+              style="background:#fef2f2;color:#b91c1c"
+              onclick="deleteAd('${escapeHtml(ad.id || "")}')">
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+function openAdModal(){
+
+  $("adId").value="";
+  $("adTitle").value="";
+  $("adMessage").value="";
+  $("adImage").value="";
+  $("adUrl").value="";
+
+  $("adModal")
+    .classList.add("show");
+}
+
+
+function closeAdModal(){
+
+  $("adModal")
+    .classList.remove("show");
+}
+
+
+$("adForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const body = {
+
+      title:
+        $("adTitle").value.trim(),
+
+      message:
+        $("adMessage").value.trim(),
+
+      image_url:
+        $("adImage").value.trim(),
+
+      button_url:
+        $("adUrl").value.trim()
+    };
+
+    try{
+
+      await api(
+        API.ads,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+      toast(
+        "Advertisement saved",
+        "success"
+      );
+
+      closeAdModal();
+
+      await loadAds();
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+  }
+);
+
+
+async function publishAd(id){
+
+  if(!id){
+    toast("Advertisement ID missing","error");
+    return;
+  }
+
+  try{
+
+    await api(
+      API.ads + "/" +
+      encodeURIComponent(id) +
+      "/publish",
+      {
+        method:"POST"
+      }
+    );
+
+    toast(
+      "Advertisement published",
+      "success"
+    );
+
+    await loadAds();
+
+  }catch(error){
+
+    toast(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+async function deleteAd(id){
+
+  if(!confirm(
+    "Delete this advertisement?"
+  )){
+    return;
+  }
+
+  try{
+
+    await api(
+      API.ads + "/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    toast(
+      "Advertisement deleted",
+      "success"
+    );
+
+    await loadAds();
+
+  }catch(error){
+
+    toast(
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================================================
+   EMPLOYEES
+========================================================= */
+
+async function loadEmployees(){
+
+  try{
+
+    const data =
+      await api(API.employees);
+
+    employees =
+      Array.isArray(data)
+        ? data
+        : (
+            data.employees ||
+            data.data ||
+            []
+          );
+
+    renderEmployees();
+
+  }catch(error){
+
+    $("employeesList").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+  }
+}
+
+
+function renderEmployees(){
+
+  if(!employees.length){
+
+    $("employeesList").innerHTML =
+      `<div class="empty">
+        No employees found.
+      </div>`;
+
+    return;
+  }
+
+  $("employeesList").innerHTML =
+    employees.map(employee=>{
+
+      return `
+        <div class="order-card">
+
+          <div class="order-head">
+
+            <div>
+              <div class="order-id">
+                ${escapeHtml(
+                  employee.name ||
+                  employee.username ||
+                  "Employee"
+                )}
+              </div>
+
+              <div
+                style="
+                color:#718096;
+                font-size:11px;
+                margin-top:4px;">
+                @${escapeHtml(
+                  employee.username || ""
+                )}
+              </div>
+            </div>
+
+            <span class="status">
+              ${escapeHtml(
+                employee.role || "employee"
+              )}
+            </span>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+function openEmployeeModal(){
+
+  $("eUsername").value="";
+  $("eName").value="";
+  $("ePassword").value="";
+
+  document
+    .querySelectorAll(".perm")
+    .forEach(el=>{
+      el.checked=false;
+    });
+
+  $("employeeModal")
+    .classList.add("show");
+}
+
+
+function closeEmployeeModal(){
+
+  $("employeeModal")
+    .classList.remove("show");
+}
+
+
+$("employeeForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const permissions =
+      Array.from(
+        document.querySelectorAll(".perm:checked")
+      ).map(
+        el=>el.value
+      );
+
+    const body = {
+
+      username:
+        $("eUsername").value.trim(),
+
+      name:
+        $("eName").value.trim(),
+
+      password:
+        $("ePassword").value,
+
+      permissions
+    };
+
+    try{
+
+      await api(
+        API.employees,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+      toast(
+        "Employee created",
+        "success"
+      );
+
+      closeEmployeeModal();
+
+      await loadEmployees();
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+
+  }
+);
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+async function loadReports(){
+
+  try{
+
+    const data =
+      await api(API.reports);
+
+    const sales =
+      Number(
+        data.sales ||
+        data.total_sales ||
+        0
+      );
+
+    const profit =
+      Number(
+        data.profit ||
+        data.total_profit ||
+        0
+      );
+
+    const ordersCount =
+      Number(
+        data.orders ||
+        data.total_orders ||
+        orders.length ||
+        0
+      );
+
+    $("reportsContent").innerHTML = `
+
+      <div class="stats"
+           style="margin:0;">
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Sales
+          </div>
+
+          <div class="stat-value">
+            ${money(sales)}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Profit
+          </div>
+
+          <div class="stat-value">
+            ${money(profit)}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            Orders
+          </div>
+
+          <div class="stat-value">
+            ${ordersCount}
+          </div>
+        </div>
+
+      </div>
+    `;
+
+  }catch(error){
+
+    $("reportsContent").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+  }
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+async function loadSettings(){
+
+  try{
+
+    const payment =
+      await api(API.payment);
+
+    const p =
+      payment.settings ||
+      payment.data ||
+      payment ||
+      {};
+
+    $("paymentMethod").value =
+      p.method ||
+      p.payment_method ||
+      "";
+
+    $("paymentAccount").value =
+      p.account ||
+      p.account_number ||
+      p.phone ||
+      "";
+
+    $("paymentInstructions").value =
+      p.instructions ||
+      "";
+
+  }catch(error){
+
+    console.log(
+      "Payment settings:",
+      error.message
+    );
+  }
+
+
+  try{
+
+    const telegram =
+      await api(API.telegram);
+
+    const t =
+      telegram.settings ||
+      telegram.data ||
+      telegram ||
+      {};
+
+    $("telegramChatId").value =
+      t.admin_chat_id ||
+      t.chat_id ||
+      "";
+
+    $("telegramBotUsername").value =
+      t.bot_username ||
+      "uni_market_shop_bot";
+
+  }catch(error){
+
+    console.log(
+      "Telegram settings:",
+      error.message
+    );
+  }
+
+
+  await loadChannels();
+}
+
+
+$("paymentForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const body = {
+
+      method:
+        $("paymentMethod").value.trim(),
+
+      account:
+        $("paymentAccount").value.trim(),
+
+      instructions:
+        $("paymentInstructions").value.trim()
+    };
+
+    try{
+
+      await api(
+        API.payment,
+        {
+          method:"PUT",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+      toast(
+        "Payment settings saved",
+        "success"
+      );
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+  }
+);
+
+
+$("telegramForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const body = {
+
+      admin_chat_id:
+        $("telegramChatId").value.trim(),
+
+      bot_username:
+        $("telegramBotUsername").value.trim()
+    };
+
+    try{
+
+      await api(
+        API.telegram,
+        {
+          method:"PUT",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+      toast(
+        "Telegram settings saved",
+        "success"
+      );
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+  }
+);
+
+
+/* =========================================================
+   CHANNELS
+========================================================= */
+
+async function loadChannels(){
+
+  try{
+
+    const data =
+      await api(API.channels);
+
+    channels =
+      Array.isArray(data)
+        ? data
+        : (
+            data.channels ||
+            data.data ||
+            []
+          );
+
+    renderChannels();
+
+  }catch(error){
+
+    $("channelsList").innerHTML =
+      `<div class="empty">
+        ${escapeHtml(error.message)}
+      </div>`;
+  }
+}
+
+
+function renderChannels(){
+
+  if(!channels.length){
+
+    $("channelsList").innerHTML =
+      `<div class="empty">
+        No Telegram channels.
+      </div>`;
+
+    return;
+  }
+
+  $("channelsList").innerHTML =
+    channels.map(channel=>`
+
+      <div class="order-card">
+
+        <div class="order-head">
+
+          <div>
+            <div class="order-id">
+              ${escapeHtml(
+                channel.name ||
+                channel.channel_name ||
+                "Telegram Channel"
+              )}
+            </div>
+
+            <div
+              style="
+              color:#718096;
+              font-size:11px;
+              margin-top:4px;">
+              ${escapeHtml(
+                channel.chat_id ||
+                channel.channel_id ||
+                channel.username ||
+                ""
+              )}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+function openChannelModal(){
+
+  $("cName").value="";
+  $("cChatId").value="";
+
+  $("channelModal")
+    .classList.add("show");
+}
+
+
+function closeChannelModal(){
+
+  $("channelModal")
+    .classList.remove("show");
+}
+
+
+$("channelForm").addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const body = {
+
+      name:
+        $("cName").value.trim(),
+
+      chat_id:
+        $("cChatId").value.trim()
+    };
+
+    try{
+
+      await api(
+        API.channels,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+      toast(
+        "Channel added",
+        "success"
+      );
+
+      closeChannelModal();
+
+      await loadChannels();
+
+    }catch(error){
+
+      toast(
+        error.message,
+        "error"
+      );
+    }
+  }
+);
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  $("statProducts").textContent =
+    products.length;
+
+  $("statOrders").textContent =
+    orders.length;
+
+  const stock =
+    products.reduce(
+      (sum,p)=>
+        sum + Number(p.stock || 0),
+      0
+    );
+
+  $("statStock").textContent =
+    stock;
+
+  const sales =
+    orders.reduce(
+      (sum,o)=>{
+
+        const status =
+          String(
+            o.status || ""
+          ).toUpperCase();
+
+        if(
+          status === "REJECTED" ||
+          status === "CANCELLED"
+        ){
+          return sum;
+        }
+
+        return sum +
+          Number(
+            o.total ||
+            o.total_amount ||
+            0
+          );
+
+      },
+      0
+    );
+
+  $("statSales").textContent =
+    money(sales);
+}
+
+
+/* =========================================================
+   MODAL BACKGROUND CLOSE
+========================================================= */
+
+document
+  .querySelectorAll(".modal")
+  .forEach(modal=>{
+
+    modal.addEventListener(
+      "click",
+      event=>{
+
+        if(event.target === modal){
+          modal.classList.remove("show");
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   START
+========================================================= */
+
+checkSession();
+
+</script>
+
+</body>
+</html>
