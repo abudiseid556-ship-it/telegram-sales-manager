@@ -1,0 +1,4783 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>Telegram Sales Manager — Master Admin</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --blue:#1477ff;
+  --blue2:#655cff;
+  --bg:#f4f7fb;
+  --card:#fff;
+  --text:#182230;
+  --muted:#718096;
+  --border:#e8edf5;
+  --green:#16a34a;
+  --orange:#f59e0b;
+  --red:#ef4444;
+  --shadow:0 10px 30px rgba(30,60,100,.08);
+  --radius:20px;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans Ethiopic",
+    "Segoe UI",
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:88px;
+  transform:translateX(-50%) translateY(20px);
+  background:#182230;
+  color:white;
+  padding:13px 18px;
+  border-radius:14px;
+  z-index:9999;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  max-width:90%;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+#toast.success{
+  background:#15803d;
+}
+
+#toast.error{
+  background:#dc2626;
+}
+
+/* LOGIN */
+
+#loginPage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,#80b8ff55,transparent 35%),
+    linear-gradient(145deg,#1477ff,#655cff);
+}
+
+.login-card{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:28px;
+  padding:30px 24px;
+  box-shadow:0 25px 70px rgba(0,0,0,.18);
+}
+
+.logo{
+  width:76px;
+  height:76px;
+  margin:0 auto 14px;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:38px;
+  box-shadow:0 15px 30px #1477ff40;
+}
+
+.login-card h1{
+  margin:0;
+  text-align:center;
+  font-size:25px;
+}
+
+.login-sub{
+  text-align:center;
+  color:var(--muted);
+  margin:7px 0 26px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  border:1px solid var(--border);
+  background:#f9fbfe;
+  border-radius:13px;
+  padding:13px 14px;
+  outline:none;
+  transition:.2s;
+}
+
+.field textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--blue);
+  background:white;
+  box-shadow:0 0 0 3px #1477ff18;
+}
+
+.primary{
+  width:100%;
+  padding:14px 18px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  font-weight:800;
+  box-shadow:0 9px 20px #1477ff30;
+}
+
+.secondary{
+  padding:11px 15px;
+  border-radius:12px;
+  background:#eef4ff;
+  color:#1264d6;
+  font-weight:700;
+}
+
+.danger{
+  padding:11px 15px;
+  border-radius:12px;
+  background:#fff0f0;
+  color:#dc2626;
+  font-weight:700;
+}
+
+.success-btn{
+  padding:11px 15px;
+  border-radius:12px;
+  background:#eaf9ef;
+  color:#15803d;
+  font-weight:700;
+}
+
+/* APP */
+
+#app{
+  min-height:100vh;
+  padding-bottom:82px;
+}
+
+.topbar{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  padding:20px 18px 25px;
+  border-radius:0 0 28px 28px;
+}
+
+.topbar-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-icon{
+  width:48px;
+  height:48px;
+  background:#ffffff25;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+}
+
+.brand-title{
+  font-weight:900;
+  font-size:19px;
+}
+
+.brand-sub{
+  font-size:12px;
+  opacity:.85;
+}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+}
+
+.icon-btn{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:#ffffff20;
+  color:white;
+  font-size:19px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+
+.stat{
+  background:#ffffff16;
+  border:1px solid #ffffff20;
+  border-radius:17px;
+  padding:14px;
+}
+
+.stat-value{
+  font-size:22px;
+  font-weight:900;
+}
+
+.stat-label{
+  font-size:12px;
+  opacity:.85;
+  margin-top:3px;
+}
+
+/* CONTENT */
+
+.container{
+  width:min(1100px,100%);
+  margin:auto;
+  padding:18px 14px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:8px 2px 14px;
+}
+
+.section-title{
+  font-size:21px;
+  font-weight:900;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:17px;
+  margin-bottom:14px;
+}
+
+.card-title{
+  font-weight:900;
+  font-size:17px;
+  margin-bottom:13px;
+}
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:11px;
+  margin-bottom:18px;
+}
+
+.quick{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--shadow);
+  text-align:left;
+}
+
+.quick-icon{
+  width:43px;
+  height:43px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef4ff;
+  font-size:22px;
+  margin-bottom:9px;
+}
+
+.quick strong{
+  display:block;
+  font-size:14px;
+}
+
+.quick span{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+/* PRODUCT */
+
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.product{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+.product-photo{
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  background:#eef2f7;
+}
+
+.product-body{
+  padding:12px;
+}
+
+.product-name{
+  font-weight:900;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.product-category{
+  font-size:11px;
+  color:var(--muted);
+  margin:4px 0;
+}
+
+.product-price{
+  font-weight:900;
+  color:var(--blue);
+}
+
+.product-stock{
+  font-size:11px;
+  margin-top:4px;
+}
+
+.product-actions{
+  display:flex;
+  gap:7px;
+  margin-top:10px;
+}
+
+.product-actions button{
+  flex:1;
+  padding:9px 6px;
+  border-radius:10px;
+  font-size:11px;
+}
+
+/* ORDERS */
+
+.order{
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:14px;
+  margin-bottom:11px;
+  background:white;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.order-id{
+  font-weight:900;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:800;
+}
+
+.badge.pending{
+  background:#fff7df;
+  color:#b77900;
+}
+
+.badge.confirmed{
+  background:#e9f9ef;
+  color:#15803d;
+}
+
+.badge.rejected{
+  background:#fff0f0;
+  color:#dc2626;
+}
+
+.badge.delivery{
+  background:#eaf2ff;
+  color:#1769d0;
+}
+
+.order-info{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.order-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.order-actions button{
+  flex:1;
+}
+
+/* TABLE */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+
+th,td{
+  padding:11px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:13px;
+}
+
+th{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* REPORT */
+
+.report-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:11px;
+}
+
+.report-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:17px;
+  box-shadow:var(--shadow);
+}
+
+.report-card .label{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.report-card .value{
+  font-size:22px;
+  font-weight:900;
+  margin-top:7px;
+}
+
+/* CHANNEL */
+
+.channel-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:15px;
+  margin-bottom:9px;
+}
+
+.channel-item input{
+  width:18px;
+  height:18px;
+}
+
+.channel-info{
+  flex:1;
+}
+
+.channel-name{
+  font-weight:800;
+  font-size:14px;
+}
+
+.channel-id{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#07142680;
+  z-index:5000;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(650px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:white;
+  border-radius:25px 25px 0 0;
+  padding:20px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.modal-title{
+  font-size:20px;
+  font-weight:900;
+}
+
+.close{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:#f1f4f8;
+  font-size:20px;
+}
+
+/* BOTTOM NAV */
+
+.bottom-nav{
+  position:fixed;
+  z-index:4000;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#ffffffed;
+  backdrop-filter:blur(15px);
+  border-top:1px solid var(--border);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+
+.nav-btn{
+  background:transparent;
+  color:#718096;
+  padding:6px 2px;
+  border-radius:12px;
+  font-size:10px;
+}
+
+.nav-btn .nav-icon{
+  display:block;
+  font-size:19px;
+  margin-bottom:2px;
+}
+
+.nav-btn.active{
+  color:var(--blue);
+  font-weight:900;
+}
+
+/* EMPTY */
+
+.empty{
+  padding:30px 15px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.empty-icon{
+  font-size:38px;
+  margin-bottom:8px;
+}
+
+/* DESKTOP */
+
+@media(min-width:700px){
+  .stats{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .quick-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .product-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .report-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .modal{
+    align-items:center;
+    padding:20px;
+  }
+
+  .modal-box{
+    border-radius:25px;
+    max-height:90vh;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="toast"></div>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginPage">
+
+  <div class="login-card">
+
+    <div class="logo">🛍️</div>
+
+    <h1>UNI MARKET</h1>
+
+    <div class="login-sub">
+      Telegram Sales Manager • Master Admin
+    </div>
+
+    <div class="field">
+      <label>Username</label>
+      <input id="loginUsername"
+             type="text"
+             autocomplete="username"
+             placeholder="Username">
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input id="loginPassword"
+             type="password"
+             autocomplete="current-password"
+             placeholder="Password">
+    </div>
+
+    <button class="primary" onclick="login()">
+      🔐 Login
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= APP ================= -->
+
+<div id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="topbar-row">
+
+      <div class="brand">
+
+        <div class="brand-icon">🛍️</div>
+
+        <div>
+          <div class="brand-title">
+            Telegram Sales Manager
+          </div>
+
+          <div class="brand-sub">
+            Master Admin • UNI MARKET
+          </div>
+        </div>
+
+      </div>
+
+      <div class="top-actions">
+
+        <button class="icon-btn"
+                onclick="refreshAll()">
+          ↻
+        </button>
+
+        <button class="icon-btn"
+                onclick="logout()">
+          ↪
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        <div id="statProducts" class="stat-value">0</div>
+        <div class="stat-label">📦 ምርቶች</div>
+      </div>
+
+      <div class="stat">
+        <div id="statPending" class="stat-value">0</div>
+        <div class="stat-label">🟠 Pending Orders</div>
+      </div>
+
+      <div class="stat">
+        <div id="statSales" class="stat-value">0 ETB</div>
+        <div class="stat-label">💰 ሽያጭ</div>
+      </div>
+
+      <div class="stat">
+        <div id="statStock" class="stat-value">0</div>
+        <div class="stat-label">📦 Stock</div>
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <!-- ================= HOME ================= -->
+
+    <section id="homeSection"
+             class="section active">
+
+      <div class="section-head">
+        <div class="section-title">
+          📊 Dashboard
+        </div>
+      </div>
+
+
+      <div class="quick-grid">
+
+        <button class="quick"
+                onclick="showSection('products')">
+
+          <div class="quick-icon">📦</div>
+
+          <strong>አዲስ ምርት</strong>
+
+          <span>
+            ስም • ዋጋ • Stock
+          </span>
+
+        </button>
+
+
+        <button class="quick"
+                onclick="showSection('orders')">
+
+          <div class="quick-icon">🛒</div>
+
+          <strong>Orders</strong>
+
+          <span>
+            Confirm • Reject
+          </span>
+
+        </button>
+
+
+        <button class="quick"
+                onclick="showSection('ads')">
+
+          <div class="quick-icon">📢</div>
+
+          <strong>ማስታወቂያ</strong>
+
+          <span>
+            Save • Publish
+          </span>
+
+        </button>
+
+
+        <button class="quick"
+                onclick="showSection('reports')">
+
+          <div class="quick-icon">📈</div>
+
+          <strong>Reports</strong>
+
+          <span>
+            Sales • Profit • Stock
+          </span>
+
+        </button>
+
+
+        <button class="quick"
+                onclick="showSection('employees')">
+
+          <div class="quick-icon">👥</div>
+
+          <strong>Employees</strong>
+
+          <span>
+            Users • Permissions
+          </span>
+
+        </button>
+
+
+        <button class="quick"
+                onclick="showSection('settings')">
+
+          <div class="quick-icon">⚙️</div>
+
+          <strong>Settings</strong>
+
+          <span>
+            Payment • Telegram
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <div class="section-head">
+        <div class="section-title">
+          📦 የቅርብ ምርቶች
+        </div>
+
+        <button class="secondary"
+                onclick="showSection('products')">
+          ሁሉንም
+        </button>
+      </div>
+
+      <div id="homeProducts"
+           class="product-grid"></div>
+
+
+      <div class="section-head"
+           style="margin-top:22px">
+
+        <div class="section-title">
+          🛒 Pending Orders
+        </div>
+
+        <button class="secondary"
+                onclick="showSection('orders')">
+          Orders
+        </button>
+
+      </div>
+
+      <div id="homeOrders"></div>
+
+    </section>
+
+
+    <!-- ================= PRODUCTS ================= -->
+
+    <section id="productsSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          📦 Products
+        </div>
+
+        <button class="primary"
+                style="width:auto"
+                onclick="openProductModal()">
+          ＋ አዲስ
+        </button>
+
+      </div>
+
+      <div id="productsList"
+           class="product-grid"></div>
+
+    </section>
+
+
+    <!-- ================= ORDERS ================= -->
+
+    <section id="ordersSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          🛒 Orders
+        </div>
+
+        <button class="secondary"
+                onclick="loadOrders()">
+          ↻
+        </button>
+
+      </div>
+
+      <div class="card">
+
+        <div class="muted">
+          🧾 የደረሰኝ ማረጋገጫ እና
+          Order Confirmation በAdmin በኩል ይደረጋል።
+        </div>
+
+      </div>
+
+      <div id="ordersList"></div>
+
+    </section>
+
+
+    <!-- ================= ADS ================= -->
+
+    <section id="adsSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          📢 Advertising
+        </div>
+
+        <button class="primary"
+                style="width:auto"
+                onclick="openAdModal()">
+          ＋ ማስታወቂያ
+        </button>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="muted">
+          📢 ከታች የሚመረጡትን Channel ይምረጡ፤
+          ከዚያ Publish ሲደረግ ማስታወቂያው
+          ወደ የተመረጡት Channels ይላካል።
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          🔥 Advertisement Types
+        </div>
+
+        <div class="quick-grid">
+
+          <button class="quick"
+                  onclick="setAdType('new_product')">
+            🆕 አዲስ ምርት
+          </button>
+
+          <button class="quick"
+                  onclick="setAdType('special_offer')">
+            🔥 ልዩ ቅናሽ
+          </button>
+
+          <button class="quick"
+                  onclick="setAdType('limited_stock')">
+            ⚡ ውስን Stock
+          </button>
+
+          <button class="quick"
+                  onclick="setAdType('discount')">
+            💰 የዋጋ ቅናሽ
+          </button>
+
+          <button class="quick"
+                  onclick="setAdType('featured')">
+            ⭐ ተመራጭ
+          </button>
+
+          <button class="quick"
+                  onclick="setAdType('normal')">
+            📢 መደበኛ
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div id="adsList"></div>
+
+    </section>
+
+
+    <!-- ================= EMPLOYEES ================= -->
+
+    <section id="employeesSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          👥 Employees
+        </div>
+
+        <button class="primary"
+                style="width:auto"
+                onclick="openEmployeeModal()">
+          ＋ Employee
+        </button>
+
+      </div>
+
+      <div id="employeesList"></div>
+
+    </section>
+
+
+    <!-- ================= REPORTS ================= -->
+
+    <section id="reportsSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          📈 Reports
+        </div>
+
+        <button class="secondary"
+                onclick="loadReports()">
+          ↻
+        </button>
+
+      </div>
+
+
+      <div class="report-grid">
+
+        <div class="report-card">
+          <div class="label">💰 Sales</div>
+          <div id="reportSales"
+               class="value">0 ETB</div>
+        </div>
+
+        <div class="report-card">
+          <div class="label">📈 Profit</div>
+          <div id="reportProfit"
+               class="value">0 ETB</div>
+        </div>
+
+        <div class="report-card">
+          <div class="label">🛒 Orders</div>
+          <div id="reportOrders"
+               class="value">0</div>
+        </div>
+
+        <div class="report-card">
+          <div class="label">📦 Stock</div>
+          <div id="reportStock"
+               class="value">0</div>
+        </div>
+
+      </div>
+
+      <div id="reportDetails"
+           style="margin-top:15px"></div>
+
+    </section>
+
+
+    <!-- ================= SETTINGS ================= -->
+
+    <section id="settingsSection"
+             class="section">
+
+      <div class="section-head">
+
+        <div class="section-title">
+          ⚙️ Settings
+        </div>
+
+      </div>
+
+
+      <!-- PAYMENT -->
+
+      <div class="card">
+
+        <div class="card-title">
+          💳 Payment Settings
+        </div>
+
+        <div class="field">
+          <label>Payment Information</label>
+
+          <textarea id="paymentInformation"
+                    placeholder="የባንክ / Telebirr / CBE / የክፍያ መረጃ"></textarea>
+        </div>
+
+        <button class="primary"
+                onclick="savePaymentSettings()">
+          💾 Save Payment Settings
+        </button>
+
+      </div>
+
+
+      <!-- CHANNELS -->
+
+      <div class="card">
+
+        <div class="card-title">
+          📢 Telegram Channels
+        </div>
+
+        <div class="muted"
+             style="margin-bottom:13px">
+          ብዙ Channel ማገናኘት ይችላሉ።
+        </div>
+
+        <button class="primary"
+                onclick="openChannelModal()">
+          ＋ Channel
+        </button>
+
+        <div id="channelsList"
+             style="margin-top:14px"></div>
+
+        <div class="card"
+             style="background:#f8fbff;margin-top:14px">
+
+          💡 Channel ላይ Bot-ውን Admin አድርገው
+          <strong>Post Messages</strong> permission ይስጡ።
+
+        </div>
+
+      </div>
+
+
+      <!-- BOT -->
+
+      <div class="card">
+
+        <div class="card-title">
+          🤖 Telegram Bot
+        </div>
+
+        <div class="field">
+
+          <label>Bot Username</label>
+
+          <input id="telegramBotUsername"
+                 placeholder="@uni_market_shop_bot">
+
+        </div>
+
+        <button class="primary"
+                onclick="saveTelegramSettings()">
+          💾 Save Bot Settings
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= NAV ================= -->
+
+  <nav class="bottom-nav">
+
+    <button class="nav-btn active"
+            data-section="home"
+            onclick="showSection('home')">
+      <span class="nav-icon">⌂</span>
+      ዋና
+    </button>
+
+    <button class="nav-btn"
+            data-section="products"
+            onclick="showSection('products')">
+      <span class="nav-icon">📦</span>
+      Products
+    </button>
+
+    <button class="nav-btn"
+            data-section="orders"
+            onclick="showSection('orders')">
+      <span class="nav-icon">🛒</span>
+      Orders
+    </button>
+
+    <button class="nav-btn"
+            data-section="ads"
+            onclick="showSection('ads')">
+      <span class="nav-icon">📢</span>
+      Ads
+    </button>
+
+    <button class="nav-btn"
+            data-section="reports"
+            onclick="showSection('reports')">
+      <span class="nav-icon">📊</span>
+      Reports
+    </button>
+
+    <button class="nav-btn"
+            data-section="settings"
+            onclick="showSection('settings')">
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- ================= PRODUCT MODAL ================= -->
+
+<div id="productModal"
+     class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        📦 አዲስ ምርት
+      </div>
+
+      <button class="close"
+              onclick="closeModal('productModal')">
+        ×
+      </button>
+
+    </div>
+
+
+    <input type="hidden"
+           id="editingProductId">
+
+
+    <div class="field">
+
+      <label>የምርት ስም</label>
+
+      <input id="pName"
+             placeholder="Product name">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Category</label>
+
+      <select id="pCategory">
+
+        <option value="clothes">
+          👕 አልባሳት
+        </option>
+
+        <option value="electronics">
+          📱 ኤሌክትሮኒክስ
+        </option>
+
+        <option value="children">
+          🧒 የህፃናት
+        </option>
+
+        <option value="women">
+          👩 የሴቶች
+        </option>
+
+        <option value="furniture">
+          🛋️ የቤት እቃዎች
+        </option>
+
+        <option value="others">
+          📦 ሌሎች
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>የግዢ ዋጋ</label>
+
+      <input id="pBuy"
+             type="number"
+             min="0"
+             step="0.01"
+             placeholder="0">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>የሽያጭ ዋጋ</label>
+
+      <input id="pSell"
+             type="number"
+             min="0"
+             step="0.01"
+             placeholder="0">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Stock</label>
+
+      <input id="pStock"
+             type="number"
+             min="0"
+             step="1"
+             placeholder="0">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Product Photo</label>
+
+      <input id="pPhotoFile"
+             type="file"
+             accept="image/*">
+
+      <input id="pPhoto"
+             type="hidden">
+
+      <div id="photoStatus"
+           class="muted"
+           style="margin-top:7px"></div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Product Photo URL</label>
+
+      <input id="pPhotoUrl"
+             type="url"
+             placeholder="https://...">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Description</label>
+
+      <textarea id="pDescription"
+                placeholder="የምርቱ መግለጫ"></textarea>
+
+    </div>
+
+
+    <button class="primary"
+            onclick="saveProduct()">
+      💾 Save Product
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= AD MODAL ================= -->
+
+<div id="adModal"
+     class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        📢 አዲስ ማስታወቂያ
+      </div>
+
+      <button class="close"
+              onclick="closeModal('adModal')">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Advertisement Type</label>
+
+      <select id="adType">
+
+        <option value="new_product">
+          🆕 አዲስ ምርት
+        </option>
+
+        <option value="special_offer">
+          🔥 ልዩ ቅናሽ
+        </option>
+
+        <option value="limited_stock">
+          ⚡ ውስን Stock
+        </option>
+
+        <option value="discount">
+          💰 የዋጋ ቅናሽ
+        </option>
+
+        <option value="featured">
+          ⭐ ተመራጭ
+        </option>
+
+        <option value="normal">
+          📢 መደበኛ ማስታወቂያ
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Product</label>
+
+      <select id="adProduct">
+
+        <option value="">
+          -- Product ምረጥ --
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Title</label>
+
+      <input id="adTitle"
+             placeholder="Advertisement title">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Advertisement Text</label>
+
+      <textarea id="adText"
+                placeholder="የማስታወቂያ ጽሑፍ"></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Button Text</label>
+
+      <input id="adButtonText"
+             value="🛍️ ምርቶችን ይመልከቱ">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Photo URL</label>
+
+      <input id="adPhoto"
+             type="url"
+             placeholder="https://...">
+
+    </div>
+
+
+    <div class="card"
+         style="background:#f8fbff">
+
+      <div style="display:flex;align-items:center;gap:8px">
+
+        <input id="selectAllChannels"
+               class="channel-check"
+               type="checkbox"
+               onchange="toggleAllChannels(this.checked)">
+
+        <span>
+          ሁሉንም Channels ምረጥ
+        </span>
+
+      </div>
+
+      <div id="selectedChannelCount"
+           class="muted"
+           style="margin-top:7px">
+        0 selected
+      </div>
+
+      <div id="adChannels"
+           style="margin-top:12px"></div>
+
+    </div>
+
+
+    <button class="primary"
+            onclick="saveAdvertisement()">
+      💾 Save Advertisement
+    </button>
+
+
+    <button class="success-btn"
+            style="width:100%;margin-top:9px"
+            onclick="publishAdvertisement()">
+      📢 Publish To Channels
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= CHANNEL MODAL ================= -->
+
+<div id="channelModal"
+     class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        📢 Add Telegram Channel
+      </div>
+
+      <button class="close"
+              onclick="closeModal('channelModal')">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Channel Name</label>
+
+      <input id="channelName"
+             placeholder="UNI MARKET">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Channel Chat ID</label>
+
+      <input id="channelChatId"
+             placeholder="-1001234567890">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Channel Username</label>
+
+      <input id="channelUsername"
+             placeholder="@uni_market">
+
+    </div>
+
+
+    <div id="channelCheckResult"
+         class="muted"
+         style="margin-bottom:12px"></div>
+
+
+    <button class="secondary"
+            style="width:100%"
+            onclick="checkChannel()">
+      🔎 Check Connection
+    </button>
+
+
+    <button class="primary"
+            style="margin-top:9px"
+            onclick="saveChannel()">
+      💾 Save Channel
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= EMPLOYEE MODAL ================= -->
+
+<div id="employeeModal"
+     class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        👤 አዲስ Employee
+      </div>
+
+      <button class="close"
+              onclick="closeModal('employeeModal')">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Employee Name</label>
+
+      <input id="employeeName"
+             placeholder="Employee name">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Username</label>
+
+      <input id="employeeUsername"
+             placeholder="username">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Password</label>
+
+      <input id="employeePassword"
+             type="password"
+             placeholder="Password">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Role</label>
+
+      <select id="employeeRole">
+
+        <option value="EMPLOYEE">
+          Employee
+        </option>
+
+        <option value="MANAGER">
+          Manager
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Permissions
+      </div>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="view_orders"
+               checked>
+        View Orders
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="verify_payment">
+        Verify Payment
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="confirm_order">
+        Confirm Order
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="products">
+        Products
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="delete_product">
+        Delete Product
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="advertising">
+        Advertising
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="payment_settings">
+        Payment Settings
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="telegram_settings">
+        Telegram Settings
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="employees">
+        Employees
+      </label>
+
+      <br><br>
+
+      <label>
+        <input type="checkbox"
+               class="perm"
+               value="reports">
+        Reports
+      </label>
+
+    </div>
+
+
+    <button class="primary"
+            onclick="createEmployee()">
+      👤 Create Employee
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const API = {
+
+  auth:"/api/auth",
+
+  products:"/api/products",
+
+  orders:"/api/orders",
+
+  ads:"/api/advertisements",
+
+  employees:"/api/employees",
+
+  reports:"/api/reports",
+
+  payment:"/api/payment-settings",
+
+  telegram:"/api/telegram-settings",
+
+  channels:"/api/telegram-channels",
+
+  telegramCheck:"/api/telegram/check-chat",
+
+  upload:"/api/upload"
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let token =
+  localStorage.getItem("uni_market_auth_token") || "";
+
+let products = [];
+
+let orders = [];
+
+let advertisements = [];
+
+let employees = [];
+
+let channels = [];
+
+let reports = null;
+
+let selectedAdChannels = new Set();
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id =>
+  document.getElementById(id);
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function money(value){
+
+  const n = Number(value || 0);
+
+  return n.toLocaleString("en-US") + " ETB";
+
+}
+
+
+function toast(message,type=""){
+
+  const el = $("toast");
+
+  el.textContent = message;
+
+  el.className = "";
+
+  el.id = "toast";
+
+  if(type){
+    el.classList.add(type);
+  }
+
+  setTimeout(()=>{
+    el.classList.add("show");
+  },10);
+
+  clearTimeout(window.__toastTimer);
+
+  window.__toastTimer =
+    setTimeout(()=>{
+      el.classList.remove("show");
+    },3200);
+
+}
+
+
+function authHeaders(extra={}){
+
+  const headers = {
+    ...extra
+  };
+
+  if(token){
+    headers.Authorization =
+      "Bearer " + token;
+  }
+
+  return headers;
+
+}
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function api(url,options={}){
+
+  const opts = {
+    ...options
+  };
+
+  opts.headers =
+    authHeaders(options.headers || {});
+
+
+  let response;
+
+  try{
+
+    response =
+      await fetch(url,opts);
+
+  }catch(error){
+
+    console.error("NETWORK ERROR",url,error);
+
+    throw new Error(
+      "Server ጋር መገናኘት አልተቻለም።"
+    );
+
+  }
+
+
+  const text =
+    await response.text();
+
+  let data = {};
+
+  try{
+
+    data =
+      text ? JSON.parse(text) : {};
+
+  }catch{
+
+    data = {
+      raw:text
+    };
+
+  }
+
+
+  if(response.status === 401){
+
+    logout();
+
+    throw new Error(
+      "Session expired"
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    const message =
+      data.error ||
+      data.message ||
+      data.raw ||
+      ("Request failed: HTTP " + response.status);
+
+    throw new Error(message);
+
+  }
+
+
+  return data;
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(){
+
+  const username =
+    $("loginUsername").value.trim();
+
+  const password =
+    $("loginPassword").value;
+
+
+  if(!username || !password){
+
+    toast(
+      "Username እና Password ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const data =
+      await api(API.auth,{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+          username,
+          password
+        })
+
+      });
+
+
+    const newToken =
+      data.token ||
+      data.auth_token ||
+      data.access_token;
+
+
+    if(!newToken){
+
+      throw new Error(
+        "Login token አልተገኘም።"
+      );
+
+    }
+
+
+    token = newToken;
+
+    localStorage.setItem(
+      "uni_market_auth_token",
+      token
+    );
+
+
+    showApp();
+
+    toast(
+      "Login successful",
+      "success"
+    );
+
+
+    await refreshAll();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Login failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+function logout(){
+
+  token = "";
+
+  localStorage.removeItem(
+    "uni_market_auth_token"
+  );
+
+  $("app").classList.add("hidden");
+
+  $("loginPage").classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+function showApp(){
+
+  $("loginPage")
+    .classList.add("hidden");
+
+  $("app")
+    .classList.remove("hidden");
+
+}
+
+
+async function boot(){
+
+  if(token){
+
+    showApp();
+
+    try{
+
+      await refreshAll();
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+
+  }
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  boot
+);
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showSection(name){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+
+  const target =
+    $(name + "Section");
+
+  if(target){
+    target.classList.add("active");
+  }
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(btn=>{
+
+      btn.classList.toggle(
+        "active",
+        btn.dataset.section === name
+      );
+
+    });
+
+
+  if(name === "products"){
+    loadProducts();
+  }
+
+  if(name === "orders"){
+    loadOrders();
+  }
+
+  if(name === "ads"){
+    loadAds();
+    loadChannels();
+  }
+
+  if(name === "employees"){
+    loadEmployees();
+  }
+
+  if(name === "reports"){
+    loadReports();
+  }
+
+  if(name === "settings"){
+    loadSettings();
+  }
+
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id){
+
+  $(id).classList.add("show");
+
+}
+
+
+function closeModal(id){
+
+  $(id).classList.remove("show");
+
+}
+
+
+function openProductModal(){
+
+  $("editingProductId").value = "";
+
+  $("pName").value = "";
+
+  $("pCategory").value = "clothes";
+
+  $("pBuy").value = "";
+
+  $("pSell").value = "";
+
+  $("pStock").value = "";
+
+  $("pPhoto").value = "";
+
+  $("pPhotoUrl").value = "";
+
+  $("pDescription").value = "";
+
+  $("pPhotoFile").value = "";
+
+  $("photoStatus").textContent = "";
+
+  openModal("productModal");
+
+}
+
+
+function openAdModal(){
+
+  $("adType").value = "new_product";
+
+  $("adProduct").value = "";
+
+  $("adTitle").value = "";
+
+  $("adText").value = "";
+
+  $("adButtonText").value =
+    "🛍️ ምርቶችን ይመልከቱ";
+
+  $("adPhoto").value = "";
+
+  selectedAdChannels =
+    new Set();
+
+  $("selectAllChannels").checked =
+    false;
+
+  renderAdChannels();
+
+  populateAdProducts();
+
+  openModal("adModal");
+
+}
+
+
+function openChannelModal(){
+
+  $("channelName").value = "";
+
+  $("channelChatId").value = "";
+
+  $("channelUsername").value = "";
+
+  $("channelCheckResult").textContent = "";
+
+  openModal("channelModal");
+
+}
+
+
+function openEmployeeModal(){
+
+  $("employeeName").value = "";
+
+  $("employeeUsername").value = "";
+
+  $("employeePassword").value = "";
+
+  $("employeeRole").value = "EMPLOYEE";
+
+  document
+    .querySelectorAll(".perm")
+    .forEach((el,index)=>{
+      el.checked = index === 0;
+    });
+
+  openModal("employeeModal");
+
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+function normalizeProduct(p){
+
+  return {
+
+    id:p.id,
+
+    name:p.name || "",
+
+    category:p.category || "others",
+
+    buy:Number(
+      p.buy_price ??
+      p.buyPrice ??
+      0
+    ),
+
+    sell:Number(
+      p.sell_price ??
+      p.sellPrice ??
+      0
+    ),
+
+    stock:Number(
+      p.stock ??
+      0
+    ),
+
+    photo:
+      p.photo_url ||
+      p.photoUrl ||
+      "",
+
+    description:
+      p.description || ""
+
+  };
+
+}
+
+
+async function loadProducts(){
+
+  try{
+
+    const data =
+      await api(API.products);
+
+    products =
+      Array.isArray(data)
+        ? data
+        : (
+          data.products ||
+          data.data ||
+          []
+        );
+
+
+    products =
+      products.map(normalizeProduct);
+
+
+    renderProducts();
+
+    populateAdProducts();
+
+    updateStats();
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Products መጫን አልተቻለም።",
+      "error"
+    );
+
+  }
+
+}
+
+
+function categoryName(category){
+
+  const map = {
+
+    clothes:"👕 አልባሳት",
+
+    electronics:"📱 ኤሌክትሮኒክስ",
+
+    children:"🧒 የህፃናት",
+
+    women:"👩 የሴቶች",
+
+    furniture:"🛋️ የቤት እቃዎች",
+
+    others:"📦 ሌሎች"
+
+  };
+
+  return map[category] || category;
+
+}
+
+
+function productHtml(p){
+
+  const photo =
+    p.photo ||
+    "https://via.placeholder.com/600x400?text=UNI+MARKET";
+
+
+  return `
+
+    <div class="product">
+
+      <img
+        class="product-photo"
+        src="${escapeHtml(photo)}"
+        onerror="this.src='https://via.placeholder.com/600x400?text=UNI+MARKET'"
+      >
+
+      <div class="product-body">
+
+        <div class="product-name">
+          ${escapeHtml(p.name)}
+        </div>
+
+        <div class="product-category">
+          ${escapeHtml(categoryName(p.category))}
+        </div>
+
+        <div class="product-price">
+          ${money(p.sell)}
+        </div>
+
+        <div class="product-stock">
+          📦 Stock: ${p.stock}
+        </div>
+
+        <div class="product-actions">
+
+          <button
+            class="secondary"
+            onclick="editProduct('${escapeHtml(p.id)}')">
+            Edit
+          </button>
+
+          <button
+            class="danger"
+            onclick="deleteProduct('${escapeHtml(p.id)}')">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function renderProducts(){
+
+  const html =
+    products.length
+      ? products.map(productHtml).join("")
+      : `
+        <div class="card"
+             style="grid-column:1/-1">
+          <div class="empty">
+            <div class="empty-icon">📦</div>
+            እስካሁን Product የለም።
+          </div>
+        </div>
+      `;
+
+
+  $("productsList").innerHTML =
+    html;
+
+
+  $("homeProducts").innerHTML =
+    products
+      .slice(0,4)
+      .map(productHtml)
+      .join("") ||
+      `
+      <div class="card"
+           style="grid-column:1/-1">
+        <div class="empty">
+          📦 ምርት የለም።
+        </div>
+      </div>
+      `;
+
+}
+
+
+async function uploadPhoto(file){
+
+  if(!file){
+    return "";
+  }
+
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "image",
+    file
+  );
+
+
+  const response =
+    await fetch(
+      API.upload,
+      {
+        method:"POST",
+        headers:authHeaders(),
+        body:formData
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+  let data = {};
+
+  try{
+
+    data =
+      text ? JSON.parse(text) : {};
+
+  }catch{
+
+    data = {
+      raw:text
+    };
+
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      data.raw ||
+      "Photo upload failed"
+    );
+
+  }
+
+
+  return (
+    data.url ||
+    data.photo_url ||
+    data.photoUrl ||
+    data.publicUrl ||
+    data.path ||
+    ""
+  );
+
+}
+
+
+async function saveProduct(){
+
+  const name =
+    $("pName").value.trim();
+
+  const category =
+    $("pCategory").value;
+
+  const buy =
+    Number($("pBuy").value);
+
+  const sell =
+    Number($("pSell").value);
+
+  const stock =
+    Number($("pStock").value);
+
+
+  if(!name){
+
+    toast(
+      "የምርት ስም ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!Number.isFinite(buy) || buy < 0){
+
+    toast(
+      "የግዢ ዋጋ ትክክል አይደለም።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!Number.isFinite(sell) || sell < 0){
+
+    toast(
+      "የሽያጭ ዋጋ ትክክል አይደለም።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!Number.isFinite(stock) || stock < 0){
+
+    toast(
+      "Stock ትክክል አይደለም።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    let photoUrl =
+      $("pPhoto").value.trim();
+
+
+    const manualPhotoUrl =
+      $("pPhotoUrl").value.trim();
+
+
+    if(manualPhotoUrl){
+      photoUrl =
+        manualPhotoUrl;
+    }
+
+
+    const file =
+      $("pPhotoFile").files[0];
+
+
+    if(file){
+
+      $("photoStatus").textContent =
+        "📤 Photo በመጫን ላይ...";
+
+
+      photoUrl =
+        await uploadPhoto(file);
+
+
+      $("pPhoto").value =
+        photoUrl;
+
+
+      $("photoStatus").textContent =
+        "✅ Photo uploaded";
+
+    }
+
+
+    /*
+      IMPORTANT:
+      Send the canonical snake_case fields
+      expected by the server/database.
+    */
+
+    const body = {
+
+      name,
+
+      category,
+
+      buy_price:buy,
+
+      sell_price:sell,
+
+      stock,
+
+      photo_url:photoUrl,
+
+      description:
+        $("pDescription")
+          .value
+          .trim()
+
+    };
+
+
+    const editingId =
+      $("editingProductId").value;
+
+
+    if(editingId){
+
+      await api(
+        API.products +
+        "/" +
+        encodeURIComponent(editingId),
+        {
+          method:"PUT",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+    }else{
+
+      await api(
+        API.products,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+    }
+
+
+    closeModal("productModal");
+
+    toast(
+      editingId
+        ? "Product updated successfully"
+        : "Product saved successfully",
+      "success"
+    );
+
+
+    await loadProducts();
+
+
+  }catch(error){
+
+    console.error(
+      "SAVE PRODUCT ERROR:",
+      error
+    );
+
+    toast(
+      error.message ||
+      "Product ማስቀመጥ አልተቻለም።",
+      "error"
+    );
+
+  }
+
+}
+
+
+function editProduct(id){
+
+  const p =
+    products.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if(!p){
+    toast(
+      "Product አልተገኘም።",
+      "error"
+    );
+    return;
+  }
+
+
+  $("editingProductId").value =
+    p.id;
+
+  $("pName").value =
+    p.name;
+
+  $("pCategory").value =
+    p.category;
+
+  $("pBuy").value =
+    p.buy;
+
+  $("pSell").value =
+    p.sell;
+
+  $("pStock").value =
+    p.stock;
+
+  $("pPhoto").value =
+    p.photo;
+
+  $("pPhotoUrl").value =
+    p.photo;
+
+  $("pDescription").value =
+    p.description;
+
+  $("pPhotoFile").value =
+    "";
+
+  $("photoStatus").textContent =
+    p.photo
+      ? "Existing photo"
+      : "";
+
+  openModal("productModal");
+
+}
+
+
+async function deleteProduct(id){
+
+  if(!confirm(
+    "ይህን Product ማጥፋት ይፈልጋሉ?"
+  )){
+    return;
+  }
+
+
+  try{
+
+    await api(
+      API.products +
+      "/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+
+    toast(
+      "Product deleted",
+      "success"
+    );
+
+
+    await loadProducts();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Product delete failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function normalizeOrder(o){
+
+  return {
+
+    ...o,
+
+    id:o.id,
+
+    status:
+      o.status ||
+      "NEW",
+
+    payment_status:
+      o.payment_status ||
+      o.paymentStatus ||
+      "",
+
+    product_name:
+      o.product_name ||
+      o.productName ||
+      o.product?.name ||
+      "",
+
+    customer_name:
+      o.customer_name ||
+      o.customerName ||
+      o.name ||
+      "",
+
+    username:
+      o.username ||
+      o.telegram_username ||
+      "",
+
+    phone:
+      o.phone ||
+      "",
+
+    total:
+      Number(
+        o.total ??
+        o.total_price ??
+        o.amount ??
+        0
+      )
+
+  };
+
+}
+
+
+async function loadOrders(){
+
+  try{
+
+    const data =
+      await api(API.orders);
+
+    orders =
+      Array.isArray(data)
+        ? data
+        : (
+          data.orders ||
+          data.data ||
+          []
+        );
+
+
+    orders =
+      orders.map(normalizeOrder);
+
+
+    renderOrders();
+
+    updateStats();
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Orders መጫን አልተቻለም።",
+      "error"
+    );
+
+  }
+
+}
+
+
+function orderBadge(status){
+
+  const s =
+    String(status || "")
+      .toUpperCase();
+
+
+  if(
+    s === "CONFIRMED" ||
+    s === "COMPLETED"
+  ){
+
+    return `
+      <span class="badge confirmed">
+        ${escapeHtml(status)}
+      </span>
+    `;
+
+  }
+
+
+  if(
+    s === "REJECTED" ||
+    s === "CANCELLED"
+  ){
+
+    return `
+      <span class="badge rejected">
+        ${escapeHtml(status)}
+      </span>
+    `;
+
+  }
+
+
+  if(
+    s === "DELIVERY_PENDING" ||
+    s === "OUT_FOR_DELIVERY"
+  ){
+
+    return `
+      <span class="badge delivery">
+        ${escapeHtml(status)}
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="badge pending">
+      ${escapeHtml(status || "PENDING")}
+    </span>
+  `;
+
+}
+
+
+function orderHtml(o){
+
+  const status =
+    String(o.status || "")
+      .toUpperCase();
+
+
+  const canConfirm =
+    status !== "CONFIRMED" &&
+    status !== "REJECTED" &&
+    status !== "CANCELLED";
+
+
+  return `
+
+    <div class="order">
+
+      <div class="order-top">
+
+        <div class="order-id">
+          #${escapeHtml(o.id)}
+        </div>
+
+        ${orderBadge(o.status)}
+
+      </div>
+
+
+      <div class="order-info">
+
+        🛍️
+        <strong>
+          ${escapeHtml(o.product_name || "Product")}
+        </strong>
+
+        <br>
+
+        👤
+        ${escapeHtml(o.customer_name || "-")}
+
+        ${
+          o.username
+          ? `<br>💬 ${escapeHtml(o.username)}`
+          : ""
+        }
+
+        ${
+          o.phone
+          ? `<br>📞 ${escapeHtml(o.phone)}`
+          : ""
+        }
+
+        ${
+          o.total
+          ? `<br>💰 ${money(o.total)}`
+          : ""
+        }
+
+        ${
+          o.payment_status
+          ? `<br>💳 Payment: ${escapeHtml(o.payment_status)}`
+          : ""
+        }
+
+      </div>
+
+
+      ${
+        canConfirm
+        ? `
+          <div class="order-actions">
+
+            <button
+              class="success-btn"
+              onclick="changeOrderStatus('${escapeHtml(o.id)}','CONFIRMED')">
+              ✅ Confirm
+            </button>
+
+            <button
+              class="danger"
+              onclick="changeOrderStatus('${escapeHtml(o.id)}','REJECTED')">
+              ❌ Reject
+            </button>
+
+          </div>
+        `
+        : ""
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+function renderOrders(){
+
+  const sorted =
+    [...orders]
+      .sort(
+        (a,b) =>
+          String(b.id)
+            .localeCompare(
+              String(a.id)
+            )
+      );
+
+
+  $("ordersList").innerHTML =
+    sorted.length
+      ? sorted.map(orderHtml).join("")
+      : `
+        <div class="card">
+          <div class="empty">
+            <div class="empty-icon">🛒</div>
+            Order የለም።
+          </div>
+        </div>
+      `;
+
+
+  const pending =
+    sorted
+      .filter(o=>{
+        const s =
+          String(o.status || "")
+            .toUpperCase();
+
+        return ![
+          "CONFIRMED",
+          "REJECTED",
+          "CANCELLED",
+          "COMPLETED"
+        ].includes(s);
+      });
+
+
+  $("homeOrders").innerHTML =
+    pending.length
+      ? pending
+          .slice(0,5)
+          .map(orderHtml)
+          .join("")
+      : `
+        <div class="card">
+          <div class="empty">
+            🛒 Pending Order የለም።
+          </div>
+        </div>
+      `;
+
+}
+
+
+async function changeOrderStatus(id,status){
+
+  if(status === "REJECTED"){
+
+    if(!confirm(
+      "ይህን Order Reject ማድረግ ይፈልጋሉ?"
+    )){
+      return;
+    }
+
+  }
+
+
+  try{
+
+    await api(
+      API.orders +
+      "/" +
+      encodeURIComponent(id) +
+      "/status",
+      {
+
+        method:"PATCH",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            status
+          })
+
+      }
+    );
+
+
+    toast(
+      status === "CONFIRMED"
+        ? "Order confirmed"
+        : "Order rejected",
+      "success"
+    );
+
+
+    await loadOrders();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Order status update failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ADS
+========================================================= */
+
+function populateAdProducts(){
+
+  const select =
+    $("adProduct");
+
+
+  if(!select){
+    return;
+  }
+
+
+  select.innerHTML =
+    `<option value="">
+      -- Product ምረጥ --
+    </option>` +
+    products
+      .map(p=>`
+        <option value="${escapeHtml(p.id)}">
+          ${escapeHtml(p.name)}
+        </option>
+      `)
+      .join("");
+
+}
+
+
+function setAdType(type){
+
+  $("adType").value =
+    type;
+
+  openAdModal();
+
+}
+
+
+async function loadAds(){
+
+  try{
+
+    const data =
+      await api(API.ads);
+
+    advertisements =
+      Array.isArray(data)
+        ? data
+        : (
+          data.advertisements ||
+          data.ads ||
+          data.data ||
+          []
+        );
+
+
+    renderAds();
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+
+function renderAds(){
+
+  if(!advertisements.length){
+
+    $("adsList").innerHTML =
+      `
+      <div class="card">
+        <div class="empty">
+          <div class="empty-icon">📢</div>
+          ማስታወቂያ የለም።
+        </div>
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  $("adsList").innerHTML =
+    advertisements
+      .map(ad=>`
+
+        <div class="card">
+
+          <div style="display:flex;justify-content:space-between;gap:10px">
+
+            <strong>
+              ${escapeHtml(
+                ad.title ||
+                "Advertisement"
+              )}
+            </strong>
+
+            <span class="badge ${
+              ad.status === "PUBLISHED"
+                ? "confirmed"
+                : "pending"
+            }">
+              ${escapeHtml(
+                ad.status ||
+                "DRAFT"
+              )}
+            </span>
+
+          </div>
+
+          <div class="muted"
+               style="margin-top:8px">
+            ${escapeHtml(
+              ad.text ||
+              ad.description ||
+              ""
+            )}
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+
+/* =========================================================
+   CHANNELS
+========================================================= */
+
+async function loadChannels(){
+
+  try{
+
+    const data =
+      await api(API.channels);
+
+    channels =
+      Array.isArray(data)
+        ? data
+        : (
+          data.channels ||
+          data.data ||
+          []
+        );
+
+
+    renderChannels();
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+
+function renderChannels(){
+
+  const container =
+    $("channelsList");
+
+
+  if(!channels.length){
+
+    container.innerHTML =
+      `
+      <div class="empty">
+        📢 እስካሁን Telegram Channel አልተጨመረም።
+      </div>
+      `;
+
+    renderAdChannels();
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    channels
+      .map(ch=>`
+
+        <div class="channel-item">
+
+          <div style="font-size:22px">
+            📢
+          </div>
+
+          <div class="channel-info">
+
+            <div class="channel-name">
+              ${escapeHtml(
+                ch.name ||
+                ch.channel_name ||
+                "Channel"
+              )}
+            </div>
+
+            <div class="channel-id">
+              ${escapeHtml(
+                ch.chat_id ||
+                ch.channel_chat_id ||
+                ""
+              )}
+              ${
+                ch.username
+                  ? " • " +
+                    escapeHtml(ch.username)
+                  : ""
+              }
+            </div>
+
+          </div>
+
+          <button class="danger"
+                  onclick="deleteChannel('${escapeHtml(ch.id)}')">
+            ×
+          </button>
+
+        </div>
+
+      `)
+      .join("");
+
+
+  renderAdChannels();
+
+}
+
+
+function renderAdChannels(){
+
+  const box =
+    $("adChannels");
+
+
+  if(!box){
+    return;
+  }
+
+
+  box.innerHTML =
+    channels.length
+      ? channels.map(ch=>{
+
+          const id =
+            String(
+              ch.id ??
+              ch.chat_id ??
+              ch.channel_chat_id
+            );
+
+          const checked =
+            selectedAdChannels.has(id)
+              ? "checked"
+              : "";
+
+
+          return `
+
+            <label class="channel-item">
+
+              <input
+                class="ad-channel-check"
+                type="checkbox"
+                value="${escapeHtml(id)}"
+                ${checked}
+                onchange="updateSelectedChannels()">
+
+              <div class="channel-info">
+
+                <div class="channel-name">
+                  ${escapeHtml(
+                    ch.name ||
+                    ch.channel_name ||
+                    "Channel"
+                  )}
+                </div>
+
+                <div class="channel-id">
+                  ${escapeHtml(
+                    ch.chat_id ||
+                    ch.channel_chat_id ||
+                    ""
+                  )}
+                </div>
+
+              </div>
+
+            </label>
+
+          `;
+
+        }).join("")
+      : `
+        <div class="muted">
+          Telegram Channel የለም።
+        </div>
+      `;
+
+
+  updateSelectedChannels();
+
+}
+
+
+function updateSelectedChannels(){
+
+  selectedAdChannels =
+    new Set(
+      [...document.querySelectorAll(
+        ".ad-channel-check:checked"
+      )]
+      .map(el=>String(el.value))
+    );
+
+
+  $("selectedChannelCount").textContent =
+    `${selectedAdChannels.size} selected`;
+
+}
+
+
+function toggleAllChannels(checked){
+
+  document
+    .querySelectorAll(".ad-channel-check")
+    .forEach(el=>{
+      el.checked =
+        checked;
+    });
+
+
+  updateSelectedChannels();
+
+}
+
+
+async function checkChannel(){
+
+  const chatId =
+    $("channelChatId")
+      .value
+      .trim();
+
+
+  if(!chatId){
+
+    toast(
+      "Channel Chat ID ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const data =
+      await api(
+        API.telegramCheck,
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              chat_id:chatId
+            })
+
+        }
+      );
+
+
+    $("channelCheckResult")
+      .textContent =
+        data.message ||
+        data.title ||
+        "✅ Channel connection successful";
+
+
+    toast(
+      "Channel connection checked",
+      "success"
+    );
+
+
+  }catch(error){
+
+    $("channelCheckResult")
+      .textContent =
+        "❌ " +
+        error.message;
+
+    toast(
+      error.message ||
+      "Channel check failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+async function saveChannel(){
+
+  const body = {
+
+    name:
+      $("channelName")
+        .value
+        .trim(),
+
+    chat_id:
+      $("channelChatId")
+        .value
+        .trim(),
+
+    username:
+      $("channelUsername")
+        .value
+        .trim()
+
+  };
+
+
+  if(!body.name || !body.chat_id){
+
+    toast(
+      "Channel Name እና Chat ID ያስፈልጋሉ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    await api(
+      API.channels,
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+
+      }
+    );
+
+
+    closeModal("channelModal");
+
+    toast(
+      "Channel saved",
+      "success"
+    );
+
+
+    await loadChannels();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Channel save failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+async function deleteChannel(id){
+
+  if(!confirm(
+    "ይህን Channel ማጥፋት ይፈልጋሉ?"
+  )){
+    return;
+  }
+
+
+  try{
+
+    await api(
+      API.channels +
+      "/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+
+    await loadChannels();
+
+    toast(
+      "Channel deleted",
+      "success"
+    );
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Channel delete failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SAVE AD
+========================================================= */
+
+async function saveAdvertisement(){
+
+  const body = {
+
+    type:
+      $("adType").value,
+
+    product_id:
+      $("adProduct").value || null,
+
+    title:
+      $("adTitle")
+        .value
+        .trim(),
+
+    text:
+      $("adText")
+        .value
+        .trim(),
+
+    button_text:
+      $("adButtonText")
+        .value
+        .trim(),
+
+    photo_url:
+      $("adPhoto")
+        .value
+        .trim(),
+
+    channel_ids:
+      [...selectedAdChannels]
+
+  };
+
+
+  if(!body.title){
+
+    toast(
+      "Advertisement Title ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    await api(
+      API.ads,
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(body)
+
+      }
+    );
+
+
+    closeModal("adModal");
+
+    toast(
+      "Advertisement saved",
+      "success"
+    );
+
+
+    await loadAds();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Advertisement save failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+async function publishAdvertisement(){
+
+  const title =
+    $("adTitle")
+      .value
+      .trim();
+
+  const text =
+    $("adText")
+      .value
+      .trim();
+
+
+  if(!title || !text){
+
+    toast(
+      "Title እና Advertisement Text ያስገቡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(selectedAdChannels.size === 0){
+
+    toast(
+      "ቢያንስ አንድ Channel ይምረጡ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    /*
+      Save first so the advertisement
+      exists before publishing.
+    */
+
+    const body = {
+
+      type:
+        $("adType").value,
+
+      product_id:
+        $("adProduct").value || null,
+
+      title,
+
+      text,
+
+      button_text:
+        $("adButtonText")
+          .value
+          .trim(),
+
+      photo_url:
+        $("adPhoto")
+          .value
+          .trim(),
+
+      channel_ids:
+        [...selectedAdChannels]
+
+    };
+
+
+    const saved =
+      await api(
+        API.ads,
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(body)
+
+        }
+      );
+
+
+    const adId =
+      saved.id ||
+      saved.advertisement?.id ||
+      saved.data?.id;
+
+
+    if(!adId){
+
+      throw new Error(
+        "Advertisement ID አልተመለሰም።"
+      );
+
+    }
+
+
+    await api(
+      API.ads +
+      "/" +
+      encodeURIComponent(adId) +
+      "/publish",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+            channel_ids:
+              [...selectedAdChannels]
+          })
+
+      }
+    );
+
+
+    closeModal("adModal");
+
+    toast(
+      "Advertisement published successfully",
+      "success"
+    );
+
+
+    await loadAds();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Advertisement publish failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   EMPLOYEES
+========================================================= */
+
+async function loadEmployees(){
+
+  try{
+
+    const data =
+      await api(API.employees);
+
+    employees =
+      Array.isArray(data)
+        ? data
+        : (
+          data.employees ||
+          data.data ||
+          []
+        );
+
+
+    renderEmployees();
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Employees መጫን አልተቻለም።",
+      "error"
+    );
+
+  }
+
+}
+
+
+function renderEmployees(){
+
+  if(!employees.length){
+
+    $("employeesList").innerHTML =
+      `
+      <div class="card">
+        <div class="empty">
+          <div class="empty-icon">👥</div>
+          Employee የለም።
+        </div>
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  $("employeesList").innerHTML =
+    employees.map(emp=>`
+
+      <div class="card">
+
+        <div style="display:flex;justify-content:space-between;gap:10px">
+
+          <div>
+
+            <strong>
+              ${escapeHtml(
+                emp.name ||
+                emp.employee_name ||
+                emp.username ||
+                "Employee"
+              )}
+            </strong>
+
+            <div class="muted">
+              @${escapeHtml(
+                emp.username ||
+                ""
+              )}
+            </div>
+
+          </div>
+
+          <span class="badge confirmed">
+            ${escapeHtml(
+              emp.role ||
+              "EMPLOYEE"
+            )}
+          </span>
+
+        </div>
+
+        <div style="margin-top:10px"
+             class="muted">
+
+          ${
+            Array.isArray(emp.permissions)
+              ? emp.permissions.join(" • ")
+              : "Permissions configured"
+
+          }
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+async function createEmployee(){
+
+  const name =
+    $("employeeName")
+      .value
+      .trim();
+
+  const username =
+    $("employeeUsername")
+      .value
+      .trim();
+
+  const password =
+    $("employeePassword")
+      .value;
+
+  const role =
+    $("employeeRole").value;
+
+
+  const permissions =
+    [...document.querySelectorAll(".perm:checked")]
+      .map(el=>el.value);
+
+
+  if(!name || !username || !password){
+
+    toast(
+      "Name, Username እና Password ያስፈልጋሉ።",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    await api(
+      API.employees,
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+
+            name,
+
+            username,
+
+            password,
+
+            role,
+
+            permissions
+
+          })
+
+      }
+    );
+
+
+    closeModal("employeeModal");
+
+    toast(
+      "Employee created successfully",
+      "success"
+    );
+
+
+    await loadEmployees();
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Employee creation failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+async function loadReports(){
+
+  try{
+
+    const data =
+      await api(API.reports);
+
+    reports =
+      data;
+
+
+    const sales =
+      Number(
+        data.sales ??
+        data.total_sales ??
+        data.totalSales ??
+        0
+      );
+
+
+    const profit =
+      Number(
+        data.profit ??
+        data.total_profit ??
+        data.totalProfit ??
+        0
+      );
+
+
+    const orderCount =
+      Number(
+        data.orders ??
+        data.order_count ??
+        data.total_orders ??
+        0
+      );
+
+
+    const stock =
+      Number(
+        data.stock ??
+        data.total_stock ??
+        0
+      );
+
+
+    $("reportSales").textContent =
+      money(sales);
+
+    $("reportProfit").textContent =
+      money(profit);
+
+    $("reportOrders").textContent =
+      orderCount;
+
+    $("reportStock").textContent =
+      stock;
+
+
+    $("reportDetails").innerHTML =
+      `
+      <div class="card">
+
+        <div class="card-title">
+          📊 Report Summary
+        </div>
+
+        <div class="muted">
+          Sales: ${money(sales)}
+        </div>
+
+        <div class="muted">
+          Profit: ${money(profit)}
+        </div>
+
+        <div class="muted">
+          Orders: ${orderCount}
+        </div>
+
+        <div class="muted">
+          Stock: ${stock}
+        </div>
+
+      </div>
+      `;
+
+
+    updateStatsFromReport(
+      sales,
+      orderCount,
+      stock
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Reports መጫን አልተቻለም።",
+      "error"
+    );
+
+  }
+
+}
+
+
+function updateStatsFromReport(
+  sales,
+  orderCount,
+  stock
+){
+
+  $("statSales").textContent =
+    money(sales);
+
+  $("statStock").textContent =
+    Number(stock || 0);
+
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+async function loadSettings(){
+
+  try{
+
+    const payment =
+      await api(API.payment);
+
+
+    const info =
+      payment.payment_information ??
+      payment.paymentInformation ??
+      payment.information ??
+      payment.value ??
+      "";
+
+
+    $("paymentInformation").value =
+      info;
+
+
+  }catch(error){
+
+    console.error(
+      "Payment settings:",
+      error
+    );
+
+  }
+
+
+  try{
+
+    const telegram =
+      await api(API.telegram);
+
+
+    $("telegramBotUsername").value =
+      telegram.bot_username ??
+      telegram.botUsername ??
+      telegram.username ??
+      "";
+
+  }catch(error){
+
+    console.error(
+      "Telegram settings:",
+      error
+    );
+
+  }
+
+
+  await loadChannels();
+
+}
+
+
+async function savePaymentSettings(){
+
+  const information =
+    $("paymentInformation")
+      .value
+      .trim();
+
+
+  try{
+
+    await api(
+      API.payment,
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+
+            payment_information:
+              information
+
+        })
+
+      }
+    );
+
+
+    toast(
+      "Payment settings saved",
+      "success"
+    );
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Payment settings save failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+async function saveTelegramSettings(){
+
+  const username =
+    $("telegramBotUsername")
+      .value
+      .trim();
+
+
+  try{
+
+    await api(
+      API.telegram,
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+
+            bot_username:
+              username
+
+          })
+
+      }
+    );
+
+
+    toast(
+      "Telegram settings saved",
+      "success"
+    );
+
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Telegram settings save failed",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  const stock =
+    products.reduce(
+      (sum,p)=>
+        sum +
+        Number(p.stock || 0),
+      0
+    );
+
+
+  const pending =
+    orders.filter(o=>{
+
+      const s =
+        String(o.status || "")
+          .toUpperCase();
+
+      return ![
+        "CONFIRMED",
+        "REJECTED",
+        "CANCELLED",
+        "COMPLETED"
+      ].includes(s);
+
+    }).length;
+
+
+  const sales =
+    orders
+      .filter(o=>{
+
+        const s =
+          String(o.status || "")
+            .toUpperCase();
+
+        return [
+          "CONFIRMED",
+          "COMPLETED",
+          "DELIVERY_PENDING",
+          "OUT_FOR_DELIVERY"
+        ].includes(s);
+
+      })
+      .reduce(
+        (sum,o)=>
+          sum +
+          Number(o.total || 0),
+        0
+      );
+
+
+  $("statProducts").textContent =
+    products.length;
+
+  $("statPending").textContent =
+    pending;
+
+  $("statSales").textContent =
+    money(sales);
+
+  $("statStock").textContent =
+    stock;
+
+}
+
+
+async function refreshAll(){
+
+  if(!token){
+    return;
+  }
+
+
+  try{
+
+    await Promise.all([
+      loadProducts(),
+      loadOrders(),
+      loadAds(),
+      loadChannels()
+    ]);
+
+
+    updateStats();
+
+
+  }catch(error){
+
+    console.error(
+      "REFRESH ERROR:",
+      error
+    );
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
