@@ -180,13 +180,13 @@
 
         .product, .order, .ad, .employee, .channel {
             display: flex;
-            gap: 12px;
+            gap: 14px;
             align-items: center;
         }
 
         .pic {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: var(--radius-sm);
             background: #f1f5f9;
             display: grid;
@@ -194,6 +194,7 @@
             font-size: 24px;
             overflow: hidden;
             flex: none;
+            border: 1px solid var(--border-color);
         }
         .pic img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -352,6 +353,24 @@
         .channel-id { font-size: 12px; color: var(--text-muted); margin-top: 2px; word-break: break-all; }
         .channel-actions { display: flex; gap: 8px; margin-top: 12px; }
         .channel-actions button { flex: 1; }
+
+        /* Image Preview Box inside Form */
+        .image-preview-container {
+            width: 100%;
+            height: 120px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-sm);
+            display: grid;
+            place-items: center;
+            margin-top: 6px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         @media (min-width: 700px) {
             .content { padding: 24px; }
@@ -583,7 +602,12 @@
                 <input type="number" id="pStock" required placeholder="10">
 
                 <label>Product Photo URL</label>
-                <input type="url" id="pPhoto" placeholder="https://image-link.com/photo.jpg">
+                <input type="url" id="pPhoto" placeholder="https://image-link.com/photo.jpg" oninput="previewProductImage(this.value)">
+                
+                <div class="image-preview-container">
+                    <span id="previewPlaceholder" style="color:var(--text-muted); font-size:12px;">የፎቶ ፕሪቪው እዚህ ይታያል</span>
+                    <img id="imagePreviewTag" style="display:none;" alt="Preview">
+                </div>
 
                 <label>Description (መግለጫ)</label>
                 <textarea id="pDescription" placeholder="ስለ ምርቱ ዝርዝር መረጃ..."></textarea>
@@ -616,7 +640,7 @@
                 </select>
 
                 <label>Product (አማራጭ)</label>
-                <select id="adProduct"><option value="">-- Product ምረጥ --</option></select>
+                <select id="adProduct" onchange="autofillAdFromProduct(this.value)"><option value="">-- Product ምረጥ --</option></select>
 
                 <label>ርዕስ (Title)</label>
                 <input type="text" id="adTitle" required placeholder="የማስታወቂያ ርዕስ">
@@ -628,7 +652,12 @@
                 <input type="text" id="adButtonText" value="🛒 Order Now">
 
                 <label>Photo URL</label>
-                <input type="url" id="adPhoto" placeholder="https://...">
+                <input type="url" id="adPhoto" placeholder="https://..." oninput="previewAdImage(this.value)">
+                
+                <div class="image-preview-container">
+                    <span id="adPreviewPlaceholder" style="color:var(--text-muted); font-size:12px;">የማስታወቂያ ፎቶ ፕሪቪው</span>
+                    <img id="adImagePreviewTag" style="display:none;" alt="Ad Preview">
+                </div>
 
                 <label style="margin-top:16px;"><b>ማስታወቂያው የሚላክባቸው ቻናሎች፦</b></label>
                 <div class="select-all-box" style="display:flex; align-items:center; gap:10px; padding:10px; background:#f1f5f9; border-radius:10px; margin-top:6px;">
@@ -769,6 +798,33 @@
             el.className = (type === "ok") ? "success" : "error";
         }
 
+        /* IMAGE PREVIEW UTILS */
+        function previewProductImage(url) {
+            const tag = $("imagePreviewTag");
+            const placeholder = $("previewPlaceholder");
+            if (url && url.trim().length > 5) {
+                tag.src = url.trim();
+                tag.style.display = "block";
+                placeholder.style.display = "none";
+            } else {
+                tag.style.display = "none";
+                placeholder.style.display = "block";
+            }
+        }
+
+        function previewAdImage(url) {
+            const tag = $("adImagePreviewTag");
+            const placeholder = $("adPreviewPlaceholder");
+            if (url && url.trim().length > 5) {
+                tag.src = url.trim();
+                tag.style.display = "block";
+                placeholder.style.display = "none";
+            } else {
+                tag.style.display = "none";
+                placeholder.style.display = "block";
+            }
+        }
+
         /* LOGIN */
         async function login() {
             const username = $("loginUsername").value.trim();
@@ -849,7 +905,9 @@
             return `
             <div class="card">
                 <div class="product">
-                    <div class="pic">${p.photo ? `<img src="${esc(p.photo)}">` : "📦"}</div>
+                    <div class="pic">
+                        ${p.photo ? `<img src="${esc(p.photo)}" onerror="this.parentElement.innerHTML='📦'">` : "📦"}
+                    </div>
                     <div class="grow">
                         <b>${esc(p.name)}</b>
                         <div class="muted">Category: ${esc(p.category)} | Stock: ${p.stock}</div>
@@ -947,7 +1005,7 @@
                     <div class="row"><span>Status</span><span class="badge">${esc(o.status)}</span></div>
                     ${o.address ? `<hr><div><div class="muted">📍 Delivery Address</div><b>${esc(o.address)}</b></div>` : ""}
                 </div>
-                ${o.receipt ? `<div class="card"><h3>🧾 Receipt</h3><a class="btn primary full" target="_blank" href="${esc(o.receipt)}">👁️ View Receipt Image</a></div>` : ""}
+                ${o.receipt ? `<div class="card"><h3>🧾 Receipt</h3><a class="btn primary full" target="_blank" href="${esc(o.receipt)}">👁️️ View Receipt Image</a></div>` : ""}
                 ${["NEW", "PENDING", "RECEIPT_PENDING", "VERIFYING"].includes(o.status) ? `
                     <div class="actions">
                         <button class="btn green" onclick="changeOrderStatus('${esc(o.id)}', 'CONFIRMED')">✅ Confirm Order</button>
@@ -975,6 +1033,7 @@
         function openProductModal() {
             $("productMessage").textContent = "";
             $("productForm").reset();
+            previewProductImage("");
             openModal("productModal");
         }
 
@@ -1013,10 +1072,23 @@
             $("adProduct").innerHTML = `<option value="">-- Product ምረጥ --</option>` + products.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
         }
 
+        function autofillAdFromProduct(productId) {
+            if (!productId) return;
+            const p = products.find(x => String(x.id) === String(productId));
+            if (!p) return;
+            $("adTitle").value = p.name;
+            $("adText").value = `🔥 አዲስ ምርት ገብቷል!\n\n📦 ${p.name}\n💰 ዋጋ: ${money(p.sell)}\n\n${p.description || "ይዘዙን!"}`;
+            if (p.photo) {
+                $("adPhoto").value = p.photo;
+                previewAdImage(p.photo);
+            }
+        }
+
         function openAdModal() {
             $("adForm").reset();
             $("adButtonText").value = "🛒 Order Now";
             $("adMessage").textContent = "";
+            previewAdImage("");
             fillAdProducts();
             renderAdChannels();
             openModal("adModal");
@@ -1089,7 +1161,7 @@
                         </div>
                         <span class="badge ${published ? "green" : ""}">${published ? "✅ PUBLISHED" : "📝 " + esc(status)}</span>
                     </div>
-                    ${ad.photo_url ? `<img class="ad-photo" src="${esc(ad.photo_url)}">` : ""}
+                    ${ad.photo_url ? `<img class="ad-photo" src="${esc(ad.photo_url)}" onerror="this.style.display='none'">` : ""}
                     <div class="ad-preview"><div class="ad-text">${esc(ad.text || "")}</div></div>
                     ${Array.isArray(ad.channel_ids) ? `<div class="muted" style="margin-top:8px">📢 Channels: ${ad.channel_ids.length}</div>` : ""}
                     <div class="actions">
@@ -1352,7 +1424,7 @@
                 await api(API.payment, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.strinify ? JSON.stringify({ payment_info: $("paymentInfo").value.trim() }) : JSON.stringify({ payment_info: $("paymentInfo").value.trim() })
+                    body: JSON.stringify({ payment_info: $("paymentInfo").value.trim() })
                 });
                 alert("✅ Payment Settings ተቀምጧል።");
             } catch (error) { alert("❌ " + error.message); }
