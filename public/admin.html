@@ -1,28 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="am">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
 
 <title>Telegram Sales Manager — Master Admin</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --blue:#1769ff;
+  --blue2:#6758f5;
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#788399;
+  --border:#e8ebf2;
+  --green:#18a957;
+  --red:#e5484d;
+  --orange:#f59e0b;
+  --shadow:0 10px 30px rgba(32,52,89,.08);
+}
 
 html,body{
   margin:0;
   padding:0;
-  background:#f4f7fb;
-  color:#172033;
-  font-family:Arial,"Noto Sans Ethiopic",sans-serif;
+  width:100%;
+  min-height:100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans Ethiopic",
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
 
-button,input,select,textarea{
+button,
+input,
+select,
+textarea{
   font:inherit;
 }
 
 button{
+  border:0;
   cursor:pointer;
 }
 
@@ -34,603 +64,837 @@ button{
    LOGIN
 ========================= */
 
-#loginPage{
+.login-page{
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:22px;
   background:
-    radial-gradient(circle at top right,#dfeaff 0,#f4f7fb 38%,#eef3fa 100%);
+    radial-gradient(circle at top right,#7c6cff 0,transparent 35%),
+    linear-gradient(145deg,#1168ff,#6558f5);
 }
 
-.login-box{
-  width:min(430px,100%);
+.login-card{
+  width:100%;
+  max-width:430px;
   background:#fff;
-  border:1px solid #e3eaf3;
   border-radius:28px;
-  padding:28px 22px;
-  box-shadow:0 20px 60px rgba(27,49,80,.12);
+  padding:30px 24px;
+  box-shadow:0 25px 70px rgba(0,0,0,.22);
 }
 
 .login-logo{
-  width:72px;
-  height:72px;
-  margin:0 auto 16px;
-  border-radius:21px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,#1769ff,#6758f5);
+  width:70px;
+  height:70px;
+  border-radius:22px;
+  margin:0 auto 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   color:#fff;
-  font-size:32px;
-  box-shadow:0 12px 28px rgba(23,105,255,.25);
+  font-size:30px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
 }
 
-.login-box h1{
+.login-card h1{
   text-align:center;
   margin:0;
   font-size:23px;
 }
 
-.login-box p{
+.login-card p{
   text-align:center;
-  color:#7b8798;
-  font-size:12px;
-  margin:7px 0 22px;
+  color:var(--muted);
+  margin:8px 0 24px;
+  font-size:14px;
 }
 
-.login-box label{
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
   display:block;
-  font-size:12px;
+  margin-bottom:7px;
+  font-size:13px;
   font-weight:700;
-  margin:11px 0 6px;
 }
 
-.login-box input{
+.field input,
+.field select,
+.field textarea{
   width:100%;
-  padding:13px;
-  border:1px solid #dce4ee;
-  border-radius:13px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:13px 14px;
   outline:none;
   background:#fff;
+  color:var(--text);
 }
 
-.login-box input:focus{
-  border-color:#1769ff;
-  box-shadow:0 0 0 3px #1769ff12;
+.field textarea{
+  min-height:100px;
+  resize:vertical;
 }
 
-.login-button{
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(23,105,255,.08);
+}
+
+.primary-btn{
   width:100%;
-  margin-top:18px;
-  border:0;
+  padding:14px 18px;
   border-radius:14px;
-  padding:14px;
-  background:linear-gradient(135deg,#1769ff,#6758f5);
   color:#fff;
   font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 10px 22px rgba(23,105,255,.22);
 }
 
-.login-message{
-  margin-top:12px;
-  padding:10px;
-  border-radius:11px;
-  font-size:12px;
-  display:none;
+.primary-btn:disabled{
+  opacity:.6;
 }
 
-.login-message.show{
-  display:block;
-}
-
-.login-message.error{
+.error-box{
   background:#fff0f0;
-  color:#c83232;
+  color:#c62828;
+  border:1px solid #ffd5d5;
+  padding:11px 13px;
+  border-radius:12px;
+  font-size:13px;
+  margin-bottom:14px;
 }
-
-.login-message.success{
-  background:#e9fbf2;
-  color:#087b51;
-}
-
 
 /* =========================
    APP
 ========================= */
 
-#appShell{
-  display:none;
-}
-
 .app{
-  width:min(900px,100%);
-  margin:auto;
   min-height:100vh;
-  padding-bottom:90px;
+  padding-bottom:85px;
 }
 
-.hero{
-  background:linear-gradient(135deg,#1769ff,#6758f5);
+.top-header{
+  padding:18px 16px 30px;
   color:#fff;
-  padding:20px 16px 18px;
-  border-radius:0 0 28px 28px;
+  background:
+    radial-gradient(circle at 90% 0,#8a7fff 0,transparent 30%),
+    linear-gradient(135deg,#1769ff,#6758f5);
+  border-radius:0 0 30px 30px;
 }
 
-.row{
+.header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.brand{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
+  gap:11px;
 }
 
-.hero h1{
-  margin:0;
-  font-size:22px;
-}
-
-.hero p{
-  margin:5px 0 0;
-  font-size:12px;
-  opacity:.86;
-}
-
-.user-chip{
-  background:#ffffff20;
-  border:1px solid #ffffff35;
-  border-radius:14px;
-  padding:8px 10px;
-  font-size:10px;
-  text-align:right;
-}
-
-.logout-btn{
-  margin-top:7px;
-  border:0;
-  border-radius:9px;
-  padding:5px 8px;
-  background:#ffffff22;
-  color:#fff;
-  font-size:10px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-  margin-top:16px;
-}
-
-.stat{
-  background:#ffffff18;
-  border:1px solid #ffffff35;
-  border-radius:16px;
-  padding:12px;
-}
-
-.stat b{
-  display:block;
-  font-size:20px;
-}
-
-.stat span{
-  font-size:11px;
-  opacity:.82;
-}
-
-.content{
-  padding:14px;
-}
-
-.card{
-  background:#fff;
-  border:1px solid #e5eaf2;
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:11px;
-  box-shadow:0 5px 18px #1b31500a;
-}
-
-.section-title{
+.brand-logo{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  background:rgba(255,255,255,.18);
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin:5px 0 12px;
+  justify-content:center;
+  font-weight:900;
+  font-size:19px;
+  backdrop-filter:blur(10px);
 }
 
-.section-title h2{
-  margin:0;
+.brand-title{
+  font-weight:900;
   font-size:17px;
 }
 
-.grid{
+.brand-sub{
+  font-size:11px;
+  opacity:.8;
+  margin-top:2px;
+}
+
+.logout-btn{
+  width:40px;
+  height:40px;
+  border-radius:13px;
+  color:#fff;
+  background:rgba(255,255,255,.16);
+}
+
+.hero{
+  margin-top:22px;
+}
+
+.hero-title{
+  font-size:25px;
+  font-weight:900;
+  line-height:1.25;
+}
+
+.hero-text{
+  margin-top:7px;
+  font-size:13px;
+  opacity:.82;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-wrap{
+  margin:-18px 14px 0;
+  position:relative;
+}
+
+.stats-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(2,1fr);
   gap:10px;
 }
 
-.quick{
-  border:1px solid #e4eaf3;
+.stat-card{
   background:#fff;
-  border-radius:17px;
+  border-radius:18px;
   padding:15px;
-  text-align:left;
-  min-height:105px;
-  box-shadow:0 5px 18px #1b31500a;
+  box-shadow:var(--shadow);
 }
 
-.quick span{
-  font-size:24px;
-}
-
-.quick b{
-  display:block;
-  margin-top:9px;
-}
-
-.quick small{
-  color:#8490a0;
-}
-
-.btn{
-  border:0;
+.stat-icon{
+  width:35px;
+  height:35px;
   border-radius:11px;
-  padding:10px 13px;
-  font-weight:700;
-  background:#edf3ff;
-  color:#1664e8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef4ff;
+  color:var(--blue);
+  margin-bottom:10px;
 }
 
-.btn.primary{
-  background:#1769ff;
-  color:#fff;
+.stat-number{
+  font-size:22px;
+  font-weight:900;
 }
 
-.btn.green{
-  background:#e8fbf2;
-  color:#087b51;
-}
-
-.btn.red{
-  background:#fff0f0;
-  color:#d63737;
-}
-
-.btn.orange{
-  background:#fff5df;
-  color:#9a6900;
-}
-
-.btn.gray{
-  background:#eef2f6;
-  color:#5d6878;
-}
-
-.btn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-label{
-  display:block;
-  font-size:11px;
-  font-weight:700;
-  margin:10px 0 5px;
-}
-
-input,
-select,
-textarea{
-  width:100%;
-  padding:12px;
-  border:1px solid #dce4ee;
-  border-radius:11px;
-  outline:none;
-  background:#fff;
-}
-
-textarea{
-  min-height:100px;
-  resize:vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-  border-color:#1769ff;
-  box-shadow:0 0 0 3px #1769ff10;
-}
-
-.muted{
-  color:#8490a0;
-  font-size:11px;
-}
-
-.price{
-  color:#1769ff;
-  font-weight:800;
+.stat-label{
+  color:var(--muted);
+  font-size:12px;
   margin-top:3px;
 }
 
-.profit{
-  color:#078453;
-  font-size:11px;
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+  padding:20px 14px;
 }
 
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.section-title{
+  font-size:19px;
+  font-weight:900;
+}
+
+.section-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.small-btn{
+  padding:9px 12px;
+  border-radius:11px;
+  background:#eef4ff;
+  color:var(--blue);
+  font-size:12px;
+  font-weight:800;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:15px;
+  box-shadow:0 5px 20px rgba(30,50,90,.04);
+}
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:22px;
+}
+
+.quick{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:16px 13px;
+  text-align:left;
+  box-shadow:0 5px 18px rgba(30,50,90,.04);
+}
+
+.quick-icon{
+  width:40px;
+  height:40px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef4ff;
+  color:var(--blue);
+  font-size:19px;
+  margin-bottom:11px;
+}
+
+.quick-title{
+  font-weight:800;
+  font-size:14px;
+}
+
+.quick-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+/* =========================
+   PRODUCT
+========================= */
+
+.product-list,
+.order-list,
+.ad-list,
+.employee-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.product-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.product-img{
+  width:64px;
+  height:64px;
+  border-radius:15px;
+  object-fit:cover;
+  background:#eef1f7;
+  flex-shrink:0;
+}
+
+.product-placeholder{
+  width:64px;
+  height:64px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef1f7;
+  color:#9aa4b7;
+  flex-shrink:0;
+}
+
+.product-info{
+  min-width:0;
+  flex:1;
+}
+
+.product-name{
+  font-weight:850;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.product-meta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.product-price{
+  font-weight:900;
+  color:var(--blue);
+  margin-top:4px;
+  font-size:13px;
+}
+
+.row-actions{
+  display:flex;
+  gap:6px;
+}
+
+.icon-btn{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:#f2f5fa;
+  color:#566176;
+}
+
+.icon-btn.danger{
+  color:var(--red);
+  background:#fff0f0;
+}
+
+/* =========================
+   BADGES
+========================= */
+
 .badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
+  border-radius:999px;
   font-size:10px;
   font-weight:800;
-  background:#fff4df;
-  color:#9a6900;
+}
+
+.badge.blue{
+  background:#edf4ff;
+  color:#1769ff;
 }
 
 .badge.green{
-  background:#e8fbf2;
-  color:#087b51;
+  background:#eaf9f0;
+  color:#138a48;
+}
+
+.badge.orange{
+  background:#fff6df;
+  color:#b77900;
 }
 
 .badge.red{
   background:#fff0f0;
-  color:#d63737;
+  color:#d02e35;
 }
 
-.badge.blue{
-  background:#edf3ff;
-  color:#1769ff;
+.badge.gray{
+  background:#f0f2f5;
+  color:#687286;
 }
+
+/* =========================
+   ORDERS
+========================= */
+
+.order-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:15px;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.order-id{
+  font-weight:900;
+  font-size:14px;
+}
+
+.order-customer{
+  font-size:13px;
+  font-weight:750;
+  margin-top:9px;
+}
+
+.order-meta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.order-total{
+  font-weight:900;
+  font-size:16px;
+  color:var(--blue);
+  margin-top:9px;
+}
+
+.order-actions{
+  display:flex;
+  gap:7px;
+  margin-top:13px;
+  flex-wrap:wrap;
+}
+
+.action-btn{
+  padding:9px 11px;
+  border-radius:10px;
+  background:#eef4ff;
+  color:var(--blue);
+  font-size:11px;
+  font-weight:800;
+}
+
+.action-btn.success{
+  background:#eaf9f0;
+  color:#14894a;
+}
+
+.action-btn.danger{
+  background:#fff0f0;
+  color:#d02e35;
+}
+
+.action-btn.gray{
+  background:#f0f2f5;
+  color:#667085;
+}
+
+/* =========================
+   ADS
+========================= */
+
+.ad-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:15px;
+}
+
+.ad-title{
+  font-weight:850;
+  font-size:15px;
+}
+
+.ad-text{
+  color:#5e687b;
+  font-size:12px;
+  line-height:1.55;
+  margin-top:7px;
+}
+
+.ad-image{
+  width:100%;
+  max-height:190px;
+  object-fit:cover;
+  border-radius:13px;
+  margin-top:10px;
+}
+
+/* =========================
+   EMPTY
+========================= */
 
 .empty{
   text-align:center;
-  color:#8a95a4;
-  padding:25px;
+  padding:30px 15px;
+  color:var(--muted);
+}
+
+.empty-icon{
+  font-size:35px;
+  margin-bottom:8px;
+}
+
+.empty-title{
+  font-weight:800;
+  color:#566176;
+}
+
+.empty-sub{
   font-size:12px;
+  margin-top:4px;
 }
-
-.product,
-.order,
-.employee,
-.channel,
-.ad{
-  display:flex;
-  gap:11px;
-  align-items:center;
-}
-
-.pic{
-  width:62px;
-  height:62px;
-  border-radius:15px;
-  background:#eef3fa;
-  display:grid;
-  place-items:center;
-  font-size:25px;
-  overflow:hidden;
-  flex:none;
-}
-
-.pic img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.grow{
-  flex:1;
-  min-width:0;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #edf0f5;
-  margin:13px 0;
-}
-
 
 /* =========================
-   PHOTO UPLOAD
+   SETTINGS
 ========================= */
 
-.photo-upload{
-  border:2px dashed #1769ff;
-  background:#f7faff;
-  border-radius:17px;
-  padding:12px;
-  margin-top:5px;
+.settings-card{
+  margin-bottom:12px;
 }
 
-.photo-upload input[type=file]{
-  border:0;
-  padding:8px 0;
-  background:transparent;
-  box-shadow:none;
+.settings-title{
+  font-weight:850;
+  margin-bottom:13px;
 }
 
-.photo-preview{
-  margin-top:10px;
-  width:100%;
-  min-height:170px;
-  border-radius:15px;
-  background:#edf2f8;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  color:#8490a0;
-  text-align:center;
+.permission-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
 }
 
-.photo-preview img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-  display:block;
+.permission-item{
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:12px;
 }
-
-.photo-preview-empty{
-  padding:25px;
-}
-
-.upload-status{
-  margin-top:8px;
-  font-size:11px;
-}
-
 
 /* =========================
    BOTTOM NAV
 ========================= */
 
-.bottom{
+.bottom-nav{
   position:fixed;
+  left:0;
+  right:0;
   bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:min(900px,100%);
-  height:70px;
-  background:#fff;
-  border-top:1px solid #e5eaf2;
+  height:72px;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  z-index:20;
+  z-index:50;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
-.nav{
-  border:0;
-  background:none;
-  color:#7d8999;
+.nav-btn{
+  background:transparent;
+  color:#8a94a7;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:4px;
   font-size:10px;
+  font-weight:700;
 }
 
-.nav span{
-  display:block;
-  font-size:20px;
-  margin-bottom:2px;
+.nav-btn .nav-icon{
+  font-size:19px;
 }
 
-.nav.active{
-  color:#1769ff;
-  font-weight:800;
+.nav-btn.active{
+  color:var(--blue);
 }
-
 
 /* =========================
    MODAL
 ========================= */
 
-.modal{
+.modal-backdrop{
   position:fixed;
   inset:0;
-  background:#0008;
-  z-index:50;
+  background:rgba(10,18,35,.52);
+  z-index:100;
   display:none;
   align-items:flex-end;
+  justify-content:center;
+  padding:0;
 }
 
-.modal.show{
+.modal-backdrop.show{
   display:flex;
 }
 
-.sheet{
+.modal{
+  width:100%;
+  max-width:600px;
+  max-height:92vh;
+  overflow-y:auto;
   background:#fff;
-  width:min(900px,100%);
-  max-height:94vh;
-  overflow:auto;
   border-radius:25px 25px 0 0;
-  padding:18px;
+  padding:20px 16px 30px;
+  animation:slideUp .18s ease;
 }
 
-.close{
-  float:right;
-  border:0;
-  background:#eef2f6;
-  border-radius:50%;
-  width:34px;
-  height:34px;
-  font-size:20px;
+@keyframes slideUp{
+  from{
+    transform:translateY(25px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
 }
 
 .modal-title{
-  margin:2px 45px 5px 0;
+  font-size:19px;
+  font-weight:900;
 }
 
-.actions{
+.close-btn{
+  width:36px;
+  height:36px;
+  border-radius:11px;
+  background:#f0f2f5;
+  color:#667085;
+}
+
+.modal-actions{
   display:flex;
   gap:8px;
-  margin-top:13px;
+  margin-top:17px;
 }
 
-.actions .btn{
+.modal-actions button{
   flex:1;
 }
 
-.message{
-  font-size:12px;
-  padding:10px;
+.secondary-btn{
+  padding:13px;
+  border-radius:13px;
+  background:#f0f2f5;
+  color:#596276;
+  font-weight:800;
+}
+
+/* =========================
+   PHOTO
+========================= */
+
+.photo-box{
+  border:1px dashed #cfd6e3;
+  border-radius:16px;
+  padding:15px;
+  text-align:center;
+  background:#fafbfe;
+  margin-bottom:14px;
+}
+
+.photo-preview{
+  width:120px;
+  height:120px;
+  border-radius:16px;
+  object-fit:cover;
+  display:none;
+  margin:0 auto 10px;
+}
+
+.photo-label{
+  display:inline-block;
+  padding:10px 14px;
   border-radius:11px;
-  margin-top:10px;
+  background:#eef4ff;
+  color:var(--blue);
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#productPhotoFile{
   display:none;
 }
 
-.message.show{
-  display:block;
-}
-
-.message.ok{
-  background:#e9fbf2;
-  color:#087b51;
-}
-
-.message.err{
-  background:#fff0f0;
-  color:#c83232;
-}
-
-
 /* =========================
-   TABLE / SETTINGS
+   TOAST
 ========================= */
 
-.info-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:86px;
+  transform:translateX(-50%) translateY(20px);
+  background:#172033;
+  color:#fff;
+  padding:11px 15px;
+  border-radius:12px;
   font-size:12px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+  z-index:200;
+  max-width:90%;
+  text-align:center;
 }
 
-.permission-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
 }
 
-.permission{
-  background:#f5f8fc;
-  border:1px solid #e1e7ef;
-  border-radius:10px;
-  padding:9px;
-  font-size:11px;
+.toast.success{
+  background:#138a48;
 }
 
-.permission input{
-  width:auto;
-  margin-right:5px;
+.toast.error{
+  background:#d02e35;
 }
 
-@media(max-width:480px){
-  .grid{
-    gap:8px;
+/* =========================
+   DESKTOP
+========================= */
+
+@media(min-width:700px){
+  .content{
+    max-width:900px;
+    margin:auto;
   }
 
-  .quick{
-    padding:13px;
+  .stats-wrap{
+    max-width:900px;
+    margin:-18px auto 0;
   }
 
-  .hero h1{
-    font-size:19px;
+  .stats-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .quick-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .bottom-nav{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    width:560px;
+    border-radius:18px 18px 0 0;
+  }
+
+  .modal-backdrop{
+    align-items:center;
+    padding:20px;
+  }
+
+  .modal{
+    border-radius:25px;
   }
 }
 </style>
@@ -638,1240 +902,1332 @@ hr{
 
 <body>
 
-<!-- =========================================================
-     LOGIN PAGE
-========================================================= -->
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
-<div id="loginPage">
+<div id="loginPage" class="login-page">
 
-  <div class="login-box">
+  <div class="login-card">
 
-    <div class="login-logo">🛍️</div>
+    <div class="login-logo">UM</div>
 
-    <h1>UNI MARKET</h1>
+    <h1>Telegram Sales Manager</h1>
+    <p>Master Admin Login</p>
 
-    <p>Telegram Sales Manager • Master Admin</p>
+    <div id="loginError" class="error-box hidden"></div>
 
-    <label>Username</label>
-    <input
-      type="text"
-      id="loginUsername"
-      autocomplete="username"
-      placeholder="ዩዘርናሜ ያስገቡ"
-    >
+    <form id="loginForm">
 
-    <label>Password</label>
-    <input
-      type="password"
-      id="loginPassword"
-      autocomplete="current-password"
-      placeholder="ፓስዎርድ ያስገቡ"
-      onkeydown="if(event.key==='Enter') login()"
-    >
+      <div class="field">
+        <label>Username</label>
+        <input
+          id="loginUsername"
+          type="text"
+          autocomplete="username"
+          placeholder="Username"
+          required>
+      </div>
 
-    <button
-      class="login-button"
-      id="loginButton"
-      onclick="login()"
-    >
-      🔐 ግባ
-    </button>
+      <div class="field">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Password"
+          required>
+      </div>
 
-    <div id="loginMessage" class="login-message"></div>
-
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     APPLICATION
-========================================================= -->
-
-<div id="appShell">
-
-<div class="app">
-
-<header class="hero">
-
-  <div class="row">
-
-    <div>
-      <h1>📊 Telegram Sales Manager</h1>
-      <p>Master Admin • Products • Orders • Sales</p>
-    </div>
-
-    <div class="user-chip">
-      <div id="userLabel">Master Admin</div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-
-  </div>
-
-  <div class="stats">
-
-    <div class="stat">
-      <b id="productCount">0</b>
-      <span>📦 ምርቶች</span>
-    </div>
-
-    <div class="stat">
-      <b id="pendingCount">0</b>
-      <span>🟠 Pending Orders</span>
-    </div>
-
-    <div class="stat">
-      <b id="salesTotal">0 ETB</b>
-      <span>💰 ሽያጭ</span>
-    </div>
-
-    <div class="stat">
-      <b id="stockTotal">0</b>
-      <span>📦 Stock</span>
-    </div>
-
-  </div>
-
-</header>
-
-
-<main class="content">
-
-<!-- =========================================================
-     HOME
-========================================================= -->
-
-<section id="home">
-
-  <div class="grid">
-
-    <button
-      class="quick"
-      onclick="openModal('productModal')"
-    >
-      <span>📦</span>
-      <b>አዲስ ምርት</b>
-      <small>Photo • Price • Stock</small>
-    </button>
-
-    <button
-      class="quick"
-      onclick="showSection('orders')"
-    >
-      <span>🛒</span>
-      <b>Orders</b>
-      <small>Pending • Confirm • Reject</small>
-    </button>
-
-    <button
-      class="quick"
-      onclick="showSection('ads')"
-    >
-      <span>📢</span>
-      <b>Advertising</b>
-      <small>Telegram Ads</small>
-    </button>
-
-    <button
-      class="quick"
-      onclick="showSection('employees')"
-    >
-      <span>👥</span>
-      <b>Employees</b>
-      <small>Permissions</small>
-    </button>
-
-  </div>
-
-
-  <div class="card">
-
-    <div class="section-title">
-      <h2>📦 የቅርብ ምርቶች</h2>
-
-      <button
-        class="btn"
-        onclick="showSection('products')"
-      >
-        ሁሉንም
+      <button id="loginButton"
+              class="primary-btn"
+              type="submit">
+        Login
       </button>
-    </div>
 
-    <div id="homeProducts">
-      <div class="empty">እየጫነ...</div>
-    </div>
+    </form>
 
   </div>
 
+</div>
 
-  <div class="card">
 
-    <div class="section-title">
-      <h2>🛒 Pending Orders</h2>
+<!-- =====================================================
+     APP
+===================================================== -->
 
-      <button
-        class="btn"
-        onclick="showSection('orders')"
-      >
-        Orders
+<div id="app" class="app hidden">
+
+  <header class="top-header">
+
+    <div class="header-row">
+
+      <div class="brand">
+
+        <div class="brand-logo">UM</div>
+
+        <div>
+          <div class="brand-title">UNI MARKET</div>
+          <div class="brand-sub">Telegram Sales Manager</div>
+        </div>
+
+      </div>
+
+      <button class="logout-btn"
+              onclick="logout()"
+              title="Logout">
+        ↪
       </button>
+
     </div>
 
-    <div id="homeOrders">
-      <div class="empty">እየጫነ...</div>
+    <div class="hero">
+
+      <div class="hero-title">
+        እንኳን ደህና መጡ 👋
+      </div>
+
+      <div class="hero-text">
+        የUNI MARKET የሽያጭ እና የTelegram አስተዳደር
+      </div>
+
     </div>
 
-  </div>
-
-</section>
+  </header>
 
 
-<!-- =========================================================
-     PRODUCTS
-========================================================= -->
+  <!-- STATS -->
 
-<section id="products" style="display:none">
+  <div class="stats-wrap">
 
-  <div class="section-title">
+    <div class="stats-grid">
 
-    <h2>📦 Products</h2>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div id="productCount" class="stat-number">0</div>
+        <div class="stat-label">Products</div>
+      </div>
 
-    <button
-      class="btn primary"
-      onclick="openNewProduct()"
-    >
-      ＋ አዲስ
-    </button>
+      <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div id="pendingCount" class="stat-number">0</div>
+        <div class="stat-label">Pending Orders</div>
+      </div>
 
-  </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div id="salesTotal" class="stat-number">0</div>
+        <div class="stat-label">Sales ETB</div>
+      </div>
 
-  <div id="productsList"></div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div id="stockTotal" class="stat-number">0</div>
+        <div class="stat-label">Stock</div>
+      </div>
 
-</section>
-
-
-<!-- =========================================================
-     ORDERS
-========================================================= -->
-
-<section id="orders" style="display:none">
-
-  <div class="section-title">
-
-    <h2>🛒 Orders</h2>
-
-    <button
-      class="btn"
-      onclick="loadOrders()"
-    >
-      ↻
-    </button>
-
-  </div>
-
-  <div class="card">
-    🧾 የክፍያ ደረሰኝ ከተላከ በኋላ
-    <b>Admin ያረጋግጣል።</b>
-  </div>
-
-  <div id="ordersList"></div>
-
-</section>
-
-
-<!-- =========================================================
-     ADS
-========================================================= -->
-
-<section id="ads" style="display:none">
-
-  <div class="section-title">
-
-    <h2>📢 Advertising</h2>
-
-    <button
-      class="btn primary"
-      onclick="openModal('adModal')"
-    >
-      ＋ አዲስ
-    </button>
-
-  </div>
-
-  <div id="adsList"></div>
-
-</section>
-
-
-<!-- =========================================================
-     EMPLOYEES
-========================================================= -->
-
-<section id="employees" style="display:none">
-
-  <div class="section-title">
-
-    <h2>👥 Employees</h2>
-
-    <button
-      class="btn primary"
-      onclick="openModal('employeeModal')"
-    >
-      ＋ Employee
-    </button>
-
-  </div>
-
-  <div id="employeesList"></div>
-
-</section>
-
-
-<!-- =========================================================
-     REPORTS
-========================================================= -->
-
-<section id="reports" style="display:none">
-
-  <div class="card">
-
-    <h2 style="margin-top:0">📈 Master Reports</h2>
-
-    <div class="info-row">
-      <span>ምርቶች</span>
-      <b id="rProducts">0</b>
-    </div>
-
-    <hr>
-
-    <div class="info-row">
-      <span>Stock</span>
-      <b id="rStock">0</b>
-    </div>
-
-    <hr>
-
-    <div class="info-row">
-      <span>Pending Orders</span>
-      <b id="rPending">0</b>
-    </div>
-
-    <hr>
-
-    <div class="info-row">
-      <span>Sales</span>
-      <b id="rSales">0 ETB</b>
-    </div>
-
-    <hr>
-
-    <div class="info-row">
-      <span>Profit</span>
-      <b id="rProfit">0 ETB</b>
     </div>
 
   </div>
 
-</section>
+
+  <main class="content">
+
+    <!-- =================================================
+         HOME
+    ================================================== -->
+
+    <section id="section-home" class="section active">
+
+      <div class="section-head">
+        <div>
+          <div class="section-title">Quick Actions</div>
+          <div class="section-sub">ዋና የአስተዳደር አማራጮች</div>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+
+        <button class="quick"
+                onclick="showSection('products')">
+
+          <div class="quick-icon">➕</div>
+          <div class="quick-title">New Product</div>
+          <div class="quick-sub">ምርት ጨምር</div>
+
+        </button>
+
+        <button class="quick"
+                onclick="showSection('orders')">
+
+          <div class="quick-icon">🛒</div>
+          <div class="quick-title">Orders</div>
+          <div class="quick-sub">ትዕዛዞች</div>
+
+        </button>
+
+        <button class="quick"
+                onclick="showSection('ads')">
+
+          <div class="quick-icon">📢</div>
+          <div class="quick-title">Advertising</div>
+          <div class="quick-sub">ማስታወቂያ</div>
+
+        </button>
+
+        <button class="quick"
+                onclick="showSection('reports')">
+
+          <div class="quick-icon">📈</div>
+          <div class="quick-title">Reports</div>
+          <div class="quick-sub">ሪፖርት</div>
+
+        </button>
+
+        <button class="quick"
+                onclick="showSection('employees')">
+
+          <div class="quick-icon">👥</div>
+          <div class="quick-title">Employees</div>
+          <div class="quick-sub">ሰራተኞች</div>
+
+        </button>
+
+        <button class="quick"
+                onclick="showSection('settings')">
+
+          <div class="quick-icon">⚙️</div>
+          <div class="quick-title">Settings</div>
+          <div class="quick-sub">ቅንብሮች</div>
+
+        </button>
+
+      </div>
 
 
-<!-- =========================================================
-     SETTINGS
-========================================================= -->
+      <!-- RECENT PRODUCTS -->
 
-<section id="settings" style="display:none">
+      <div class="section-head">
 
-  <div class="card">
+        <div>
+          <div class="section-title">Recent Products</div>
+          <div class="section-sub">የቅርብ ጊዜ ምርቶች</div>
+        </div>
 
-    <h2 style="margin-top:0">💳 Payment Settings</h2>
+        <button class="small-btn"
+                onclick="showSection('products')">
+          View All
+        </button>
 
-    <label>Bank Name</label>
-    <input id="bankName" placeholder="Bank">
+      </div>
 
-    <label>Account Name</label>
-    <input id="accountName" placeholder="Account owner">
+      <div id="homeProducts"
+           class="product-list"></div>
 
-    <label>Account Number</label>
-    <input id="accountNumber" placeholder="Account number">
 
-    <label>Telebirr</label>
-    <input id="telebirr" placeholder="Telebirr number">
+      <!-- PENDING ORDERS -->
 
-    <label>CBE Birr</label>
-    <input id="cbeBirr" placeholder="CBE Birr">
+      <div class="section-head"
+           style="margin-top:25px">
 
-    <label>Instructions</label>
-    <textarea id="paymentInstructions"
-      placeholder="የክፍያ መመሪያ"></textarea>
+        <div>
+          <div class="section-title">Pending Orders</div>
+          <div class="section-sub">ትዕዛዝ ማረጋገጫ የሚጠብቁ</div>
+        </div>
 
-    <button
-      class="btn primary"
-      style="width:100%;margin-top:12px"
-      onclick="savePaymentSettings()"
-    >
-      💾 Save Payment Settings
+        <button class="small-btn"
+                onclick="showSection('orders')">
+          View All
+        </button>
+
+      </div>
+
+      <div id="homeOrders"
+           class="order-list"></div>
+
+    </section>
+
+
+    <!-- =================================================
+         PRODUCTS
+    ================================================== -->
+
+    <section id="section-products" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Products</div>
+          <div class="section-sub">ምርቶችን አስተዳድር</div>
+        </div>
+
+        <button class="small-btn"
+                onclick="openNewProduct()">
+          + Add
+        </button>
+
+      </div>
+
+      <div id="productsList"
+           class="product-list"></div>
+
+    </section>
+
+
+    <!-- =================================================
+         ORDERS
+    ================================================== -->
+
+    <section id="section-orders" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Orders</div>
+          <div class="section-sub">የደንበኞች ትዕዛዞች</div>
+        </div>
+
+        <button class="small-btn"
+                onclick="loadOrders()">
+          ↻ Refresh
+        </button>
+
+      </div>
+
+      <div id="ordersList"
+           class="order-list"></div>
+
+    </section>
+
+
+    <!-- =================================================
+         ADS
+    ================================================== -->
+
+    <section id="section-ads" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Advertising</div>
+          <div class="section-sub">Telegram ማስታወቂያዎች</div>
+        </div>
+
+        <button class="small-btn"
+                onclick="openNewAd()">
+          + New Ad
+        </button>
+
+      </div>
+
+      <div id="adsList"
+           class="ad-list"></div>
+
+    </section>
+
+
+    <!-- =================================================
+         EMPLOYEES
+    ================================================== -->
+
+    <section id="section-employees" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Employees</div>
+          <div class="section-sub">ሰራተኞች እና permissions</div>
+        </div>
+
+        <button class="small-btn"
+                onclick="openNewEmployee()">
+          + Employee
+        </button>
+
+      </div>
+
+      <div id="employeesList"
+           class="employee-list"></div>
+
+    </section>
+
+
+    <!-- =================================================
+         REPORTS
+    ================================================== -->
+
+    <section id="section-reports" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Reports</div>
+          <div class="section-sub">የሽያጭ እና ትርፍ ሪፖርት</div>
+        </div>
+
+        <button class="small-btn"
+                onclick="loadReports()">
+          ↻ Refresh
+        </button>
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">💵</div>
+          <div id="reportSales" class="stat-number">0</div>
+          <div class="stat-label">Sales ETB</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div id="reportProfit" class="stat-number">0</div>
+          <div class="stat-label">Profit ETB</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div id="reportOrders" class="stat-number">0</div>
+          <div class="stat-label">Orders</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div id="reportStock" class="stat-number">0</div>
+          <div class="stat-label">Stock</div>
+        </div>
+
+      </div>
+
+      <div class="card"
+           style="margin-top:14px">
+
+        <div class="settings-title">
+          Profit Summary
+        </div>
+
+        <div id="profitDetails"
+             style="font-size:13px;color:#697386">
+          ሪፖርት እየተዘጋጀ ነው...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         SETTINGS
+    ================================================== -->
+
+    <section id="section-settings" class="section">
+
+      <div class="section-head">
+
+        <div>
+          <div class="section-title">Settings</div>
+          <div class="section-sub">የስርዓቱ ቅንብሮች</div>
+        </div>
+
+      </div>
+
+
+      <div class="card settings-card">
+
+        <div class="settings-title">
+          💳 Payment Settings
+        </div>
+
+        <form id="paymentSettingsForm">
+
+          <div class="field">
+            <label>Payment Instructions</label>
+            <textarea id="paymentInstructions"
+                      placeholder="የክፍያ መመሪያ..."></textarea>
+          </div>
+
+          <button class="primary-btn"
+                  type="submit">
+            Save Payment Settings
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <div class="card settings-card">
+
+        <div class="settings-title">
+          📱 Telegram Settings
+        </div>
+
+        <form id="telegramSettingsForm">
+
+          <div class="field">
+            <label>Admin Chat ID</label>
+            <input id="telegramAdminChatId"
+                   type="text"
+                   placeholder="Telegram Chat ID">
+          </div>
+
+          <div class="field">
+            <label>Telegram Username</label>
+            <input id="telegramBotUsername"
+                   type="text"
+                   placeholder="uni_market_shop_bot">
+          </div>
+
+          <button class="primary-btn"
+                  type="submit">
+            Save Telegram Settings
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <div class="card settings-card">
+
+        <div class="settings-title">
+          🔐 Account
+        </div>
+
+        <button class="action-btn danger"
+                style="width:100%"
+                onclick="logout()">
+          Logout
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =================================================
+       BOTTOM NAV
+  ================================================== -->
+
+  <nav class="bottom-nav">
+
+    <button class="nav-btn active"
+            data-section="home"
+            onclick="showSection('home')">
+      <span class="nav-icon">⌂</span>
+      Home
     </button>
 
-    <div id="paymentMessage" class="message"></div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h2 style="margin-top:0">🤖 Telegram Settings</h2>
-
-    <label>Admin Chat ID</label>
-    <input id="telegramAdminChatId">
-
-    <label>Bot Username</label>
-    <input id="telegramBotUsername">
-
-    <button
-      class="btn primary"
-      style="width:100%;margin-top:12px"
-      onclick="saveTelegramSettings()"
-    >
-      💾 Save Telegram Settings
+    <button class="nav-btn"
+            data-section="products"
+            onclick="showSection('products')">
+      <span class="nav-icon">📦</span>
+      Products
     </button>
 
-    <div id="telegramMessage" class="message"></div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h2 style="margin-top:0">📣 Telegram Channels / Groups</h2>
-
-    <label>Name</label>
-    <input id="channelName" placeholder="UNI MARKET Channel">
-
-    <label>Chat ID</label>
-    <input id="channelChatId" placeholder="-100...">
-
-    <button
-      class="btn primary"
-      style="width:100%;margin-top:12px"
-      onclick="addChannel()"
-    >
-      ＋ Add Channel / Group
+    <button class="nav-btn"
+            data-section="orders"
+            onclick="showSection('orders')">
+      <span class="nav-icon">🛒</span>
+      Orders
     </button>
 
-    <div id="channelsList" style="margin-top:12px"></div>
+    <button class="nav-btn"
+            data-section="ads"
+            onclick="showSection('ads')">
+      <span class="nav-icon">📢</span>
+      Ads
+    </button>
 
-  </div>
+    <button class="nav-btn"
+            data-section="settings"
+            onclick="showSection('settings')">
+      <span class="nav-icon">⚙️</span>
+      Settings
+    </button>
 
-</section>
-
-</main>
-
-
-<!-- =========================================================
-     BOTTOM NAV
-========================================================= -->
-
-<nav class="bottom">
-
-  <button
-    class="nav active"
-    data-section="home"
-    onclick="showSection('home')"
-  >
-    <span>⌂</span>
-    ዋና
-  </button>
-
-  <button
-    class="nav"
-    data-section="products"
-    onclick="showSection('products')"
-  >
-    <span>📦</span>
-    Products
-  </button>
-
-  <button
-    class="nav"
-    data-section="orders"
-    onclick="showSection('orders')"
-  >
-    <span>🛒</span>
-    Orders
-  </button>
-
-  <button
-    class="nav"
-    data-section="ads"
-    onclick="showSection('ads')"
-  >
-    <span>📢</span>
-    Ads
-  </button>
-
-  <button
-    class="nav"
-    data-section="settings"
-    onclick="showSection('settings')"
-  >
-    <span>⚙️</span>
-    Settings
-  </button>
-
-</nav>
+  </nav>
 
 </div>
-</div>
 
 
-<!-- =========================================================
+<!-- =====================================================
      PRODUCT MODAL
-========================================================= -->
+===================================================== -->
 
-<div id="productModal" class="modal">
+<div id="productModal"
+     class="modal-backdrop">
 
-<div class="sheet">
+  <div class="modal">
 
-<button
-  class="close"
-  onclick="closeModal('productModal')"
->
-×
-</button>
+    <div class="modal-head">
 
-<h2 class="modal-title" id="productModalTitle">
-📦 አዲስ ምርት
-</h2>
+      <div id="productModalTitle"
+           class="modal-title">
+        New Product
+      </div>
 
-<form id="productForm">
+      <button class="close-btn"
+              onclick="closeModal('productModal')">
+        ✕
+      </button>
 
-<input
-  type="hidden"
-  id="productId"
->
-
-<label>የምርት ስም</label>
-
-<input
-  id="pName"
-  required
-  placeholder="ምሳሌ፦ ሴቶች ልብስ"
->
+    </div>
 
 
-<label>Category</label>
+    <form id="productForm">
 
-<select id="pCategory">
+      <input id="productId"
+             type="hidden">
 
-<option value="clothing">👕 አልባሳት</option>
-<option value="electronics">📱 ኤሌክትሮኒክስ</option>
-<option value="kids">🧒 የህፃናት</option>
-<option value="women">👩 የሴቶች</option>
-<option value="home">🏠 የቤት እቃዎች</option>
-<option value="other">🛍️ ሌሎች</option>
-
-</select>
-
-
-<label>የግዢ ዋጋ</label>
-
-<input
-  id="pBuy"
-  type="number"
-  min="0"
-  step="0.01"
-  required
-  placeholder="500"
->
+      <div class="field">
+        <label>Product Name *</label>
+        <input id="pName"
+               required
+               placeholder="ምርት ስም">
+      </div>
 
 
-<label>የሽያጭ ዋጋ</label>
+      <div class="field">
+        <label>Category *</label>
 
-<input
-  id="pSell"
-  type="number"
-  min="0"
-  step="0.01"
-  required
-  placeholder="800"
->
+        <select id="pCategory"
+                required>
 
+          <option value="clothing">አልባሳት</option>
+          <option value="electronics">ኤሌክትሮኒክስ</option>
+          <option value="kids">የህፃናት</option>
+          <option value="women">የሴቶች</option>
+          <option value="home">የቤት እቃዎች</option>
+          <option value="other">ሌሎች</option>
 
-<label>Stock</label>
-
-<input
-  id="pStock"
-  type="number"
-  min="0"
-  step="1"
-  required
-  placeholder="10"
->
+        </select>
+      </div>
 
 
-<label>Product Photo</label>
+      <div class="photo-box">
 
-<div class="photo-upload">
+        <img id="productPhotoPreview"
+             class="photo-preview"
+             alt="Preview">
 
-<input
-  type="file"
-  id="productPhotoFile"
-  accept="image/*"
-  capture="environment"
-  onchange="previewProductPhoto(event)"
->
+        <label for="productPhotoFile"
+               class="photo-label">
+          📸 Choose Product Photo
+        </label>
 
-<div
-  id="productPhotoPreview"
-  class="photo-preview"
->
+        <input id="productPhotoFile"
+               type="file"
+               accept="image/*"
+               capture="environment">
 
-<div class="photo-preview-empty">
-📷<br>
-<b>ፎቶ ይምረጡ</b><br>
-<span class="muted">
-Gallery ወይም Camera
-</span>
-</div>
+        <input id="pPhoto"
+               type="hidden">
 
-</div>
+        <div style="font-size:11px;color:#8993a6;margin-top:8px">
+          ምስል ካለ ይምረጡ፤ አሮጌው ምስል በedit ጊዜ እንዳለ ይቆያል።
+        </div>
 
-<div
-  id="uploadStatus"
-  class="upload-status muted"
-></div>
-
-</div>
+      </div>
 
 
-<input
-  type="hidden"
-  id="pPhoto"
->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+        <div class="field">
+          <label>Buy Price</label>
+          <input id="pBuyPrice"
+                 type="number"
+                 min="0"
+                 step="0.01"
+                 placeholder="0">
+        </div>
+
+        <div class="field">
+          <label>Sell Price *</label>
+          <input id="pSellPrice"
+                 type="number"
+                 min="0"
+                 step="0.01"
+                 required
+                 placeholder="0">
+        </div>
+
+      </div>
 
 
-<label>Description</label>
-
-<textarea
-  id="pDescription"
-  placeholder="የምርቱ ማብራሪያ..."
-></textarea>
-
-
-<div
-  id="productMessage"
-  class="message"
-></div>
+      <div class="field">
+        <label>Stock</label>
+        <input id="pStock"
+               type="number"
+               min="0"
+               step="1"
+               value="0">
+      </div>
 
 
-<div class="actions">
+      <div class="field">
+        <label>Description</label>
+        <textarea id="pDescription"
+                  placeholder="የምርቱ መግለጫ..."></textarea>
+      </div>
 
-<button
-  type="button"
-  class="btn gray"
-  onclick="closeModal('productModal')"
->
-Cancel
-</button>
 
-<button
-  type="submit"
-  class="btn primary"
-  id="saveProductBtn"
->
-💾 Save Product
-</button>
+      <div id="productFormError"
+           class="error-box hidden"></div>
+
+
+      <div class="modal-actions">
+
+        <button type="button"
+                class="secondary-btn"
+                onclick="closeModal('productModal')">
+          Cancel
+        </button>
+
+        <button id="productSaveButton"
+                type="submit"
+                class="primary-btn">
+          Save Product
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
 
 </div>
 
-</form>
 
-</div>
-</div>
-
-
-<!-- =========================================================
+<!-- =====================================================
      ORDER MODAL
-========================================================= -->
+===================================================== -->
 
-<div id="orderModal" class="modal">
+<div id="orderModal"
+     class="modal-backdrop">
 
-<div class="sheet">
+  <div class="modal">
 
-<div id="orderBody"></div>
+    <div class="modal-head">
+
+      <div class="modal-title">
+        Order Details
+      </div>
+
+      <button class="close-btn"
+              onclick="closeModal('orderModal')">
+        ✕
+      </button>
+
+    </div>
+
+    <div id="orderDetails"></div>
+
+  </div>
 
 </div>
 
-</div>
 
-
-<!-- =========================================================
+<!-- =====================================================
      AD MODAL
-========================================================= -->
+===================================================== -->
 
-<div id="adModal" class="modal">
+<div id="adModal"
+     class="modal-backdrop">
 
-<div class="sheet">
+  <div class="modal">
 
-<button
-  class="close"
-  onclick="closeModal('adModal')"
->
-×
-</button>
+    <div class="modal-head">
 
-<h2 class="modal-title">
-📢 አዲስ Advertisement
-</h2>
+      <div id="adModalTitle"
+           class="modal-title">
+        New Advertisement
+      </div>
 
-<label>Title</label>
+      <button class="close-btn"
+              onclick="closeModal('adModal')">
+        ✕
+      </button>
 
-<input
-  id="adTitle"
-  placeholder="UNI MARKET Offer"
->
+    </div>
 
 
-<label>Message</label>
+    <form id="adForm">
 
-<textarea
-  id="adText"
-  placeholder="የማስታወቂያ ጽሑፍ..."
-></textarea>
+      <input id="adId"
+             type="hidden">
 
 
-<label>Photo URL</label>
+      <div class="field">
+        <label>Ad Type</label>
 
-<input
-  id="adPhoto"
-  placeholder="https://..."
->
+        <select id="adType">
 
+          <option value="text">Text</option>
+          <option value="product">Product</option>
+          <option value="image">Image</option>
 
-<label>Telegram Chat ID</label>
+        </select>
 
-<input
-  id="adChatId"
-  placeholder="-100..."
->
+      </div>
 
 
-<div id="adMessage" class="message"></div>
+      <div class="field">
+        <label>Product (optional)</label>
+
+        <select id="adProductId">
+
+          <option value="">No Product</option>
+
+        </select>
+
+      </div>
 
 
-<div class="actions">
+      <div class="field">
+        <label>Title</label>
 
-<button
-  class="btn gray"
-  onclick="closeModal('adModal')"
->
-Cancel
-</button>
+        <input id="adTitle"
+               placeholder="ማስታወቂያ ርዕስ">
 
-<button
-  class="btn primary"
-  onclick="saveAdvertisement()"
->
-💾 Save Draft
-</button>
+      </div>
+
+
+      <div class="field">
+        <label>Message</label>
+
+        <textarea id="adText"
+                  placeholder="የማስታወቂያ መልዕክት..."></textarea>
+
+      </div>
+
+
+      <div class="field">
+        <label>Button Text</label>
+
+        <input id="adButtonText"
+               value="Open Catalog"
+               placeholder="Open Catalog">
+
+      </div>
+
+
+      <div class="field">
+        <label>Photo URL (optional)</label>
+
+        <input id="adPhotoUrl"
+               placeholder="https://...">
+
+      </div>
+
+
+      <div class="field">
+        <label>Telegram Chat / Channel IDs</label>
+
+        <input id="adChatId"
+               placeholder="-1001234567890, -1009876543210">
+
+        <div style="font-size:11px;color:#8a94a7;margin-top:6px">
+          ከአንድ በላይ ከሆነ comma በመጠቀም ይለያዩ።
+        </div>
+
+      </div>
+
+
+      <div id="adFormError"
+           class="error-box hidden"></div>
+
+
+      <div class="modal-actions">
+
+        <button type="button"
+                class="secondary-btn"
+                onclick="closeModal('adModal')">
+          Cancel
+        </button>
+
+        <button id="adSaveButton"
+                type="submit"
+                class="primary-btn">
+          Save Advertisement
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
 
 </div>
 
-</div>
 
-</div>
-
-
-<!-- =========================================================
+<!-- =====================================================
      EMPLOYEE MODAL
-========================================================= -->
+===================================================== -->
 
-<div id="employeeModal" class="modal">
+<div id="employeeModal"
+     class="modal-backdrop">
 
-<div class="sheet">
+  <div class="modal">
 
-<button
-  class="close"
-  onclick="closeModal('employeeModal')"
->
-×
-</button>
+    <div class="modal-head">
 
-<h2 class="modal-title">
-👥 አዲስ Employee
-</h2>
+      <div class="modal-title">
+        New Employee
+      </div>
 
-<label>Name</label>
+      <button class="close-btn"
+              onclick="closeModal('employeeModal')">
+        ✕
+      </button>
 
-<input
-  id="employeeName"
-  placeholder="Employee name"
->
+    </div>
 
 
-<label>Username</label>
+    <form id="employeeForm">
 
-<input
-  id="employeeUsername"
-  placeholder="username"
->
-
-
-<label>Password</label>
-
-<input
-  id="employeePassword"
-  type="password"
-  placeholder="password"
->
+      <div class="field">
+        <label>Name *</label>
+        <input id="eName"
+               required
+               placeholder="Employee name">
+      </div>
 
 
-<label>Role</label>
-
-<select id="employeeRole">
-
-<option value="EMPLOYEE">
-EMPLOYEE
-</option>
-
-<option value="MANAGER">
-MANAGER
-</option>
-
-</select>
+      <div class="field">
+        <label>Username *</label>
+        <input id="eUsername"
+               required
+               placeholder="username">
+      </div>
 
 
-<label>Permissions</label>
+      <div class="field">
+        <label>Password *</label>
+        <input id="ePassword"
+               required
+               type="password"
+               placeholder="password">
+      </div>
 
-<div class="permission-grid">
 
-<label class="permission">
-<input type="checkbox" value="products">
-Products
-</label>
+      <div class="field">
+        <label>Role</label>
 
-<label class="permission">
-<input type="checkbox" value="delete_product">
-Delete Product
-</label>
+        <select id="eRole">
+          <option value="employee">Employee</option>
+          <option value="manager">Manager</option>
+        </select>
 
-<label class="permission">
-<input type="checkbox" value="view_orders">
-Orders
-</label>
+      </div>
 
-<label class="permission">
-<input type="checkbox" value="verify_payment">
-Verify Payment
-</label>
 
-<label class="permission">
-<input type="checkbox" value="confirm_order">
-Confirm Order
-</label>
+      <div class="field">
 
-<label class="permission">
-<input type="checkbox" value="advertising">
-Advertising
-</label>
+        <label>Permissions</label>
 
-<label class="permission">
-<input type="checkbox" value="employees">
-Employees
-</label>
+        <div class="permission-list">
 
-<label class="permission">
-<input type="checkbox" value="reports">
-Reports
-</label>
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="products"
+                   class="permission">
+            Products
+          </label>
 
-<label class="permission">
-<input type="checkbox" value="delivery">
-Delivery
-</label>
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="delete_product"
+                   class="permission">
+            Delete Product
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="view_orders"
+                   class="permission">
+            Orders
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="verify_payment"
+                   class="permission">
+            Payment
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="confirm_order"
+                   class="permission">
+            Confirm Order
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="advertising"
+                   class="permission">
+            Advertising
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="payment_settings"
+                   class="permission">
+            Payment Settings
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="telegram_settings"
+                   class="permission">
+            Telegram
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="employees"
+                   class="permission">
+            Employees
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="reports"
+                   class="permission">
+            Reports
+          </label>
+
+          <label class="permission-item">
+            <input type="checkbox"
+                   value="delivery"
+                   class="permission">
+            Delivery
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div id="employeeFormError"
+           class="error-box hidden"></div>
+
+
+      <div class="modal-actions">
+
+        <button type="button"
+                class="secondary-btn"
+                onclick="closeModal('employeeModal')">
+          Cancel
+        </button>
+
+        <button id="employeeSaveButton"
+                type="submit"
+                class="primary-btn">
+          Create Employee
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
 
 </div>
 
 
-<div id="employeeMessage" class="message"></div>
-
-
-<div class="actions">
-
-<button
-  class="btn gray"
-  onclick="closeModal('employeeModal')"
->
-Cancel
-</button>
-
-<button
-  class="btn primary"
-  onclick="saveEmployee()"
->
-💾 Create Employee
-</button>
-
-</div>
-
-</div>
-
-</div>
+<div id="toast"
+     class="toast"></div>
 
 
 <script>
-
-/* =========================================================
-   API
-========================================================= */
-
-const API = {
-
-  auth: "/api/auth",
-
-  products: "/api/products",
-
-  upload: "/api/upload",
-
-  orders: "/api/orders",
-
-  ads: "/api/advertisements",
-
-  employees: "/api/employees",
-
-  reports: "/api/reports",
-
-  payment: "/api/payment-settings",
-
-  telegram: "/api/telegram-settings",
-
-  channels: "/api/telegram-channels",
-
-  telegramCheck: "/api/telegram/check-chat"
-
-};
-
+"use strict";
 
 /* =========================================================
    STATE
 ========================================================= */
 
-let token =
-  localStorage.getItem("tsm_token") || "";
-
-let currentUser = null;
-
-let products = [];
-
-let orders = [];
-
-let advertisements = [];
-
-let employees = [];
-
-let channels = [];
-
-let editingProductId = null;
+const state = {
+  token: localStorage.getItem("tsm_token") || "",
+  user: null,
+  products: [],
+  orders: [],
+  ads: [],
+  employees: [],
+  reports: null,
+  currentOrder: null
+};
 
 
 /* =========================================================
-   HELPERS
+   BASIC HELPERS
 ========================================================= */
 
-const $ = id =>
-  document.getElementById(id);
-
+function $(id){
+  return document.getElementById(id);
+}
 
 function esc(value){
-
   return String(value ?? "")
-    .replace(/[&<>"']/g,c => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#39;"
-    }[c]));
-
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
-
 
 function money(value){
+  const n = Number(value || 0);
 
-  return (
-    Number(value || 0)
-      .toLocaleString(
-        "en-US",
-        {maximumFractionDigits:2}
-      )
-    + " ETB"
-  );
+  return new Intl.NumberFormat("en-US",{
+    maximumFractionDigits:2
+  }).format(n);
+}
 
+function toast(message,type=""){
+  const el = $("toast");
+
+  el.textContent = message;
+  el.className = "toast show " + type;
+
+  clearTimeout(window.__toastTimer);
+
+  window.__toastTimer = setTimeout(()=>{
+    el.className = "toast";
+  },2800);
+}
+
+function showError(id,message){
+  const el = $(id);
+
+  if(!el) return;
+
+  el.textContent = message || "Something went wrong.";
+  el.classList.remove("hidden");
+}
+
+function hideError(id){
+  const el = $(id);
+
+  if(el){
+    el.classList.add("hidden");
+    el.textContent = "";
+  }
 }
 
 
-function authHeaders(extra = {}){
+/* =========================================================
+   API
+========================================================= */
 
-  return {
+async function api(url,options={}){
+  const opts = {...options};
 
-    ...extra,
-
-    ...(token
-      ? {
-          Authorization:
-            "Bearer " + token
-        }
-      : {})
-
+  opts.headers = {
+    ...(options.headers || {})
   };
 
-}
+  if(state.token){
+    opts.headers.Authorization = "Bearer " + state.token;
+  }
 
+  /*
+    IMPORTANT:
+    Do NOT manually set Content-Type when body is FormData.
+    Browser must set multipart boundary automatically.
+  */
 
-async function api(url,options = {}){
+  if(
+    opts.body &&
+    typeof opts.body === "object" &&
+    !(opts.body instanceof FormData) &&
+    !(opts.body instanceof Blob)
+  ){
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(opts.body);
+  }
 
-  const opts = {
-    ...options
-  };
+  const response = await fetch(url,opts);
 
-  opts.headers =
-    authHeaders({
-      ...(options.headers || {})
-    });
+  const contentType =
+    response.headers.get("content-type") || "";
 
-  const response =
-    await fetch(url,opts);
+  let data;
 
-  const text =
-    await response.text();
-
-  let data = {};
-
-  try{
-
-    data =
-      text
-        ? JSON.parse(text)
-        : {};
-
-  }catch{
-
-    data = {};
-
+  if(contentType.includes("application/json")){
+    data = await response.json().catch(()=>({}));
+  }else{
+    const text = await response.text().catch(()=>"");
+    data = {
+      ok:response.ok,
+      message:text
+    };
   }
 
   if(response.status === 401){
 
-    logout();
+    localStorage.removeItem("tsm_token");
+    state.token = "";
+
+    if(
+      !location.pathname.endsWith("/login") &&
+      !location.pathname.endsWith("admin.html")
+    ){
+      location.reload();
+    }
 
     throw new Error(
+      data?.error ||
+      data?.message ||
       "Session expired"
     );
-
   }
 
-  if(!response.ok){
+  if(!response.ok || data?.ok === false){
 
     throw new Error(
-      data.error ||
-      data.message ||
-      "Request failed"
+      data?.error ||
+      data?.message ||
+      `Request failed (${response.status})`
     );
-
   }
 
   return data;
+}
 
+
+/*
+  Optional endpoint helper.
+
+  Some server versions may not yet have reports/channels.
+  Such an endpoint must NOT break the whole dashboard.
+*/
+
+async function optionalApi(url,options={}){
+  try{
+    return await api(url,options);
+  }catch(error){
+    console.warn("Optional API unavailable:",url,error.message);
+    return null;
+  }
 }
 
 
 /* =========================================================
-   LOGIN
+   AUTH
 ========================================================= */
 
-function loginMessage(text,type){
+async function login(username,password){
 
-  const box =
-    $("loginMessage");
+  hideError("loginError");
 
-  box.textContent = text;
-
-  box.className =
-    "login-message show " +
-    type;
-
-}
-
-
-async function login(){
-
-  const username =
-    $("loginUsername")
-      .value
-      .trim();
-
-  const password =
-    $("loginPassword")
-      .value;
-
-  if(!username || !password){
-
-    loginMessage(
-      "Username እና Password ያስገቡ።",
-      "error"
-    );
-
-    return;
-
-  }
-
-  const button =
-    $("loginButton");
-
-  button.disabled = true;
-
-  button.textContent =
-    "⏳ እየገባ...";
+  $("loginButton").disabled = true;
+  $("loginButton").textContent = "Logging in...";
 
   try{
 
-    const data =
-      await api(
-        API.auth + "/login",
-        {
-          method:"POST",
+    const data = await api("/api/auth/login",{
+      method:"POST",
+      body:{
+        username,
+        password
+      }
+    });
 
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
+    const token =
+      data.token ||
+      data.access_token ||
+      data.accessToken;
 
-          body:JSON.stringify({
-            username,
-            password
-          })
-        }
-      );
+    if(!token){
+      throw new Error("Login succeeded but no token was returned.");
+    }
 
-    token =
-      data.token;
+    state.token = token;
 
-    localStorage.setItem(
-      "tsm_token",
-      token
-    );
+    localStorage.setItem("tsm_token",token);
 
-    currentUser =
-      data.user || null;
+    state.user =
+      data.user ||
+      data.admin ||
+      null;
 
-    loginMessage(
-      "✅ Login successful",
-      "success"
-    );
-
-    await enterApp();
+    await startApp();
 
   }catch(error){
 
-    loginMessage(
-      "❌ " + error.message,
-      "error"
+    showError(
+      "loginError",
+      error.message || "Login failed"
     );
 
   }finally{
 
-    button.disabled = false;
-
-    button.textContent =
-      "🔐 ግባ";
+    $("loginButton").disabled = false;
+    $("loginButton").textContent = "Login";
 
   }
-
 }
 
 
-async function checkLogin(){
+async function checkAuth(){
 
-  if(!token){
-
-    $("loginPage")
-      .style
-      .display = "flex";
-
-    $("appShell")
-      .style
-      .display = "none";
-
+  if(!state.token){
+    showLogin();
     return;
-
   }
 
   try{
 
-    const data =
-      await api(
-        API.auth + "/me"
-      );
+    const data = await api("/api/auth/me");
 
-    currentUser =
-      data.user || null;
+    state.user =
+      data.user ||
+      data.admin ||
+      data;
 
-    await enterApp();
+    await startApp();
 
-  }catch{
+  }catch(error){
 
-    localStorage.removeItem(
-      "tsm_token"
-    );
+    console.warn("Auth check failed:",error.message);
 
-    token = "";
+    localStorage.removeItem("tsm_token");
+    state.token = "";
 
-    $("loginPage")
-      .style
-      .display = "flex";
-
-    $("appShell")
-      .style
-      .display = "none";
-
+    showLogin();
   }
-
 }
 
 
-async function enterApp(){
+async function startApp(){
 
-  $("loginPage")
-    .style
-    .display = "none";
-
-  $("appShell")
-    .style
-    .display = "block";
-
-  $("userLabel")
-    .textContent =
-      currentUser?.name ||
-      currentUser?.username ||
-      "Master Admin";
+  $("loginPage").classList.add("hidden");
+  $("app").classList.remove("hidden");
 
   await refreshAll();
+}
 
+
+function showLogin(){
+
+  $("loginPage").classList.remove("hidden");
+  $("app").classList.add("hidden");
 }
 
 
 function logout(){
 
-  token = "";
+  localStorage.removeItem("tsm_token");
 
-  currentUser = null;
-
-  localStorage.removeItem(
-    "tsm_token"
-  );
+  state.token = "";
+  state.user = null;
 
   location.reload();
-
 }
 
 
@@ -1879,1960 +2235,57 @@ function logout(){
    NAVIGATION
 ========================================================= */
 
-const sections = [
-  "home",
-  "products",
-  "orders",
-  "ads",
-  "employees",
-  "reports",
-  "settings"
-];
-
-
-function showSection(id){
-
-  sections.forEach(section => {
-
-    const element =
-      $(section);
-
-    if(element){
-
-      element.style.display =
-        section === id
-          ? "block"
-          : "none";
-
-    }
-
-  });
+function showSection(name){
 
   document
-    .querySelectorAll(".nav")
-    .forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.section === id
-      );
-
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
     });
 
-  if(id === "products")
-    renderProducts();
+  const target = $("section-" + name);
 
-  if(id === "orders")
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(button=>{
+      button.classList.toggle(
+        "active",
+        button.dataset.section === name
+      );
+    });
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  if(name === "products"){
+    loadProducts();
+  }
+
+  if(name === "orders"){
     loadOrders();
+  }
 
-  if(id === "ads")
+  if(name === "ads"){
     loadAds();
+  }
 
-  if(id === "employees")
+  if(name === "employees"){
     loadEmployees();
+  }
 
-  if(id === "settings")
+  if(name === "reports"){
+    loadReports();
+  }
+
+  if(name === "settings"){
     loadSettings();
-
-}
-
-
-/* =========================================================
-   MODALS
-========================================================= */
-
-function openModal(id){
-
-  $(id)
-    .classList
-    .add("show");
-
-}
-
-
-function closeModal(id){
-
-  $(id)
-    .classList
-    .remove("show");
-
-}
-
-
-/* =========================================================
-   PRODUCTS
-========================================================= */
-
-function mapProduct(p){
-
-  return {
-
-    id:p.id,
-
-    name:p.name || "",
-
-    description:
-      p.description || "",
-
-    category:
-      p.category || "other",
-
-    buy:
-      Number(
-        p.buy_price ??
-        p.buyPrice ??
-        0
-      ),
-
-    sell:
-      Number(
-        p.sell_price ??
-        p.sellPrice ??
-        0
-      ),
-
-    stock:
-      Number(
-        p.stock ?? 0
-      ),
-
-    photo:
-      p.photo_url ??
-      p.photoUrl ??
-      p.photo ??
-      ""
-
-  };
-
-}
-
-
-async function loadProducts(){
-
-  const data =
-    await api(API.products);
-
-  const raw =
-    Array.isArray(data)
-      ? data
-      : (
-          data.products ||
-          []
-        );
-
-  products =
-    raw.map(mapProduct);
-
-  renderProducts();
-
-}
-
-
-function renderProducts(){
-
-  $("productCount")
-    .textContent =
-      products.length;
-
-  const stock =
-    products.reduce(
-      (sum,p) =>
-        sum + p.stock,
-      0
-    );
-
-  $("stockTotal")
-    .textContent =
-      stock;
-
-  $("rProducts")
-    .textContent =
-      products.length;
-
-  $("rStock")
-    .textContent =
-      stock;
-
-  const html =
-    products.length
-
-      ? products
-          .map(productCard)
-          .join("")
-
-      : `
-        <div class="empty">
-          ምርት የለም።
-          ＋ አዲስ ምርት ጨምር።
-        </div>
-      `;
-
-  $("productsList")
-    .innerHTML =
-      html;
-
-  $("homeProducts")
-    .innerHTML =
-      products.length
-
-        ? products
-            .slice(0,3)
-            .map(productCard)
-            .join("")
-
-        : `
-          <div class="empty">
-            ምርት የለም።
-          </div>
-        `;
-
-}
-
-
-function productCard(p){
-
-  return `
-
-  <div class="card">
-
-    <div class="product">
-
-      <div class="pic">
-
-        ${
-          p.photo
-
-            ? `
-              <img
-                src="${esc(p.photo)}"
-                alt=""
-                loading="lazy"
-              >
-            `
-
-            : "📦"
-        }
-
-      </div>
-
-      <div class="grow">
-
-        <b>${esc(p.name)}</b>
-
-        <div class="muted">
-          ${esc(p.category)}
-          • Stock: ${p.stock}
-        </div>
-
-        <div class="price">
-          የሽያጭ ዋጋ:
-          ${money(p.sell)}
-        </div>
-
-        <div class="muted">
-
-          የግዢ:
-          ${money(p.buy)}
-
-          •
-
-          <span class="profit">
-            Profit:
-            ${money(p.sell-p.buy)}
-          </span>
-
-        </div>
-
-      </div>
-
-      <div>
-
-        <button
-          class="btn"
-          onclick="editProduct('${esc(p.id)}')"
-        >
-          ✏️
-        </button>
-
-        <button
-          class="btn red"
-          onclick="deleteProduct('${esc(p.id)}')"
-        >
-          🗑️
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  `;
-
-}
-
-
-function openNewProduct(){
-
-  editingProductId =
-    null;
-
-  $("productModalTitle")
-    .textContent =
-      "📦 አዲስ ምርት";
-
-  $("productForm")
-    .reset();
-
-  $("productId")
-    .value = "";
-
-  $("pPhoto")
-    .value = "";
-
-  resetPhotoPreview();
-
-  $("productMessage")
-    .className =
-      "message";
-
-  openModal(
-    "productModal"
-  );
-
-}
-
-
-function editProduct(id){
-
-  const p =
-    products.find(
-      x => String(x.id) === String(id)
-    );
-
-  if(!p)return;
-
-  editingProductId =
-    p.id;
-
-  $("productModalTitle")
-    .textContent =
-      "✏️ ምርት አስተካክል";
-
-  $("productId")
-    .value = p.id;
-
-  $("pName")
-    .value = p.name;
-
-  $("pCategory")
-    .value = p.category;
-
-  $("pBuy")
-    .value = p.buy;
-
-  $("pSell")
-    .value = p.sell;
-
-  $("pStock")
-    .value = p.stock;
-
-  $("pDescription")
-    .value = p.description;
-
-  $("pPhoto")
-    .value = p.photo;
-
-  if(p.photo){
-
-    $("productPhotoPreview")
-      .innerHTML = `
-        <img
-          src="${esc(p.photo)}"
-          alt="Product"
-        >
-      `;
-
-  }else{
-
-    resetPhotoPreview();
-
   }
-
-  openModal(
-    "productModal"
-  );
-
-}
-
-
-/* =========================================================
-   PHOTO PREVIEW + UPLOAD
-========================================================= */
-
-function resetPhotoPreview(){
-
-  $("productPhotoPreview")
-    .innerHTML = `
-
-      <div class="photo-preview-empty">
-
-        📷<br>
-
-        <b>ፎቶ ይምረጡ</b>
-
-        <br>
-
-        <span class="muted">
-          Gallery ወይም Camera
-        </span>
-
-      </div>
-
-  `;
-
-  $("uploadStatus")
-    .textContent = "";
-
-  $("productPhotoFile")
-    .value = "";
-
-}
-
-
-function previewProductPhoto(event){
-
-  const file =
-    event.target.files?.[0];
-
-  if(!file){
-
-    resetPhotoPreview();
-
-    return;
-
-  }
-
-  if(!file.type.startsWith("image/")){
-
-    alert(
-      "እባክዎ image file ይምረጡ።"
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-  if(file.size > 8 * 1024 * 1024){
-
-    alert(
-      "ፎቶው ከ 8MB መብለጥ የለበትም።"
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-  const reader =
-    new FileReader();
-
-  reader.onload =
-    function(e){
-
-      $("productPhotoPreview")
-        .innerHTML = `
-
-          <img
-            src="${e.target.result}"
-            alt="Preview"
-          >
-
-        `;
-
-    };
-
-  reader.readAsDataURL(file);
-
-}
-
-
-async function uploadProductPhoto(){
-
-  const file =
-    $("productPhotoFile")
-      .files?.[0];
-
-  if(!file){
-
-    return $("pPhoto")
-      .value
-      .trim();
-
-  }
-
-  $("uploadStatus")
-    .textContent =
-      "⏳ ፎቶው እየተጫነ ነው...";
-
-  const formData =
-    new FormData();
-
-  formData.append(
-    "file",
-    file
-  );
-
-  const response =
-    await fetch(
-      API.upload,
-      {
-        method:"POST",
-        headers:
-          authHeaders(),
-        body:formData
-      }
-    );
-
-  const text =
-    await response.text();
-
-  let data = {};
-
-  try{
-
-    data =
-      text
-        ? JSON.parse(text)
-        : {};
-
-  }catch{
-
-    data = {};
-
-  }
-
-  if(!response.ok){
-
-    throw new Error(
-      data.error ||
-      "Photo upload failed"
-    );
-
-  }
-
-  const url =
-    data.url ||
-    data.publicUrl ||
-    data.photo_url ||
-    data.path ||
-    "";
-
-  if(!url){
-
-    throw new Error(
-      "Upload ተሳክቷል ግን URL አልተመለሰም።"
-    );
-
-  }
-
-  $("pPhoto")
-    .value = url;
-
-  $("uploadStatus")
-    .textContent =
-      "✅ Photo uploaded";
-
-  return url;
-
-}
-
-
-/* =========================================================
-   SAVE PRODUCT
-========================================================= */
-
-$("productForm")
-  .addEventListener(
-    "submit",
-    async function(event){
-
-      event.preventDefault();
-
-      const button =
-        $("saveProductBtn");
-
-      button.disabled = true;
-
-      button.textContent =
-        "⏳ Saving...";
-
-      try{
-
-        const photoUrl =
-          await uploadProductPhoto();
-
-        const body = {
-
-          name:
-            $("pName")
-              .value
-              .trim(),
-
-          category:
-            $("pCategory")
-              .value,
-
-          buy_price:
-            Number(
-              $("pBuy").value
-            ),
-
-          sell_price:
-            Number(
-              $("pSell").value
-            ),
-
-          stock:
-            Number(
-              $("pStock").value
-            ),
-
-          photo_url:
-            photoUrl,
-
-          description:
-            $("pDescription")
-              .value
-              .trim()
-
-        };
-
-        if(!body.name){
-
-          throw new Error(
-            "የምርት ስም ያስገቡ።"
-          );
-
-        }
-
-        let url =
-          API.products;
-
-        let method =
-          "POST";
-
-        if(editingProductId){
-
-          url +=
-            "/" +
-            encodeURIComponent(
-              editingProductId
-            );
-
-          method =
-            "PATCH";
-
-        }
-
-        await api(
-          url,
-          {
-            method,
-
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify(body)
-          }
-        );
-
-        showMessage(
-          "productMessage",
-          "✅ ምርቱ ተቀምጧል።",
-          "ok"
-        );
-
-        await loadProducts();
-
-        setTimeout(
-          () =>
-            closeModal(
-              "productModal"
-            ),
-          600
-        );
-
-      }catch(error){
-
-        showMessage(
-          "productMessage",
-          "❌ " +
-            error.message,
-          "err"
-        );
-
-      }finally{
-
-        button.disabled = false;
-
-        button.textContent =
-          "💾 Save Product";
-
-      }
-
-    }
-  );
-
-
-async function deleteProduct(id){
-
-  if(!confirm(
-    "ይህን ምርት ማጥፋት እርግጠኛ ነዎት?"
-  ))return;
-
-  try{
-
-    await api(
-      API.products +
-      "/" +
-      encodeURIComponent(id),
-      {
-        method:"DELETE"
-      }
-    );
-
-    await loadProducts();
-
-  }catch(error){
-
-    alert(
-      "❌ " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   ORDERS
-========================================================= */
-
-function mapOrder(o){
-
-  return {
-
-    id:o.id,
-
-    productName:
-      o.product_name ??
-      o.productName ??
-      "—",
-
-    customerName:
-      o.customer_name ??
-      o.customerName ??
-      o.name ??
-      "—",
-
-    phone:
-      o.phone ??
-      "—",
-
-    username:
-      o.username ??
-      "",
-
-    quantity:
-      Number(
-        o.quantity ?? 1
-      ),
-
-    total:
-      Number(
-        o.total ?? 0
-      ),
-
-    status:
-      String(
-        o.status ??
-        "NEW"
-      ).toUpperCase(),
-
-    receipt:
-      o.receipt_url ??
-      o.receiptUrl ??
-      "",
-
-    address:
-      o.address ??
-      o.destination ??
-      "",
-
-    createdAt:
-      o.created_at ??
-      o.createdAt ??
-      ""
-
-  };
-
-}
-
-
-async function loadOrders(){
-
-  try{
-
-    const data =
-      await api(API.orders);
-
-    const raw =
-      Array.isArray(data)
-        ? data
-        : (
-            data.orders ||
-            []
-          );
-
-    orders =
-      raw.map(mapOrder);
-
-    renderOrders();
-
-  }catch(error){
-
-    console.error(
-      "Orders:",
-      error
-    );
-
-    orders = [];
-
-    renderOrders();
-
-  }
-
-}
-
-
-function renderOrders(){
-
-  const pending =
-    orders.filter(
-      o =>
-        ![
-          "CONFIRMED",
-          "REJECTED",
-          "DELIVERED"
-        ].includes(
-          o.status
-        )
-    );
-
-  $("pendingCount")
-    .textContent =
-      pending.length;
-
-  $("rPending")
-    .textContent =
-      pending.length;
-
-  const sales =
-    orders
-      .filter(
-        o =>
-          [
-            "CONFIRMED",
-            "DELIVERED"
-          ].includes(
-            o.status
-          )
-      )
-      .reduce(
-        (sum,o) =>
-          sum + o.total,
-        0
-      );
-
-  $("salesTotal")
-    .textContent =
-      money(sales);
-
-  $("rSales")
-    .textContent =
-      money(sales);
-
-  $("ordersList")
-    .innerHTML =
-      orders.length
-
-        ? orders
-            .map(orderCard)
-            .join("")
-
-        : `
-          <div class="empty">
-            አሁን Order የለም።
-          </div>
-        `;
-
-  $("homeOrders")
-    .innerHTML =
-      pending.length
-
-        ? pending
-            .slice(0,3)
-            .map(orderCard)
-            .join("")
-
-        : `
-          <div class="empty">
-            Pending Order የለም።
-          </div>
-        `;
-
-}
-
-
-function orderCard(o){
-
-  const statusClass =
-    o.status === "CONFIRMED"
-      ? "green"
-      : o.status === "REJECTED"
-        ? "red"
-        : "blue";
-
-  return `
-
-  <div
-    class="card"
-    onclick="openOrder('${esc(o.id)}')"
-  >
-
-    <div class="order">
-
-      <div class="grow">
-
-        <b>
-          ${esc(o.productName)}
-        </b>
-
-        <div class="muted">
-          👤 ${esc(o.customerName)}
-          • ×${o.quantity}
-        </div>
-
-        <div class="muted">
-          📞 ${esc(o.phone)}
-        </div>
-
-      </div>
-
-      <div style="text-align:right">
-
-        <b>
-          ${money(o.total)}
-        </b>
-
-        <br>
-
-        <span
-          class="badge ${statusClass}"
-        >
-          ${esc(o.status)}
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  `;
-
-}
-
-
-function openOrder(id){
-
-  const order =
-    orders.find(
-      o =>
-        String(o.id) ===
-        String(id)
-    );
-
-  if(!order)return;
-
-  $("orderBody")
-    .innerHTML = `
-
-    <button
-      class="close"
-      onclick="closeModal('orderModal')"
-    >
-      ×
-    </button>
-
-    <h2 class="modal-title">
-      🛒 Order Details
-    </h2>
-
-    <div class="card">
-
-      <div class="info-row">
-        <span>ደንበኛ</span>
-        <b>${esc(order.customerName)}</b>
-      </div>
-
-      <hr>
-
-      <div class="info-row">
-        <span>📞 Phone</span>
-        <b>${esc(order.phone)}</b>
-      </div>
-
-      <hr>
-
-      <div class="info-row">
-        <span>📦 Product</span>
-        <b>${esc(order.productName)}</b>
-      </div>
-
-      <hr>
-
-      <div class="info-row">
-        <span>ብዛት</span>
-        <b>${order.quantity}</b>
-      </div>
-
-      <hr>
-
-      <div class="info-row">
-        <span>💰 Total</span>
-        <b>${money(order.total)}</b>
-      </div>
-
-      <hr>
-
-      <div class="info-row">
-        <span>Status</span>
-        <span class="badge">
-          ${esc(order.status)}
-        </span>
-      </div>
-
-      ${
-        order.address
-          ? `
-            <hr>
-            <div>
-              <span class="muted">
-                📍 Delivery Address
-              </span>
-              <br>
-              <b>${esc(order.address)}</b>
-            </div>
-          `
-          : ""
-      }
-
-    </div>
-
-    ${
-      order.receipt
-        ? `
-          <div class="card">
-
-            <h3>
-              🧾 Payment Receipt
-            </h3>
-
-            <a
-              href="${esc(order.receipt)}"
-              target="_blank"
-              class="btn primary"
-            >
-              🖼️ Open Receipt
-            </a>
-
-          </div>
-        `
-        : ""
-    }
-
-    ${
-      ![
-        "CONFIRMED",
-        "REJECTED",
-        "DELIVERED"
-      ].includes(order.status)
-
-        ? `
-
-          <div class="actions">
-
-            <button
-              class="btn green"
-              onclick="
-                changeOrderStatus(
-                  '${esc(order.id)}',
-                  'CONFIRMED'
-                )
-              "
-            >
-              ✅ Confirm
-            </button>
-
-            <button
-              class="btn red"
-              onclick="
-                changeOrderStatus(
-                  '${esc(order.id)}',
-                  'REJECTED'
-                )
-              "
-            >
-              ❌ Reject
-            </button>
-
-          </div>
-
-        `
-
-        : ""
-    }
-
-  `;
-
-  openModal(
-    "orderModal"
-  );
-
-}
-
-
-async function changeOrderStatus(
-  id,
-  status
-){
-
-  try{
-
-    await api(
-      API.orders +
-      "/" +
-      encodeURIComponent(id),
-      {
-        method:"PATCH",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            status
-          })
-      }
-    );
-
-    closeModal(
-      "orderModal"
-    );
-
-    await loadOrders();
-
-  }catch(error){
-
-    alert(
-      "❌ " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   ADS
-========================================================= */
-
-async function loadAds(){
-
-  try{
-
-    const data =
-      await api(API.ads);
-
-    advertisements =
-      Array.isArray(data)
-        ? data
-        : (
-            data.advertisements ||
-            []
-          );
-
-    renderAds();
-
-  }catch(error){
-
-    console.error(
-      "Ads:",
-      error
-    );
-
-  }
-
-}
-
-
-function renderAds(){
-
-  $("adsList")
-    .innerHTML =
-      advertisements.length
-
-        ? advertisements
-            .map(ad => `
-
-              <div class="card">
-
-                <div class="ad">
-
-                  <div class="grow">
-
-                    <b>
-                      ${esc(ad.title)}
-                    </b>
-
-                    <div class="muted">
-                      ${esc(ad.text)}
-                    </div>
-
-                    <br>
-
-                    <span class="badge">
-                      ${esc(ad.status || "DRAFT")}
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            `)
-            .join("")
-
-        : `
-          <div class="empty">
-            Advertisement የለም።
-          </div>
-        `;
-
-}
-
-
-async function saveAdvertisement(){
-
-  const body = {
-
-    title:
-      $("adTitle")
-        .value
-        .trim(),
-
-    text:
-      $("adText")
-        .value
-        .trim(),
-
-    photo_url:
-      $("adPhoto")
-        .value
-        .trim(),
-
-    telegram_chat_id:
-      $("adChatId")
-        .value
-        .trim()
-
-  };
-
-  try{
-
-    await api(
-      API.ads,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(body)
-      }
-    );
-
-    showMessage(
-      "adMessage",
-      "✅ Advertisement draft saved.",
-      "ok"
-    );
-
-    await loadAds();
-
-    setTimeout(
-      () =>
-        closeModal("adModal"),
-      600
-    );
-
-  }catch(error){
-
-    showMessage(
-      "adMessage",
-      "❌ " +
-        error.message,
-      "err"
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   EMPLOYEES
-========================================================= */
-
-async function loadEmployees(){
-
-  try{
-
-    const data =
-      await api(API.employees);
-
-    employees =
-      Array.isArray(data)
-        ? data
-        : (
-            data.employees ||
-            []
-          );
-
-    renderEmployees();
-
-  }catch(error){
-
-    console.error(
-      "Employees:",
-      error
-    );
-
-  }
-
-}
-
-
-function renderEmployees(){
-
-  $("employeesList")
-    .innerHTML =
-      employees.length
-
-        ? employees
-            .map(e => `
-
-              <div class="card">
-
-                <div class="employee">
-
-                  <div class="pic">
-                    👤
-                  </div>
-
-                  <div class="grow">
-
-                    <b>
-                      ${esc(
-                        e.name ||
-                        e.username
-                      )}
-                    </b>
-
-                    <div class="muted">
-                      @${esc(
-                        e.username ||
-                        ""
-                      )}
-                    </div>
-
-                    <span class="badge blue">
-                      ${esc(
-                        e.role ||
-                        "EMPLOYEE"
-                      )}
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            `)
-            .join("")
-
-        : `
-          <div class="empty">
-            Employee የለም።
-          </div>
-        `;
-
-}
-
-
-async function saveEmployee(){
-
-  const permissions =
-    Array.from(
-      document.querySelectorAll(
-        "#employeeModal .permission input:checked"
-      )
-    )
-    .map(
-      input =>
-        input.value
-    );
-
-  const body = {
-
-    name:
-      $("employeeName")
-        .value
-        .trim(),
-
-    username:
-      $("employeeUsername")
-        .value
-        .trim(),
-
-    password:
-      $("employeePassword")
-        .value,
-
-    role:
-      $("employeeRole")
-        .value,
-
-    permissions
-
-  };
-
-  try{
-
-    await api(
-      API.employees,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(body)
-      }
-    );
-
-    showMessage(
-      "employeeMessage",
-      "✅ Employee created.",
-      "ok"
-    );
-
-    await loadEmployees();
-
-    setTimeout(
-      () =>
-        closeModal(
-          "employeeModal"
-        ),
-      600
-    );
-
-  }catch(error){
-
-    showMessage(
-      "employeeMessage",
-      "❌ " +
-        error.message,
-      "err"
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   REPORTS
-========================================================= */
-
-async function loadReports(){
-
-  try{
-
-    const data =
-      await api(API.reports);
-
-    const summary =
-      data.summary ||
-      data;
-
-    $("rProducts")
-      .textContent =
-        products.length;
-
-    $("rStock")
-      .textContent =
-        products.reduce(
-          (sum,p) =>
-            sum + p.stock,
-          0
-        );
-
-    $("rPending")
-      .textContent =
-        summary.pendingOrders ??
-        0;
-
-    $("rSales")
-      .textContent =
-        money(
-          summary.totalSales
-        );
-
-    $("rProfit")
-      .textContent =
-        money(
-          summary.totalProfit
-        );
-
-  }catch(error){
-
-    console.error(
-      "Reports:",
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-async function loadSettings(){
-
-  try{
-
-    const payment =
-      await api(
-        API.payment
-      );
-
-    $("bankName")
-      .value =
-        payment.bank_name ||
-        payment.bank ||
-        "";
-
-    $("accountName")
-      .value =
-        payment.account_name ||
-        "";
-
-    $("accountNumber")
-      .value =
-        payment.account_number ||
-        "";
-
-    $("telebirr")
-      .value =
-        payment.telebirr ||
-        payment.telebirr_number ||
-        "";
-
-    $("cbeBirr")
-      .value =
-        payment.cbe_birr ||
-        payment.cbe_birr_number ||
-        "";
-
-    $("paymentInstructions")
-      .value =
-        payment.instructions ||
-        payment.note ||
-        "";
-
-  }catch(error){
-
-    console.error(
-      "Payment settings:",
-      error
-    );
-
-  }
-
-
-  try{
-
-    const telegram =
-      await api(
-        API.telegram
-      );
-
-    $("telegramAdminChatId")
-      .value =
-        telegram.admin_chat_id ||
-        telegram.telegram_admin_chat_id ||
-        telegram.chat_id ||
-        "";
-
-    $("telegramBotUsername")
-      .value =
-        telegram.bot_username ||
-        "";
-
-  }catch(error){
-
-    console.error(
-      "Telegram settings:",
-      error
-    );
-
-  }
-
-  await loadChannels();
-
-}
-
-
-async function savePaymentSettings(){
-
-  const body = {
-
-    bank_name:
-      $("bankName").value.trim(),
-
-    account_name:
-      $("accountName").value.trim(),
-
-    account_number:
-      $("accountNumber").value.trim(),
-
-    telebirr:
-      $("telebirr").value.trim(),
-
-    cbe_birr:
-      $("cbeBirr").value.trim(),
-
-    instructions:
-      $("paymentInstructions")
-        .value
-        .trim()
-
-  };
-
-  try{
-
-    await api(
-      API.payment,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(body)
-      }
-    );
-
-    showMessage(
-      "paymentMessage",
-      "✅ Payment settings saved.",
-      "ok"
-    );
-
-  }catch(error){
-
-    showMessage(
-      "paymentMessage",
-      "❌ " +
-        error.message,
-      "err"
-    );
-
-  }
-
-}
-
-
-async function saveTelegramSettings(){
-
-  const body = {
-
-    admin_chat_id:
-      $("telegramAdminChatId")
-        .value
-        .trim(),
-
-    bot_username:
-      $("telegramBotUsername")
-        .value
-        .trim()
-
-  };
-
-  try{
-
-    await api(
-      API.telegram,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(body)
-      }
-    );
-
-    showMessage(
-      "telegramMessage",
-      "✅ Telegram settings saved.",
-      "ok"
-    );
-
-  }catch(error){
-
-    showMessage(
-      "telegramMessage",
-      "❌ " +
-        error.message,
-      "err"
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   CHANNELS
-========================================================= */
-
-async function loadChannels(){
-
-  try{
-
-    const data =
-      await api(
-        API.channels
-      );
-
-    channels =
-      Array.isArray(data)
-        ? data
-        : (
-            data.channels ||
-            []
-          );
-
-    renderChannels();
-
-  }catch(error){
-
-    console.error(
-      "Channels:",
-      error
-    );
-
-  }
-
-}
-
-
-function renderChannels(){
-
-  $("channelsList")
-    .innerHTML =
-      channels.length
-
-        ? channels
-            .map(c => `
-
-              <div class="card">
-
-                <div class="channel">
-
-                  <div class="grow">
-
-                    <b>
-                      ${esc(
-                        c.name ||
-                        c.username ||
-                        c.chat_id
-                      )}
-                    </b>
-
-                    <div class="muted">
-                      ${esc(
-                        c.chat_id ||
-                        ""
-                      )}
-                    </div>
-
-                  </div>
-
-                  <span
-                    class="badge
-                    ${
-                      c.is_active !== false
-                        ? "green"
-                        : "red"
-                    }"
-                  >
-                    ${
-                      c.is_active !== false
-                        ? "ACTIVE"
-                        : "OFF"
-                    }
-                  </span>
-
-                </div>
-
-              </div>
-
-            `)
-            .join("")
-
-        : `
-          <div class="empty">
-            Channel / Group የለም።
-          </div>
-        `;
-
-}
-
-
-async function addChannel(){
-
-  const name =
-    $("channelName")
-      .value
-      .trim();
-
-  const chat_id =
-    $("channelChatId")
-      .value
-      .trim();
-
-  if(!chat_id){
-
-    alert(
-      "Chat ID ያስገቡ።"
-    );
-
-    return;
-
-  }
-
-  try{
-
-    await api(
-      API.channels,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            name,
-            chat_id
-          })
-        }
-    );
-
-    $("channelName")
-      .value = "";
-
-    $("channelChatId")
-      .value = "";
-
-    await loadChannels();
-
-  }catch(error){
-
-    alert(
-      "❌ " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   UI MESSAGE
-========================================================= */
-
-function showMessage(
-  id,
-  text,
-  type
-){
-
-  const element =
-    $(id);
-
-  element.textContent =
-    text;
-
-  element.className =
-    "message show " +
-    type;
-
 }
 
 
@@ -3842,64 +2295,360 @@ function showMessage(
 
 async function refreshAll(){
 
-  try{
+  /*
+    Promise.allSettled prevents one missing optional endpoint
+    from stopping the entire dashboard.
+  */
 
-    await Promise.all([
-      loadProducts(),
-      loadOrders(),
-      loadAds(),
-      loadEmployees(),
-      loadReports()
-    ]);
+  await Promise.allSettled([
+    loadProducts(),
+    loadOrders(),
+    loadAds(),
+    loadEmployees(),
+    loadReports(),
+    loadSettings()
+  ]);
 
-  }catch(error){
-
-    console.error(
-      "Refresh:",
-      error
-    );
-
-  }
-
+  updateStats();
+  renderHome();
 }
 
 
 /* =========================================================
-   START
+   PRODUCTS
 ========================================================= */
 
-checkLogin();
+function normalizeProducts(data){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  return (
+    data?.products ||
+    data?.items ||
+    data?.data ||
+    []
+  );
+}
 
 
-/*
-  Orders refresh.
-  Login is still required because
-  api() sends the Bearer token and
-  401 automatically returns to Login.
-*/
+async function loadProducts(){
 
-setInterval(
-  async () => {
+  try{
 
-    if(token){
+    const data = await api("/api/products");
 
-      try{
+    state.products = normalizeProducts(data);
 
-        await loadOrders();
+    renderProducts();
+    updateStats();
+    renderHome();
+    populateAdProducts();
 
-      }catch(error){
+  }catch(error){
 
-        console.error(error);
+    console.error("Products:",error);
 
-      }
+    state.products = [];
 
-    }
+    renderProductsError(
+      "Unable to load products: " + error.message
+    );
+  }
+}
 
-  },
-  15000
-);
 
-</script>
+function renderProductsError(message){
 
-</body>
-</html>
+  $("productsList").innerHTML = `
+    <div class="card">
+      <div style="color:#d02e35;font-size:13px">
+        ${esc(message)}
+      </div>
+    </div>
+  `;
+}
+
+
+function categoryLabel(category){
+
+  const labels = {
+    clothing:"አልባሳት",
+    electronics:"ኤሌክትሮኒክስ",
+    kids:"የህፃናት",
+    women:"የሴቶች",
+    home:"የቤት እቃዎች",
+    other:"ሌሎች"
+  };
+
+  return labels[category] || category || "ሌሎች";
+}
+
+
+function productImage(url){
+
+  if(!url){
+    return `
+      <div class="product-placeholder">
+        📦
+      </div>
+    `;
+  }
+
+  return `
+    <img
+      class="product-img"
+      src="${esc(url)}"
+      alt=""
+      loading="lazy"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+
+    <div class="product-placeholder"
+         style="display:none">
+      📦
+    </div>
+  `;
+}
+
+
+function renderProducts(){
+
+  const container = $("productsList");
+
+  if(!state.products.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">📦</div>
+        <div class="empty-title">
+          No products yet
+        </div>
+        <div class="empty-sub">
+          Add your first product.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = state.products.map(product=>{
+
+    const id = product.id;
+
+    return `
+      <div class="card">
+
+        <div class="product-row">
+
+          ${productImage(product.photo_url || product.photoUrl)}
+
+          <div class="product-info">
+
+            <div class="product-name">
+              ${esc(product.name || "Unnamed Product")}
+            </div>
+
+            <div class="product-meta">
+              ${esc(categoryLabel(product.category))}
+              · Stock ${money(product.stock)}
+            </div>
+
+            <div class="product-price">
+              ${money(product.sell_price)} ETB
+            </div>
+
+          </div>
+
+          <div class="row-actions">
+
+            <button class="icon-btn"
+                    title="Edit"
+                    onclick="editProduct('${esc(id)}')">
+              ✏️
+            </button>
+
+            <button class="icon-btn danger"
+                    title="Delete"
+                    onclick="deleteProduct('${esc(id)}')">
+              🗑
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }).join("");
+}
+
+
+function openNewProduct(){
+
+  $("productForm").reset();
+
+  $("productId").value = "";
+  $("pPhoto").value = "";
+
+  $("productModalTitle").textContent = "New Product";
+
+  $("productPhotoPreview").src = "";
+  $("productPhotoPreview").style.display = "none";
+
+  hideError("productFormError");
+
+  openModal("productModal");
+}
+
+
+function editProduct(id){
+
+  const product =
+    state.products.find(p=>String(p.id) === String(id));
+
+  if(!product){
+    toast("Product not found","error");
+    return;
+  }
+
+  $("productId").value = product.id || "";
+
+  $("pName").value =
+    product.name || "";
+
+  $("pCategory").value =
+    product.category || "other";
+
+  $("pBuyPrice").value =
+    product.buy_price ??
+    product.buyPrice ??
+    0;
+
+  $("pSellPrice").value =
+    product.sell_price ??
+    product.sellPrice ??
+    0;
+
+  $("pStock").value =
+    product.stock ?? 0;
+
+  $("pDescription").value =
+    product.description || "";
+
+  const photo =
+    product.photo_url ||
+    product.photoUrl ||
+    "";
+
+  $("pPhoto").value = photo;
+
+  if(photo){
+
+    $("productPhotoPreview").src = photo;
+    $("productPhotoPreview").style.display = "block";
+
+  }else{
+
+    $("productPhotoPreview").src = "";
+    $("productPhotoPreview").style.display = "none";
+
+  }
+
+  /*
+    Important:
+    We intentionally reset only the file input.
+    Existing photo URL remains in pPhoto.
+  */
+
+  $("productPhotoFile").value = "";
+
+  $("productModalTitle").textContent = "Edit Product";
+
+  hideError("productFormError");
+
+  openModal("productModal");
+}
+
+
+async function uploadProductPhoto(){
+
+  const input = $("productPhotoFile");
+
+  if(!input.files || !input.files.length){
+    return $("pPhoto").value || "";
+  }
+
+  const file = input.files[0];
+
+  if(file.size > 8 * 1024 * 1024){
+    throw new Error("Photo is larger than 8MB.");
+  }
+
+  const form = new FormData();
+
+  /*
+    IMPORTANT FIX:
+    Backend expects field name "photo", not "file".
+  */
+
+  form.append("photo",file);
+
+  const data = await api("/api/upload",{
+    method:"POST",
+    body:form
+  });
+
+  const url =
+    data.url ||
+    data.photo_url ||
+    data.photoUrl ||
+    data.publicUrl ||
+    data.path ||
+    "";
+
+  if(!url){
+    throw new Error("Photo uploaded but no URL was returned.");
+  }
+
+  return url;
+}
+
+
+async function saveProduct(event){
+
+  event.preventDefault();
+
+  hideError("productFormError");
+
+  const button = $("productSaveButton");
+
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try{
+
+    const id =
+      $("productId").value.trim();
+
+    const photoUrl =
+      await uploadProductPhoto();
+
+    const payload = {
+
+      name:$("pName").value.trim(),
+
+      category:$("pCategory").value,
+
+      buy_price:Number(
+        $("pBuyPrice").value || 0
+      ),
+
+      sell_price:Number(
+        $("pSellPrice").value || 0
+      ),
+
+      stock:Number(
+        $("pStock
