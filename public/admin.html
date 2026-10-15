@@ -2651,4 +2651,2001 @@ async function saveProduct(event){
       ),
 
       stock:Number(
-        $("pStock
+        $("pStock").value || 0
+      ),
+
+      photo_url:photoUrl,
+
+      description:$("pDescription").value.trim()
+
+    };
+
+
+    if(!payload.name){
+      throw new Error("Product name is required.");
+    }
+
+    if(payload.sell_price < 0){
+      throw new Error("Sell price cannot be negative.");
+    }
+
+    if(payload.stock < 0){
+      throw new Error("Stock cannot be negative.");
+    }
+
+
+    if(id){
+
+      /*
+        IMPORTANT FIX:
+        Product edit uses PUT, not PATCH.
+      */
+
+      await api(
+        `/api/products/${encodeURIComponent(id)}`,
+        {
+          method:"PUT",
+          body:payload
+        }
+      );
+
+      toast("Product updated successfully","success");
+
+    }else{
+
+      await api("/api/products",{
+        method:"POST",
+        body:payload
+      });
+
+      toast("Product added successfully","success");
+
+    }
+
+
+    closeModal("productModal");
+
+    await loadProducts();
+
+    updateStats();
+    renderHome();
+
+  }catch(error){
+
+    showError(
+      "productFormError",
+      error.message || "Could not save product."
+    );
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "Save Product";
+
+  }
+}
+
+
+async function deleteProduct(id){
+
+  const product =
+    state.products.find(
+      p=>String(p.id) === String(id)
+    );
+
+  const name =
+    product?.name || "this product";
+
+  if(!confirm(
+    `Delete "${name}"?\n\nይህን ምርት መሰረዝ ይፈልጋሉ?`
+  )){
+    return;
+  }
+
+  try{
+
+    await api(
+      `/api/products/${encodeURIComponent(id)}`,
+      {
+        method:"DELETE"
+      }
+    );
+
+    toast("Product deleted","success");
+
+    await loadProducts();
+
+    updateStats();
+    renderHome();
+
+  }catch(error){
+
+    toast(
+      error.message || "Could not delete product.",
+      "error"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function normalizeOrders(data){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  return (
+    data?.orders ||
+    data?.items ||
+    data?.data ||
+    []
+  );
+}
+
+
+async function loadOrders(){
+
+  try{
+
+    const data = await api("/api/orders");
+
+    state.orders = normalizeOrders(data);
+
+    renderOrders();
+    updateStats();
+    renderHome();
+
+  }catch(error){
+
+    console.error("Orders:",error);
+
+    state.orders = [];
+
+    $("ordersList").innerHTML = `
+      <div class="card">
+        <div style="color:#d02e35;font-size:13px">
+          ${esc(error.message)}
+        </div>
+      </div>
+    `;
+  }
+}
+
+
+function orderStatusLabel(status){
+
+  const labels = {
+    NEW:"New",
+    PENDING:"Pending",
+    PAYMENT_PENDING:"Payment Pending",
+    PAYMENT_SUBMITTED:"Receipt Submitted",
+    CONFIRMED:"Confirmed",
+    DELIVERY_PENDING:"Delivery Pending",
+    OUT_FOR_DELIVERY:"Out for Delivery",
+    DELIVERED:"Delivered",
+    REJECTED:"Rejected",
+    CANCELLED:"Cancelled"
+  };
+
+  return labels[status] || status || "Pending";
+}
+
+
+function orderBadge(status){
+
+  const s =
+    String(status || "")
+      .toUpperCase();
+
+  if(
+    s === "DELIVERED"
+  ){
+    return "green";
+  }
+
+  if(
+    s === "REJECTED" ||
+    s === "CANCELLED"
+  ){
+    return "red";
+  }
+
+  if(
+    s === "CONFIRMED" ||
+    s === "DELIVERY_PENDING" ||
+    s === "OUT_FOR_DELIVERY"
+  ){
+    return "blue";
+  }
+
+  if(
+    s === "PAYMENT_PENDING" ||
+    s === "PAYMENT_SUBMITTED"
+  ){
+    return "orange";
+  }
+
+  return "gray";
+}
+
+
+function getOrderTotal(order){
+
+  return Number(
+    order.total_amount ??
+    order.total ??
+    order.amount ??
+    (
+      Number(order.sell_price || 0) *
+      Number(order.quantity || 1)
+    ) ??
+    0
+  );
+}
+
+
+function getCustomerName(order){
+
+  return (
+    order.customer_name ||
+    order.customerName ||
+    order.name ||
+    order.delivery_name ||
+    "Customer"
+  );
+}
+
+
+function getCustomerPhone(order){
+
+  return (
+    order.customer_phone ||
+    order.customerPhone ||
+    order.phone ||
+    ""
+  );
+}
+
+
+function getOrderProductName(order){
+
+  return (
+    order.product_name ||
+    order.productName ||
+    order.product?.name ||
+    "Product"
+  );
+}
+
+
+function isPendingOrder(order){
+
+  const status =
+    String(order.status || "")
+      .toUpperCase();
+
+  /*
+    DELIVERY_PENDING means payment/order has already
+    passed confirmation and is waiting for delivery.
+    It should not remain in "Pending Orders".
+  */
+
+  return ![
+    "CONFIRMED",
+    "DELIVERY_PENDING",
+    "OUT_FOR_DELIVERY",
+    "DELIVERED",
+    "REJECTED",
+    "CANCELLED"
+  ].includes(status);
+}
+
+
+function isSale(order){
+
+  const status =
+    String(order.status || "")
+      .toUpperCase();
+
+  return [
+    "CONFIRMED",
+    "DELIVERY_PENDING",
+    "OUT_FOR_DELIVERY",
+    "DELIVERED"
+  ].includes(status);
+}
+
+
+function renderOrders(){
+
+  const container = $("ordersList");
+
+  if(!state.orders.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">🛒</div>
+        <div class="empty-title">
+          No orders
+        </div>
+        <div class="empty-sub">
+          እስካሁን ትዕዛዝ የለም።
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const sorted =
+    [...state.orders].sort((a,b)=>{
+      const da =
+        new Date(
+          a.created_at ||
+          a.createdAt ||
+          0
+        ).getTime();
+
+      const db =
+        new Date(
+          b.created_at ||
+          b.createdAt ||
+          0
+        ).getTime();
+
+      return db - da;
+    });
+
+
+  container.innerHTML =
+    sorted.map(order=>{
+
+      const status =
+        String(order.status || "PENDING")
+          .toUpperCase();
+
+      const receipt =
+        order.receipt_url ||
+        order.receiptUrl ||
+        order.payment_receipt ||
+        order.receipt ||
+        "";
+
+      const total =
+        getOrderTotal(order);
+
+      return `
+        <div class="order-card">
+
+          <div class="order-top">
+
+            <div>
+
+              <div class="order-id">
+                #${esc(
+                  order.id ??
+                  order.order_id ??
+                  "ORDER"
+                )}
+              </div>
+
+              <div class="order-customer">
+                ${esc(getCustomerName(order))}
+              </div>
+
+            </div>
+
+            <span class="badge ${orderBadge(status)}">
+              ${esc(orderStatusLabel(status))}
+            </span>
+
+          </div>
+
+
+          <div class="order-meta">
+            📦 ${esc(getOrderProductName(order))}
+            · Qty ${esc(order.quantity ?? 1)}
+          </div>
+
+          ${
+            getCustomerPhone(order)
+              ? `
+                <div class="order-meta">
+                  📞 ${esc(getCustomerPhone(order))}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            order.address ||
+            order.destination ||
+            order.delivery_address
+              ? `
+                <div class="order-meta">
+                  📍 ${esc(
+                    order.address ||
+                    order.destination ||
+                    order.delivery_address
+                  )}
+                </div>
+              `
+              : ""
+          }
+
+          <div class="order-total">
+            ${money(total)} ETB
+          </div>
+
+
+          ${
+            receipt
+              ? `
+                <div style="margin-top:9px">
+                  <a
+                    href="${esc(receipt)}"
+                    target="_blank"
+                    rel="noopener"
+                    class="badge blue">
+                    🧾 View Receipt
+                  </a>
+                </div>
+              `
+              : ""
+          }
+
+
+          <div class="order-actions">
+
+            <button class="action-btn"
+                    onclick="openOrder('${esc(order.id)}')">
+              View
+            </button>
+
+            ${
+              isPendingOrder(order)
+                ? `
+                  <button
+                    class="action-btn success"
+                    onclick="confirmOrder('${esc(order.id)}')">
+                    ✓ Confirm
+                  </button>
+
+                  <button
+                    class="action-btn danger"
+                    onclick="rejectOrder('${esc(order.id)}')">
+                    ✕ Reject
+                  </button>
+                `
+                : ""
+            }
+
+            ${
+              status === "DELIVERY_PENDING"
+                ? `
+                  <button
+                    class="action-btn"
+                    onclick="markDelivered('${esc(order.id)}')">
+                    🚚 Delivered
+                  </button>
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+function openOrder(id){
+
+  const order =
+    state.orders.find(
+      o=>String(o.id) === String(id)
+    );
+
+  if(!order){
+    toast("Order not found","error");
+    return;
+  }
+
+  state.currentOrder = order;
+
+  const status =
+    String(order.status || "PENDING")
+      .toUpperCase();
+
+  const receipt =
+    order.receipt_url ||
+    order.receiptUrl ||
+    order.payment_receipt ||
+    order.receipt ||
+    "";
+
+  const total =
+    getOrderTotal(order);
+
+  $("orderDetails").innerHTML = `
+
+    <div class="card">
+
+      <div class="settings-title">
+        Order #${esc(order.id)}
+      </div>
+
+      <div style="margin-bottom:10px">
+        <span class="badge ${orderBadge(status)}">
+          ${esc(orderStatusLabel(status))}
+        </span>
+      </div>
+
+      <div class="order-meta">
+        Customer
+      </div>
+
+      <div style="font-weight:800;margin-top:3px">
+        ${esc(getCustomerName(order))}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Phone
+      </div>
+
+      <div style="font-weight:700;margin-top:3px">
+        ${esc(getCustomerPhone(order) || "—")}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Product
+      </div>
+
+      <div style="font-weight:700;margin-top:3px">
+        ${esc(getOrderProductName(order))}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Quantity
+      </div>
+
+      <div style="font-weight:700;margin-top:3px">
+        ${esc(order.quantity ?? 1)}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Destination
+      </div>
+
+      <div style="font-weight:700;margin-top:3px">
+        ${esc(
+          order.address ||
+          order.destination ||
+          order.delivery_address ||
+          "—"
+        )}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Payment Status
+      </div>
+
+      <div style="font-weight:700;margin-top:3px">
+        ${esc(
+          order.payment_status ||
+          order.paymentStatus ||
+          "—"
+        )}
+      </div>
+
+      <div class="order-meta"
+           style="margin-top:12px">
+        Total
+      </div>
+
+      <div class="order-total">
+        ${money(total)} ETB
+      </div>
+
+      ${
+        receipt
+          ? `
+            <a
+              href="${esc(receipt)}"
+              target="_blank"
+              rel="noopener"
+              class="action-btn"
+              style="display:inline-block;margin-top:13px">
+              🧾 Open Receipt
+            </a>
+          `
+          : `
+            <div style="margin-top:13px;color:#8a94a7;font-size:12px">
+              No receipt uploaded.
+            </div>
+          `
+      }
+
+    </div>
+
+
+    ${
+      isPendingOrder(order)
+        ? `
+          <div class="modal-actions">
+
+            <button
+              class="action-btn danger"
+              onclick="rejectOrder('${esc(order.id)}');closeModal('orderModal')">
+              ✕ Reject
+            </button>
+
+            <button
+              class="action-btn success"
+              onclick="confirmOrder('${esc(order.id)}');closeModal('orderModal')">
+              ✓ Confirm Payment / Order
+            </button>
+
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      status === "DELIVERY_PENDING"
+        ? `
+          <div style="margin-top:12px">
+
+            <button
+              class="primary-btn"
+              onclick="markDelivered('${esc(order.id)}');closeModal('orderModal')">
+              🚚 Mark as Delivered
+            </button>
+
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+  openModal("orderModal");
+}
+
+
+/*
+  IMPORTANT:
+  Backend endpoint is:
+  PATCH /api/orders/:id/status
+
+  NOT:
+  PATCH /api/orders/:id
+*/
+
+async function updateOrderStatus(id,status){
+
+  await api(
+    `/api/orders/${encodeURIComponent(id)}/status`,
+    {
+      method:"PATCH",
+      body:{
+        status
+      }
+    }
+  );
+
+  await loadOrders();
+
+  updateStats();
+  renderHome();
+}
+
+
+async function confirmOrder(id){
+
+  if(!confirm(
+    "ይህን ትዕዛዝ እና ክፍያ ለማረጋገጥ እርግጠኛ ነዎት?"
+  )){
+    return;
+  }
+
+  try{
+
+    /*
+      Existing backend logic handles CONFIRMED:
+      payment_status -> CONFIRMED
+      order -> DELIVERY_PENDING
+      confirmation metadata
+    */
+
+    await updateOrderStatus(id,"CONFIRMED");
+
+    toast(
+      "Order/payment confirmed. Ready for delivery.",
+      "success"
+    );
+
+  }catch(error){
+
+    toast(
+      error.message || "Could not confirm order.",
+      "error"
+    );
+
+  }
+}
+
+
+async function rejectOrder(id){
+
+  if(!confirm(
+    "ይህን ትዕዛዝ ለመከልከል እርግጠኛ ነዎት?"
+  )){
+    return;
+  }
+
+  try{
+
+    await updateOrderStatus(id,"REJECTED");
+
+    toast("Order rejected","success");
+
+  }catch(error){
+
+    toast(
+      error.message || "Could not reject order.",
+      "error"
+    );
+
+  }
+}
+
+
+async function markDelivered(id){
+
+  if(!confirm(
+    "ይህ ትዕዛዝ ተረክቧል ብለው ማረጋገጥ ይፈልጋሉ?"
+  )){
+    return;
+  }
+
+  try{
+
+    await updateOrderStatus(id,"DELIVERED");
+
+    toast("Order marked as delivered","success");
+
+  }catch(error){
+
+    toast(
+      error.message || "Could not update delivery.",
+      "error"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   ADVERTISEMENTS
+========================================================= */
+
+function normalizeAds(data){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  return (
+    data?.advertisements ||
+    data?.ads ||
+    data?.items ||
+    data?.data ||
+    []
+  );
+}
+
+
+async function loadAds(){
+
+  try{
+
+    const data =
+      await optionalApi("/api/advertisements");
+
+    if(!data){
+
+      $("adsList").innerHTML = `
+        <div class="card empty">
+          <div class="empty-icon">📢</div>
+          <div class="empty-title">
+            Advertising API not available
+          </div>
+          <div class="empty-sub">
+            Server-side advertising endpoint is not available
+            in the current deployment.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    state.ads = normalizeAds(data);
+
+    renderAds();
+
+  }catch(error){
+
+    console.error("Ads:",error);
+
+  }
+}
+
+
+function renderAds(){
+
+  const container = $("adsList");
+
+  if(!state.ads.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">📢</div>
+        <div class="empty-title">
+          No advertisements
+        </div>
+        <div class="empty-sub">
+          Create a Telegram advertisement.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    state.ads.map(ad=>{
+
+      const image =
+        ad.photo_url ||
+        ad.photoUrl ||
+        "";
+
+      return `
+        <div class="ad-card">
+
+          <div style="display:flex;justify-content:space-between;gap:10px">
+
+            <div class="ad-title">
+              ${esc(ad.title || "Advertisement")}
+            </div>
+
+            <span class="badge ${
+              String(ad.status || "")
+                .toLowerCase() === "published"
+                  ? "green"
+                  : "gray"
+            }">
+              ${esc(ad.status || "draft")}
+            </span>
+
+          </div>
+
+          <div class="ad-text">
+            ${esc(ad.text || ad.message || "")}
+          </div>
+
+          ${
+            image
+              ? `
+                <img
+                  src="${esc(image)}"
+                  class="ad-image"
+                  alt=""
+                  onerror="this.style.display='none'">
+              `
+              : ""
+          }
+
+          <div class="order-actions">
+
+            ${
+              ad.id
+                ? `
+                  <button
+                    class="action-btn"
+                    onclick="publishAd('${esc(ad.id)}')">
+                    📤 Publish
+                  </button>
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+function populateAdProducts(){
+
+  const select = $("adProductId");
+
+  if(!select) return;
+
+  const current =
+    select.value;
+
+  select.innerHTML =
+    `<option value="">No Product</option>` +
+    state.products.map(product=>`
+      <option value="${esc(product.id)}">
+        ${esc(product.name || "Product")}
+      </option>
+    `).join("");
+
+  if(current){
+    select.value = current;
+  }
+}
+
+
+function openNewAd(){
+
+  $("adForm").reset();
+
+  $("adId").value = "";
+
+  $("adType").value = "text";
+
+  $("adButtonText").value =
+    "Open Catalog";
+
+  populateAdProducts();
+
+  hideError("adFormError");
+
+  $("adModalTitle").textContent =
+    "New Advertisement";
+
+  openModal("adModal");
+}
+
+
+async function saveAdvertisement(event){
+
+  event.preventDefault();
+
+  hideError("adFormError");
+
+  const button =
+    $("adSaveButton");
+
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try{
+
+    const channelText =
+      $("adChatId").value.trim();
+
+    const channelIds =
+      channelText
+        ? channelText
+            .split(",")
+            .map(x=>x.trim())
+            .filter(Boolean)
+        : [];
+
+    const productId =
+      $("adProductId").value || null;
+
+
+    /*
+      Send both the modern advertisement fields and
+      the simple chat-id field for compatibility with
+      different existing backend versions.
+    */
+
+    const payload = {
+
+      ad_type:$("adType").value,
+
+      product_id:productId,
+
+      title:$("adTitle").value.trim(),
+
+      text:$("adText").value.trim(),
+
+      button_text:
+        $("adButtonText").value.trim() ||
+        "Open Catalog",
+
+      photo_url:
+        $("adPhotoUrl").value.trim(),
+
+      channel_ids:channelIds,
+
+      telegram_chat_id:
+        channelIds[0] || ""
+
+    };
+
+
+    if(!payload.title && !payload.text){
+      throw new Error(
+        "Please enter advertisement title or message."
+      );
+    }
+
+
+    await api("/api/advertisements",{
+      method:"POST",
+      body:payload
+    });
+
+
+    closeModal("adModal");
+
+    toast(
+      "Advertisement saved successfully",
+      "success"
+    );
+
+    await loadAds();
+
+  }catch(error){
+
+    showError(
+      "adFormError",
+      error.message ||
+      "Could not save advertisement."
+    );
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "Save Advertisement";
+
+  }
+}
+
+
+async function publishAd(id){
+
+  if(!confirm(
+    "ይህን ማስታወቂያ Telegram ላይ ለመላክ እርግጠኛ ነዎት?"
+  )){
+    return;
+  }
+
+  try{
+
+    await api(
+      `/api/advertisements/${encodeURIComponent(id)}/publish`,
+      {
+        method:"POST"
+      }
+    );
+
+    toast(
+      "Advertisement published",
+      "success"
+    );
+
+    await loadAds();
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Could not publish advertisement.",
+      "error"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   EMPLOYEES
+========================================================= */
+
+function normalizeEmployees(data){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  return (
+    data?.employees ||
+    data?.items ||
+    data?.data ||
+    []
+  );
+}
+
+
+async function loadEmployees(){
+
+  try{
+
+    const data =
+      await optionalApi("/api/employees");
+
+    if(!data){
+
+      $("employeesList").innerHTML = `
+        <div class="card empty">
+          <div class="empty-icon">👥</div>
+          <div class="empty-title">
+            Employee API not available
+          </div>
+          <div class="empty-sub">
+            Check the current server deployment.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    state.employees =
+      normalizeEmployees(data);
+
+    renderEmployees();
+
+  }catch(error){
+
+    console.error("Employees:",error);
+
+  }
+}
+
+
+function renderEmployees(){
+
+  const container =
+    $("employeesList");
+
+  if(!state.employees.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">
+          No employees
+        </div>
+        <div class="empty-sub">
+          Create an employee and assign permissions.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    state.employees.map(employee=>{
+
+      const permissions =
+        Array.isArray(employee.permissions)
+          ? employee.permissions
+          : [];
+
+      return `
+        <div class="card">
+
+          <div style="display:flex;justify-content:space-between;gap:10px">
+
+            <div>
+
+              <div class="product-name">
+                ${esc(
+                  employee.name ||
+                  employee.username ||
+                  "Employee"
+                )}
+              </div>
+
+              <div class="product-meta">
+                @${esc(employee.username || "")}
+                · ${esc(employee.role || "employee")}
+              </div>
+
+            </div>
+
+            <span class="badge blue">
+              ${permissions.length} permissions
+            </span>
+
+          </div>
+
+          ${
+            permissions.length
+              ? `
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+                  ${permissions.map(permission=>`
+                    <span class="badge gray">
+                      ${esc(permission)}
+                    </span>
+                  `).join("")}
+                </div>
+              `
+              : `
+                <div class="product-meta"
+                     style="margin-top:10px">
+                  No permissions assigned.
+                </div>
+              `
+          }
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+function openNewEmployee(){
+
+  $("employeeForm").reset();
+
+  document
+    .querySelectorAll(".permission")
+    .forEach(box=>{
+      box.checked = false;
+    });
+
+  hideError("employeeFormError");
+
+  openModal("employeeModal");
+}
+
+
+async function saveEmployee(event){
+
+  event.preventDefault();
+
+  hideError("employeeFormError");
+
+  const button =
+    $("employeeSaveButton");
+
+  button.disabled = true;
+  button.textContent = "Creating...";
+
+  try{
+
+    const permissions =
+      Array.from(
+        document.querySelectorAll(
+          ".permission:checked"
+        )
+      ).map(input=>input.value);
+
+
+    const payload = {
+
+      name:$("eName").value.trim(),
+
+      username:$("eUsername").value.trim(),
+
+      password:$("ePassword").value,
+
+      role:$("eRole").value,
+
+      permissions
+
+    };
+
+
+    if(!payload.name){
+      throw new Error("Employee name is required.");
+    }
+
+    if(!payload.username){
+      throw new Error("Username is required.");
+    }
+
+    if(!payload.password){
+      throw new Error("Password is required.");
+    }
+
+
+    await api("/api/employees",{
+      method:"POST",
+      body:payload
+    });
+
+
+    closeModal("employeeModal");
+
+    toast(
+      "Employee created successfully",
+      "success"
+    );
+
+    await loadEmployees();
+
+  }catch(error){
+
+    showError(
+      "employeeFormError",
+      error.message ||
+      "Could not create employee."
+    );
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "Create Employee";
+
+  }
+}
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+async function loadReports(){
+
+  /*
+    Try backend reports first.
+    If not available, calculate safe dashboard totals
+    from the data already loaded.
+  */
+
+  const data =
+    await optionalApi("/api/reports");
+
+  if(data){
+
+    state.reports =
+      data.report ||
+      data.reports ||
+      data;
+
+  }else{
+
+    state.reports = null;
+
+  }
+
+  calculateLocalReport();
+
+  updateStats();
+}
+
+
+function calculateLocalReport(){
+
+  const saleOrders =
+    state.orders.filter(isSale);
+
+  let sales = 0;
+  let profit = 0;
+
+  saleOrders.forEach(order=>{
+
+    const quantity =
+      Number(order.quantity || 1);
+
+    const total =
+      getOrderTotal(order);
+
+    sales += total;
+
+    const buyPrice =
+      Number(
+        order.buy_price ??
+        order.buyPrice ??
+        order.product?.buy_price ??
+        0
+      );
+
+    const sellPrice =
+      Number(
+        order.sell_price ??
+        order.sellPrice ??
+        order.product?.sell_price ??
+        0
+      );
+
+    /*
+      If order already has explicit profit, prefer it.
+    */
+
+    if(order.profit != null){
+
+      profit += Number(order.profit || 0);
+
+    }else if(
+      buyPrice > 0 ||
+      sellPrice > 0
+    ){
+
+      profit +=
+        (sellPrice - buyPrice) *
+        quantity;
+
+    }
+
+  });
+
+
+  $("reportSales").textContent =
+    money(sales);
+
+  $("reportProfit").textContent =
+    money(profit);
+
+  $("reportOrders").textContent =
+    saleOrders.length;
+
+  $("reportStock").textContent =
+    state.products.reduce(
+      (sum,p)=>
+        sum + Number(p.stock || 0),
+      0
+    );
+
+
+  $("profitDetails").innerHTML = `
+    <div>
+      Total sales:
+      <strong>${money(sales)} ETB</strong>
+    </div>
+
+    <div style="margin-top:8px">
+      Estimated profit:
+      <strong>${money(profit)} ETB</strong>
+    </div>
+
+    <div style="margin-top:8px">
+      Completed/confirmed orders:
+      <strong>${saleOrders.length}</strong>
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  const products =
+    state.products || [];
+
+  const orders =
+    state.orders || [];
+
+
+  $("productCount").textContent =
+    products.length;
+
+
+  const pending =
+    orders.filter(isPendingOrder).length;
+
+  $("pendingCount").textContent =
+    pending;
+
+
+  const sales =
+    orders
+      .filter(isSale)
+      .reduce(
+        (sum,order)=>
+          sum + getOrderTotal(order),
+        0
+      );
+
+  $("salesTotal").textContent =
+    money(sales);
+
+
+  const stock =
+    products.reduce(
+      (sum,product)=>
+        sum + Number(product.stock || 0),
+      0
+    );
+
+  $("stockTotal").textContent =
+    money(stock);
+
+
+  calculateLocalReport();
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function renderHome(){
+
+  renderHomeProducts();
+  renderHomeOrders();
+
+}
+
+
+function renderHomeProducts(){
+
+  const container =
+    $("homeProducts");
+
+  const recent =
+    [...state.products]
+      .slice(0,5);
+
+
+  if(!recent.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">📦</div>
+        <div class="empty-title">
+          No products yet
+        </div>
+        <div class="empty-sub">
+          Add a product to get started.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    recent.map(product=>`
+
+      <div class="card">
+
+        <div class="product-row">
+
+          ${productImage(
+            product.photo_url ||
+            product.photoUrl
+          )}
+
+          <div class="product-info">
+
+            <div class="product-name">
+              ${esc(product.name || "Product")}
+            </div>
+
+            <div class="product-meta">
+              ${esc(categoryLabel(product.category))}
+              · Stock ${money(product.stock)}
+            </div>
+
+            <div class="product-price">
+              ${money(product.sell_price)} ETB
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+function renderHomeOrders(){
+
+  const container =
+    $("homeOrders");
+
+  const pending =
+    state.orders
+      .filter(isPendingOrder)
+      .slice(0,5);
+
+
+  if(!pending.length){
+
+    container.innerHTML = `
+      <div class="card empty">
+        <div class="empty-icon">✅</div>
+        <div class="empty-title">
+          No pending orders
+        </div>
+        <div class="empty-sub">
+          የሚጠብቅ ትዕዛዝ የለም።
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    pending.map(order=>`
+
+      <div class="order-card">
+
+        <div class="order-top">
+
+          <div>
+
+            <div class="order-id">
+              #${esc(order.id)}
+            </div>
+
+            <div class="order-customer">
+              ${esc(getCustomerName(order))}
+            </div>
+
+          </div>
+
+          <span class="badge orange">
+            ${esc(
+              orderStatusLabel(
+                order.status
+              )
+            )}
+          </span>
+
+        </div>
+
+        <div class="order-meta">
+          ${esc(getOrderProductName(order))}
+          · Qty ${esc(order.quantity ?? 1)}
+        </div>
+
+        <div class="order-total">
+          ${money(getOrderTotal(order))} ETB
+        </div>
+
+        <div class="order-actions">
+
+          <button class="action-btn"
+                  onclick="openOrder('${esc(order.id)}')">
+            View
+          </button>
+
+          <button class="action-btn success"
+                  onclick="confirmOrder('${esc(order.id)}')">
+            ✓ Confirm
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+async function loadSettings(){
+
+  /*
+    Settings are optional so that an unavailable endpoint
+    does not break products/orders/dashboard.
+  */
+
+  const payment =
+    await optionalApi("/api/payment-settings");
+
+  if(payment){
+
+    const settings =
+      payment.settings ||
+      payment;
+
+    $("paymentInstructions").value =
+      settings.instructions ||
+      settings.payment_instructions ||
+      settings.description ||
+      "";
+  }
+
+
+  const telegram =
+    await optionalApi("/api/telegram-settings");
+
+  if(telegram){
+
+    const settings =
+      telegram.settings ||
+      telegram;
+
+    $("telegramAdminChatId").value =
+      settings.admin_chat_id ||
+      settings.chat_id ||
+      settings.telegram_chat_id ||
+      "";
+
+    $("telegramBotUsername").value =
+      settings.bot_username ||
+      settings.telegram_bot_username ||
+      "uni_market_shop_bot";
+  }
+}
+
+
+async function savePaymentSettings(event){
+
+  event.preventDefault();
+
+  try{
+
+    await api("/api/payment-settings",{
+      method:"POST",
+      body:{
+        instructions:
+          $("paymentInstructions").value.trim()
+      }
+    });
+
+    toast(
+      "Payment settings saved",
+      "success"
+    );
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Could not save payment settings.",
+      "error"
+    );
+
+  }
+}
+
+
+async function saveTelegramSettings(event){
+
+  event.preventDefault();
+
+  try{
+
+    await api("/api/telegram-settings",{
+      method:"POST",
+      body:{
+        admin_chat_id:
+          $("telegramAdminChatId").value.trim(),
+
+        bot_username:
+          $("telegramBotUsername").value.trim()
+      }
+    });
+
+    toast(
+      "Telegram settings saved",
+      "success"
+    );
+
+  }catch(error){
+
+    toast(
+      error.message ||
+      "Could not save Telegram settings.",
+      "error"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id){
+
+  const modal = $(id);
+
+  if(modal){
+    modal.classList.add("show");
+  }
+}
+
+
+function closeModal(id){
+
+  const modal = $(id);
+
+  if(modal){
+    modal.classList.remove("show");
+  }
+}
+
+
+/* =========================================================
+   PHOTO PREVIEW
+========================================================= */
+
+function resetPhotoPreview(){
+
+  $("productPhotoFile").value = "";
+
+  $("productPhotoPreview").src = "";
+
+  $("productPhotoPreview").style.display =
+    "none";
+}
+
+
+$("productPhotoFile")
+  .addEventListener("change",function(){
+
+    const file =
+      this.files &&
+      this.files[0];
+
+    if(!file){
+      return;
+    }
+
+    if(file.size > 8 * 1024 * 1024){
+
+      toast(
+        "Photo must be 8MB or smaller.",
+        "error"
+      );
+
+      this.value = "";
+
+      return;
+    }
+
+
+    const reader =
+      new FileReader();
+
+    reader.onload = event=>{
+
+      $("productPhotoPreview").src =
+        event.target.result;
+
+      $("productPhotoPreview").style.display =
+        "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+
+/* =========================================================
+   EVENT LISTENERS
+========================================================= */
+
+$("loginForm")
+  .addEventListener("submit",event=>{
+
+    event.preventDefault();
+
+    login(
+      $("loginUsername").value.trim(),
+      $("loginPassword").value
+    );
+
+  });
+
+
+$("productForm")
+  .addEventListener(
+    "submit",
+    saveProduct
+  );
+
+
+$("adForm")
+  .addEventListener(
+    "submit",
+    saveAdvertisement
+  );
+
+
+$("employeeForm")
+  .addEventListener(
+    "submit",
+    saveEmployee
+  );
+
+
+$("paymentSettingsForm")
+  .addEventListener(
+    "submit",
+    savePaymentSettings
+  );
+
+
+$("telegramSettingsForm")
+  .addEventListener(
+    "submit",
+    saveTelegramSettings
+);
+
+
+/* =========================================================
+   CLOSE MODALS WHEN BACKDROP IS CLICKED
+========================================================= */
+
+document
+  .querySelectorAll(".modal-backdrop")
+  .forEach(backdrop=>{
+
+    backdrop.addEventListener(
+      "click",
+      event=>{
+
+        if(event.target === backdrop){
+          backdrop.classList.remove("show");
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   ESC KEY
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(event.key !== "Escape"){
+      return;
+    }
+
+    document
+      .querySelectorAll(".modal-backdrop.show")
+      .forEach(modal=>{
+        modal.classList.remove("show");
+      });
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+checkAuth();
+
+</script>
+
+</body>
+</html>
